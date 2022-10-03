@@ -12,6 +12,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,7 +21,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity(name = "USERS")
+@Entity
 public class Users implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -43,9 +45,11 @@ public class Users implements Serializable {
 	private Roles roles;
 
 	@OneToMany(mappedBy = "users")
+	@JsonIgnore
 	private Set<Customer> customer;
 
 	@OneToMany(mappedBy = "users")
+	@JsonIgnore
 	private Set<Personnel> personnel;
 
 }

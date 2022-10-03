@@ -12,6 +12,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,7 +21,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity(name = "SERVICESS")
+@Entity
 public class Servicess implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -42,9 +44,11 @@ public class Servicess implements Serializable {
 	private int status;
 
 	@OneToMany(mappedBy = "servicess")
+	@JsonIgnore
 	private Set<ServiceDetails> serviceDetails;
 
 	@OneToMany(mappedBy = "servicess")
+	@JsonIgnore
 	private Set<ServiceAvailable> serviceAvailable;
 
 	@ManyToOne(optional = false)

@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity(name = "SERVICE_DETAILS")
+@Entity
 public class ServiceDetails implements Serializable {
 
 	private static final long serialVersionUID = 1L;

@@ -10,6 +10,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity(name = "KIND_OF_ROOM")
+@Entity
 public class KindOfRoom implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -37,6 +39,7 @@ public class KindOfRoom implements Serializable {
 	private int status;
 
 	@OneToMany(mappedBy = "kindOfRoom")
+	@JsonIgnore
 	private Set<Rooms> rooms;
 
 }

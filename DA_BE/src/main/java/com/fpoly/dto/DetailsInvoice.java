@@ -13,6 +13,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity(name = "DETAILS_INVOICE")
+@Entity
 public class DetailsInvoice implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -44,9 +46,11 @@ public class DetailsInvoice implements Serializable {
 	private Bills bills;
 
 	@OneToMany(mappedBy = "detailsInvoice")
+	@JsonIgnore
 	private Set<ServiceDetails> serviceDetails;
 
 	@OneToMany(mappedBy = "detailsInvoice")
+	@JsonIgnore
 	private Set<ServiceAvailable> serviceAvailable;
 
 	@ManyToOne(optional = false)
