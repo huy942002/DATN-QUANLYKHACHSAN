@@ -3,9 +3,11 @@
  */
 package com.fpoly.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -13,19 +15,31 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.fpoly.services.SecurityUserDetails;
+
 /**
  *
  * @author trucnv 
  *
  */
-@SuppressWarnings("deprecation")
+
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-//	@Autowired
-//	private SecurityUserDetailsService userDetailsService;
+	@Autowired
+	private SecurityUserDetails userDetailsService;
+	
+	/** Public URLs. */
+	private static final String[] PUBLIC_MATCHERS = {
+	        "/angularjs/**",
+	        "/css/**",
+	        "/font-awesome/**",
+	        "/images/**",
+	        "/js/**",
+	        "/style/**"
+	};
 //	
 //	@Autowired
 //	private TokenAuthService tokenAuthenticationService;
@@ -50,10 +64,22 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.csrf().disable();
-		http.authorizeRequests().antMatchers("/api/**").permitAll();
-		http.authorizeRequests().antMatchers("/api/login").permitAll().anyRequest().authenticated();
-//				.and()
-
+		http.authorizeRequests()
+		.antMatchers(PUBLIC_MATCHERS).permitAll()
+		.antMatchers("/authenticate").permitAll()
+		.antMatchers("/signup").permitAll()
+		.antMatchers("/user/**").authenticated()
+		.antMatchers("/admin/**").hasAnyAuthority("DIRECTOR","STAFF")
+		.antMatchers("/api/**").hasAuthority("DIRECTOR")
+		.anyRequest().authenticated();
+//		.and()
+//		
+//		.formLogin().loginPage("/login")
+//		.usernameParameter("username")
+//		.passwordParameter("password")
+//        .defaultSuccessUrl("/")
+//        .failureUrl("/login?failed=true")
+//		.permitAll();
 				/**
 				 * make sure we use stateless session; session won't be used to store user's
 				 * state.
@@ -68,10 +94,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	}
 
-//	@Override
-//	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-//		auth.userDetailsService(userDetailsService).passwordEncoder(new BCryptPasswordEncoder());
-//
-//	}
+	@Override
+	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+		auth.userDetailsService(userDetailsService).passwordEncoder(new BCryptPasswordEncoder());
+
+	}
 
 }
