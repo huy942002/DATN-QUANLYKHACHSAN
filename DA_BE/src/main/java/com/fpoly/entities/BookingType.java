@@ -1,4 +1,5 @@
-package com.fpoly.dto;
+
+package com.fpoly.entities;
 
 import java.io.Serializable;
 import java.util.Set;
@@ -20,20 +21,24 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Roles implements Serializable {
+public class BookingType implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "ID", unique = true, nullable = false, precision = 10)
-	private int id;
-	
-	@Column(name = "ROLES", nullable = false, length = 6)
-	private String roles;
-	
-	@OneToMany(mappedBy = "roles")
+
+	@Column(name = "BOOTY_ID", unique = true, nullable = false, precision = 10)
+	private int bootyId;
+
+	@Column(name = "BOOKING_TYPE", nullable = false, length = 30)
+	private String bookingType;
+
+	@Column(name = "STATUSS", nullable = false, precision = 10)
+	private int statuss;
+
+	@OneToMany(mappedBy = "bookingType")
 	@JsonIgnore
-	private Set<Users> users;
+	private Set<Booking> booking;
 
 }

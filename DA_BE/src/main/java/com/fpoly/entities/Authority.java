@@ -1,16 +1,14 @@
-package com.fpoly.dto;
+package com.fpoly.entities;
 
 import java.io.Serializable;
-import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,7 +18,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class RentalTypes implements Serializable {
+public class Authority implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -29,14 +27,12 @@ public class RentalTypes implements Serializable {
 	@Column(name = "ID", unique = true, nullable = false, precision = 10)
 	private int id;
 
-	@Column(name = "NAME_OF_RENTAL_TYPE", nullable = false, length = 30)
-	private String nameOfRentalType;
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "ID_ROLES", nullable = false)
+	private Roles roles;
 
-	@Column(name = "STATUS", nullable = false, precision = 10)
-	private int status;
-
-	@OneToMany(mappedBy = "rentalTypes")
-	@JsonIgnore
-	private Set<DetailsInvoice> detailsInvoice;
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "ID_USER", nullable = false)
+	private Users users;
 
 }

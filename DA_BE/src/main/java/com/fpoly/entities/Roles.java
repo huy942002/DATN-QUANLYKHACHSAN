@@ -1,4 +1,4 @@
-package com.fpoly.dto;
+package com.fpoly.entities;
 
 import java.io.Serializable;
 import java.util.Set;
@@ -8,7 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.ManyToMany;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class KindOfRoom implements Serializable {
+public class Roles implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -29,17 +29,11 @@ public class KindOfRoom implements Serializable {
 	@Column(name = "ID", unique = true, nullable = false, precision = 10)
 	private int id;
 
-	@Column(name = "ROOM_TYPE_NAME", nullable = false, length = 30)
-	private String roomTypeName;
+	@Column(name = "ROLES", nullable = false, length = 6)
+	private String roles;
 
-	@Column(name = "NOTE", nullable = false, length = 30)
-	private String note;
-
-	@Column(name = "STATUS", nullable = false, precision = 10)
-	private int status;
-
-	@OneToMany(mappedBy = "kindOfRoom")
-	@JsonIgnore
-	private Set<Rooms> rooms;
+    @ManyToMany(mappedBy = "roles")
+    @JsonIgnore
+    private Set<Users> users;
 
 }

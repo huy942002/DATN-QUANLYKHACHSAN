@@ -1,4 +1,4 @@
-package com.fpoly.dto;
+package com.fpoly.entities;
 
 import java.io.Serializable;
 
@@ -18,24 +18,27 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class FacilitiesDetails implements Serializable {
+public class ServiceDetails implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "ID", unique = true, nullable = false, precision = 10)
-	private int id;
+	@Column(name = "SERDE_ID", unique = true, nullable = false, precision = 10)
+	private int serdeId;
 
-	@Column(name = "STATUS", nullable = false, precision = 10)
-	private int status;
+	@Column(name = "QUANTITY", nullable = false, precision = 10)
+	private int quantity;
+
+	@Column(name = "STATUSS", nullable = false, precision = 10)
+	private int statuss;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "ID_FACILITIES", nullable = false)
-	private Facilities facilities;
+	@JoinColumn(name = "BILL_DETAILS_ID", nullable = false)
+	private BillDetails billDetails;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "ID_ROOMS", nullable = false)
-	private Rooms rooms;
+	@JoinColumn(name = "SERVICE_ID", nullable = false)
+	private Servicess servicess;
 
 }

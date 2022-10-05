@@ -1,4 +1,4 @@
-package com.fpoly.dto;
+package com.fpoly.entities;
 
 import java.io.Serializable;
 import java.util.Set;
@@ -20,23 +20,23 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class PaymentType implements Serializable {
+public class RentalTypes implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "ID", unique = true, nullable = false, precision = 10)
-	private int id;
+	@Column(name = "RETY_ID", unique = true, nullable = false, precision = 10)
+	private int retyId;
 
-	@Column(name = "NAME_PAYMENT_TYPE", nullable = false, length = 15)
-	private String namePaymentType;
+	@Column(name = "RENTAL_TYPE", nullable = false, length = 30)
+	private String rentalType;
 
-	@Column(name = "STATUS", nullable = false, precision = 10)
-	private int status;
+	@Column(name = "STATUSS", nullable = false, precision = 10)
+	private int statuss;
 
-	@OneToMany(mappedBy = "paymentType")
+	@OneToMany(mappedBy = "rentalTypes")
 	@JsonIgnore
-	private Set<Bills> bills;
+	private Set<BillDetails> billDetails;
 
 }

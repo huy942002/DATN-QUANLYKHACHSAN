@@ -15,8 +15,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.fpoly.dto.Roles;
-import com.fpoly.dto.Users;
+import com.fpoly.entities.Roles;
+import com.fpoly.entities.Users;
 import com.fpoly.repositories.repo.UserRepository;
 
 /**
@@ -38,10 +38,12 @@ public class SecurityUserDetails implements UserDetailsService {
 		}
 
 		// add grantedAuthorities from roles
-		Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
-		Roles roles = user.getRoles();
-		grantedAuthorities.add(new SimpleGrantedAuthority(roles.getRoles()));
+        Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
+        Set<Roles> roles = user.getRoles();
+        for (Roles role : roles) {
+            grantedAuthorities.add(new SimpleGrantedAuthority(role.getRoles()));
+        }
 
-		return new User(user.getUsername(), user.getPass(), grantedAuthorities);
+		return new User(user.getUsername(), user.getPassword(), grantedAuthorities);
 	}
 }

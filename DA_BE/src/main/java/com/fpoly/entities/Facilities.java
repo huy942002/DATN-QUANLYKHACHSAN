@@ -1,4 +1,4 @@
-package com.fpoly.dto;
+package com.fpoly.entities;
 
 import java.io.Serializable;
 import java.util.Set;
@@ -8,8 +8,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -22,34 +20,23 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Users implements Serializable {
+public class Facilities implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "ID", unique = true, nullable = false, precision = 10)
-	private int id;
+	@Column(name = "FACILITIES_ID", unique = true, nullable = false, precision = 10)
+	private int facilitiesId;
 
-	@Column(name = "USERNAME", nullable = false, length = 30)
-	private String username;
-
-	@Column(name = "PASS", nullable = false, length = 30)
-	private String pass;
+	@Column(name = "FACILITIES_NAME", nullable = false, length = 30)
+	private String facilitiesName;
 
 	@Column(name = "STATUSS", nullable = false, precision = 10)
 	private int statuss;
 
-	@ManyToOne(optional = false)
-	@JoinColumn(name = "ID_ROLES", nullable = false)
-	private Roles roles;
-
-	@OneToMany(mappedBy = "users")
+	@OneToMany(mappedBy = "facilities")
 	@JsonIgnore
-	private Set<Customer> customer;
-
-	@OneToMany(mappedBy = "users")
-	@JsonIgnore
-	private Set<Personnel> personnel;
+	private Set<FacilitiesDetails> facilitiesDetails;
 
 }

@@ -3,7 +3,8 @@ import config from '~/config';
 // Pages
 import Home from '~/pages/Home';
 import Login from '~/pages/Login';
-import LoginAdmin from '~/pages/LoginAdmin';
+import LoginAdmin from '~/pages/Admin/LoginAdmin';
+import HomeAdmin from '~/pages/Admin/HomeAdmin';
 import Signup from '~/pages/Signup';
 import Notfound from '~/pages/Notfound';
 
@@ -12,7 +13,8 @@ import Notfound from '~/pages/Notfound';
 const publicRoutes = [
     { path: config.routes.home, component: Home },
     { path: config.routes.login, component: Login },
-    { path: config.routes.adminLogin, component: LoginAdmin },
+    { path: config.routes.loginAdmin, component: LoginAdmin },
+    { path: config.routes.homeAdmin, component: HomeAdmin },
     { path: config.routes.signup, component: Signup },
     { path: config.routes.notfound, component: Notfound },
 ];
