@@ -1,4 +1,4 @@
-package com.fpoly.dto;
+package com.fpoly.entities;
 
 import java.io.Serializable;
 import java.util.Set;
@@ -28,8 +28,8 @@ public class Rooms implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "ID", unique = true, nullable = false, precision = 10)
-	private int id;
+	@Column(name = "ROOMS_ID", unique = true, nullable = false, precision = 10)
+	private int roomsId;
 
 	@Column(name = "NOTE", length = 50)
 	private String note;
@@ -37,15 +37,15 @@ public class Rooms implements Serializable {
 	@Column(name = "IMG")
 	private String img;
 
-	@Column(name = "STATUS", nullable = false, precision = 10)
-	private int status;
+	@Column(name = "STATUSS", nullable = false, precision = 10)
+	private int statuss;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "ID_KIND_OF_ROOM", nullable = false)
+	@JoinColumn(name = "KIND_OF_ROOM_ID", nullable = false)
 	private KindOfRoom kindOfRoom;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "ID_NUMBER_OF_FLOORS", nullable = false)
+	@JoinColumn(name = "NUMBER_OF_FLOORS_ID", nullable = false)
 	private NumberOfFloors numberOfFloors;
 
 	@OneToMany(mappedBy = "rooms")
@@ -54,6 +54,6 @@ public class Rooms implements Serializable {
 
 	@OneToMany(mappedBy = "rooms")
 	@JsonIgnore
-	private Set<DetailsInvoice> detailsInvoice;
+	private Set<BillDetails> billDetails;
 
 }

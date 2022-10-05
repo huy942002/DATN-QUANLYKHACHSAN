@@ -1,4 +1,4 @@
-package com.fpoly.dto;
+package com.fpoly.entities;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -23,14 +23,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Personnel implements Serializable {
+public class Customer implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "ID", unique = true, nullable = false, precision = 10)
-	private int id;
+	@Column(name = "CUSTOMER_ID", unique = true, nullable = false, precision = 10)
+	private int customerId;
 
 	@Column(name = "FULLNAME", nullable = false, length = 50)
 	private String fullname;
@@ -47,21 +47,21 @@ public class Personnel implements Serializable {
 	@Column(name = "PHONE_NUMBER", nullable = false, length = 12)
 	private String phoneNumber;
 
-	@Column(name = "ADDRESS")
-	private String address;
+	@Column(name = "ADDRESSS")
+	private String addresss;
 
 	@Column(name = "IMG")
 	private String img;
 
-	@Column(name = "STATUS", nullable = false, precision = 10)
-	private int status;
+	@Column(name = "STATUSS", nullable = false, precision = 10)
+	private int statuss;
+	
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "USERS_ID", nullable = false)
+	private Users users;
 
-	@OneToMany(mappedBy = "personnel")
+	@OneToMany(mappedBy = "customer")
 	@JsonIgnore
 	private Set<Bills> bills;
-
-	@ManyToOne(optional = false)
-	@JoinColumn(name = "ID_USER", nullable = false)
-	private Users users;
 
 }

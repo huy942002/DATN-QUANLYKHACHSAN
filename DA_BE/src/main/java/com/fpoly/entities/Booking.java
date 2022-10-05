@@ -1,4 +1,4 @@
-package com.fpoly.dto;
+package com.fpoly.entities;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -25,8 +25,8 @@ public class Booking implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "ID", unique = true, nullable = false, precision = 10)
-	private int id;
+	@Column(name = "BOOKING_ID", unique = true, nullable = false, precision = 10)
+	private int bookingId;
 
 	@Column(name = "DATE_OF_HIRE", nullable = false)
 	private LocalDateTime dateOfHire;
@@ -37,15 +37,15 @@ public class Booking implements Serializable {
 	@Column(name = "TIME_OUT", length = 15)
 	private String timeOut;
 
-	@Column(name = "STATUS", nullable = false, precision = 10)
-	private int status;
+	@Column(name = "STATUSS", nullable = false, precision = 10)
+	private int statuss;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "ID_BILL", nullable = false)
+	@JoinColumn(name = "BILLS_ID", nullable = false)
 	private Bills bills;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "ID_BOOKING_TYPE", nullable = false)
+	@JoinColumn(name = "BOOKING_TYPE_ID", nullable = false)
 	private BookingType bookingType;
 
 }

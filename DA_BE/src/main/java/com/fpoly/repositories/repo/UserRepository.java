@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.fpoly.dto.Users;
+import com.fpoly.entities.Users;
 
 /**
  *
@@ -20,5 +20,5 @@ public interface UserRepository extends JpaRepository<Users, Integer> {
 
 	@Query("SELECT u FROM Users u WHERE u.username =:username")
 	public Users findByUsernameEquals(@Param("username") String username);
-	
+
 }

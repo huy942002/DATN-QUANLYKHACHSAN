@@ -1,4 +1,4 @@
-package com.fpoly.dto;
+package com.fpoly.entities;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -23,14 +23,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class DetailsInvoice implements Serializable {
+public class BillDetails implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "ID", unique = true, nullable = false, precision = 10)
-	private int id;
+	@Column(name = "BIDE_ID", unique = true, nullable = false, precision = 10)
+	private int bideId;
 
 	@Column(name = "NUMBER_OF_DAYS_OF_RENT")
 	private LocalDateTime numberOfDaysOfRent;
@@ -38,27 +38,27 @@ public class DetailsInvoice implements Serializable {
 	@Column(name = "NUMBER_OF_HOURS_TO_RENT", length = 10)
 	private String numberOfHoursToRent;
 
-	@Column(name = "STATUS", nullable = false, precision = 10)
-	private int status;
+	@Column(name = "STATUSS", nullable = false, precision = 10)
+	private int statuss;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "ID_BILL", nullable = false)
+	@JoinColumn(name = "BILLS_ID", nullable = false)
 	private Bills bills;
 
-	@OneToMany(mappedBy = "detailsInvoice")
+	@OneToMany(mappedBy = "billDetails")
 	@JsonIgnore
 	private Set<ServiceDetails> serviceDetails;
 
-	@OneToMany(mappedBy = "detailsInvoice")
+	@OneToMany(mappedBy = "billDetails")
 	@JsonIgnore
 	private Set<ServiceAvailable> serviceAvailable;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "ID_RENTAL_TYPES", nullable = false)
+	@JoinColumn(name = "RENTAL_TYPE_ID", nullable = false)
 	private RentalTypes rentalTypes;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "ID_ROOMS", nullable = false)
+	@JoinColumn(name = "ROOMS_ID", nullable = false)
 	private Rooms rooms;
 
 }

@@ -1,4 +1,4 @@
-package com.fpoly.dto;
+package com.fpoly.entities;
 
 import java.io.Serializable;
 
@@ -24,24 +24,24 @@ public class ServiceAvailable implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "ID", unique = true, nullable = false, precision = 10)
-	private int id;
+	@Column(name = "SERAV_ID", unique = true, nullable = false, precision = 10)
+	private int seravId;
 
-	@Column(name = "QUANTILY", nullable = false, precision = 10)
-	private int quantily;
+	@Column(name = "QUANTITY", nullable = false, precision = 10)
+	private int quantity;
 
 	@Column(name = "TOTAL_CASH", nullable = false, precision = 53)
 	private double totalCash;
 
-	@Column(name = "STATUS", nullable = false, precision = 10)
-	private int status;
+	@Column(name = "STATUSS", nullable = false, precision = 10)
+	private int statuss;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "ID_DETAILS_INVOICE", nullable = false)
-	private DetailsInvoice detailsInvoice;
+	@JoinColumn(name = "BILL_DETAILS_ID", nullable = false)
+	private BillDetails billDetails;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "ID_SERVICE", nullable = false)
+	@JoinColumn(name = "SERVICE_ID", nullable = false)
 	private Servicess servicess;
 
 }

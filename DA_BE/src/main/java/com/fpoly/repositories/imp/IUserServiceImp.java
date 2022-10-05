@@ -8,7 +8,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fpoly.dto.Users;
+import com.fpoly.entities.Users;
 import com.fpoly.repositories.irepo.IUserService;
 import com.fpoly.repositories.repo.UserRepository;
 

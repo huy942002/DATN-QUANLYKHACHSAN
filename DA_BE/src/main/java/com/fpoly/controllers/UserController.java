@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fpoly.dto.Users;
+import com.fpoly.entities.Users;
 import com.fpoly.repositories.irepo.IUserService;
 
 /**

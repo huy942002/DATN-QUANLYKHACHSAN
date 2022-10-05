@@ -5,7 +5,8 @@ package com.fpoly.repositories.irepo;
 
 import org.springframework.stereotype.Service;
 
-import com.fpoly.dto.Users;
+import com.fpoly.entities.Users;
+
 
 /**
  *

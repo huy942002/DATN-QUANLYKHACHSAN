@@ -1,4 +1,4 @@
-package com.fpoly.dto;
+package com.fpoly.entities;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -29,8 +29,8 @@ public class Bills implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "ID", unique = true, nullable = false, precision = 10)
-	private int id;
+	@Column(name = "BILLS_ID", unique = true, nullable = false, precision = 10)
+	private int billsId;
 
 	@Column(name = "HIRE_DATE", nullable = false)
 	private LocalDateTime hireDate;
@@ -44,8 +44,8 @@ public class Bills implements Serializable {
 	@Column(name = "DATE_OF_PAYMENT", nullable = false)
 	private LocalDateTime dateOfPayment;
 
-	@Column(name = "STATUS", nullable = false, precision = 10)
-	private int status;
+	@Column(name = "STATUSS", nullable = false, precision = 10)
+	private int statuss;
 
 	@OneToMany(mappedBy = "bills")
 	@JsonIgnore
@@ -53,18 +53,18 @@ public class Bills implements Serializable {
 
 	@OneToMany(mappedBy = "bills")
 	@JsonIgnore
-	private Set<DetailsInvoice> detailsInvoice;
+	private Set<BillDetails> billDetails;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "ID_CUSTOMER", nullable = false)
+	@JoinColumn(name = "CUSTOMERS_ID", nullable = false)
 	private Customer customer;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "ID_PAYMENT_TYPE", nullable = false)
-	private PaymentType paymentType;
+	@JoinColumn(name = "EMPLOYEES_ID", nullable = false)
+	private Employees employees;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "ID_PERSONNEL", nullable = false)
-	private Personnel personnel;
+	@JoinColumn(name = "PAYMENT_TYPE_ID", nullable = false)
+	private PaymentType paymentType;
 
 }
