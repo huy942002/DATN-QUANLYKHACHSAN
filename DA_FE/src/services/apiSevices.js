@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const config = {
-    baseUrl: process.env.REACT_APP_API_ENDPOINT,
+    // baseUrl: process.env.REACT_APP_API_ENDPOINT,
+    baseUrl: 'http://localhost:8080/api/',
     options: {
         headers: { 'content-type': 'application/json' },
     },
@@ -52,9 +53,9 @@ const httpDelete = async (endpoint, data) => {
 const handleResponse = (response) => {
     // You can handle 400 errors as well.
     if (response.status === 200) {
-        return response.json();
+        return response.data;
     } else {
-        throw Error(response.json() | 'error');
+        throw Error(response.data | 'error');
     }
 };
 

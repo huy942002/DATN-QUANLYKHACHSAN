@@ -1,9 +1,8 @@
 import logo from '~/assets/images/logo250x250.png';
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope } from '@fortawesome/free-regular-svg-icons';
 import { faLock } from '@fortawesome/free-solid-svg-icons';
-import { faFacebookF, faGoogle } from '@fortawesome/free-brands-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 function LoginAdmin() {
     return (
@@ -61,22 +60,6 @@ function LoginAdmin() {
                             className="text-white w-full bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
                         >
                             Đăng nhập
-                        </button>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2 mt-4">
-                        <button
-                            type="button"
-                            class="text-white bg-[#3b5998] hover:bg-[#3b5998]/90 focus:ring-4 focus:outline-none focus:ring-[#3b5998]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#3b5998]/55  mb-2"
-                        >
-                            <FontAwesomeIcon icon={faFacebookF} />
-                            <span className="mx-2">Facebook</span>
-                        </button>
-                        <button
-                            type="button"
-                            class="text-white bg-[#c23616] hover:bg-[#eb4d4b]/90 focus:ring-4 focus:outline-none focus:ring-[#3b5998]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#3b5998]/55 mb-2"
-                        >
-                            <FontAwesomeIcon icon={faGoogle} />
-                            <span className="mx-2">Google</span>
                         </button>
                     </div>
                 </form>
