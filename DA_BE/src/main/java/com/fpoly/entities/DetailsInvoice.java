@@ -23,14 +23,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class BillDetails implements Serializable {
+public class DetailsInvoice implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "BIDE_ID", unique = true, nullable = false, precision = 10)
-	private int bideId;
+	@Column(name = "ID", unique = true, nullable = false, precision = 10)
+	private int id;
 
 	@Column(name = "NUMBER_OF_DAYS_OF_RENT")
 	private LocalDateTime numberOfDaysOfRent;
@@ -38,27 +38,29 @@ public class BillDetails implements Serializable {
 	@Column(name = "NUMBER_OF_HOURS_TO_RENT", length = 10)
 	private String numberOfHoursToRent;
 
-	@Column(name = "STATUSS", nullable = false, precision = 10)
-	private int statuss;
+	@Column(name = "NUMBER_OF_PEOPLE", precision = 10)
+	private int numberOfPeople;
+
+	@Column(name = "TOTAL_CASH", precision = 53)
+	private double totalCash;
+
+	@Column(name = "STATUS", nullable = false, precision = 10)
+	private int status;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "BILLS_ID", nullable = false)
+	@JoinColumn(name = "ID_BILL", nullable = false)
 	private Bills bills;
 
-	@OneToMany(mappedBy = "billDetails")
+	@OneToMany(mappedBy = "detailsInvoice")
 	@JsonIgnore
 	private Set<ServiceDetails> serviceDetails;
 
-	@OneToMany(mappedBy = "billDetails")
-	@JsonIgnore
-	private Set<ServiceAvailable> serviceAvailable;
-
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "RENTAL_TYPE_ID", nullable = false)
-	private RentalTypes rentalTypes;
-
-	@ManyToOne(optional = false)
-	@JoinColumn(name = "ROOMS_ID", nullable = false)
+	@JoinColumn(name = "ID_ROOMS", nullable = false)
 	private Rooms rooms;
+
+	@OneToMany(mappedBy = "detailsInvoice")
+	@JsonIgnore
+	private Set<DetailsOfRentalTypes> detailsOfRentalTypes;
 
 }

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.fpoly.controllers;
+package com.fpoly.restcontrollers;
 
 import java.util.Optional;
 
@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fpoly.entities.Users;
-import com.fpoly.repositories.irepo.IUserService;
+import com.fpoly.entities.Booking;
+import com.fpoly.repositories.irepo.IBookingService;
 
 /**
  *
@@ -28,49 +28,49 @@ import com.fpoly.repositories.irepo.IUserService;
  */
 @RestController
 @CrossOrigin("*")
-@RequestMapping("/api/user")
-public class UserController {
+@RequestMapping("/api/booking")
+public class BookingController {
 
 	@Autowired
-	IUserService repository;
+	IBookingService repository;
 
 	// getAll
 	@GetMapping
-	public ResponseEntity<Iterable<Users>> getAllPost() {
+	public ResponseEntity<Iterable<Booking>> getAllBooking() {
 		return new ResponseEntity<>(repository.findAll(), HttpStatus.OK);
 	}
 
 	// add new
 	@PostMapping
-	public ResponseEntity<Users> createNewPost(@RequestBody Users user) {
-		return new ResponseEntity<>(repository.save(user), HttpStatus.OK);
+	public ResponseEntity<Booking> createNewBooking(@RequestBody Booking booking) {
+		return new ResponseEntity<>(repository.save(booking), HttpStatus.OK);
 	}
 
 	// getById
 	@GetMapping("/{id}")
-	public ResponseEntity<Users> getPost(@PathVariable Integer id) {
-		Optional<Users> userOptional = repository.findById(id);
-		return userOptional.map(user -> new ResponseEntity<>(user, HttpStatus.OK))
+	public ResponseEntity<Booking> getBooking(@PathVariable Integer id) {
+		Optional<Booking> bookingOptional = repository.findById(id);
+		return bookingOptional.map(booking -> new ResponseEntity<>(booking, HttpStatus.OK))
 				.orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
 	}
 
 	// update
 	@PutMapping("/{id}")
-	public ResponseEntity<Users> updatePost(@PathVariable Integer id, @RequestBody Users user) {
-		Optional<Users> userOptional = repository.findById(id);
-		return userOptional.map(u -> {
-			user.setId(u.getId());
-			return new ResponseEntity<>(repository.save(user), HttpStatus.OK);
+	public ResponseEntity<Booking> updateBooking(@PathVariable Integer id, @RequestBody Booking booking) {
+		Optional<Booking> bookingOptional = repository.findById(id);
+		return bookingOptional.map(b -> {
+			booking.setId(b.getId());
+			return new ResponseEntity<>(repository.save(booking), HttpStatus.OK);
 		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
 	}
 
 	// delete
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Users> deletePost(@PathVariable Integer id) {
-		Optional<Users> postOptional = repository.findById(id);
-		return postOptional.map(u -> {
+	public ResponseEntity<Booking> deleteBooking(@PathVariable Integer id) {
+		Optional<Booking> bookingOptional = repository.findById(id);
+		return bookingOptional.map(b -> {
 			repository.remove(id);
-			return new ResponseEntity<>(u, HttpStatus.OK);
+			return new ResponseEntity<>(b, HttpStatus.OK);
 		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
 	}
 

@@ -26,14 +26,14 @@ public class Facilities implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "FACILITIES_ID", unique = true, nullable = false, precision = 10)
-	private int facilitiesId;
+	@Column(name = "ID", unique = true, nullable = false, precision = 10)
+	private int id;
 
-	@Column(name = "FACILITIES_NAME", nullable = false, length = 30)
-	private String facilitiesName;
+	@Column(name = "NAME", nullable = false, length = 255)
+	private String name;
 
-	@Column(name = "STATUSS", nullable = false, precision = 10)
-	private int statuss;
+	@Column(name = "STATUS", nullable = false, precision = 10)
+	private int status;
 
 	@OneToMany(mappedBy = "facilities")
 	@JsonIgnore

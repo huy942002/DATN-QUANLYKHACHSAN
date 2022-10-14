@@ -24,21 +24,24 @@ public class ServiceDetails implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "SERDE_ID", unique = true, nullable = false, precision = 10)
-	private int serdeId;
+	@Column(name = "ID", unique = true, nullable = false, precision = 10)
+	private int id;
 
 	@Column(name = "QUANTITY", nullable = false, precision = 10)
 	private int quantity;
 
-	@Column(name = "STATUSS", nullable = false, precision = 10)
-	private int statuss;
+	@Column(name = "TOTAL_CASH", precision = 53)
+	private double totalCash;
+
+	@Column(name = "STATUS", nullable = false, precision = 10)
+	private int status;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "BILL_DETAILS_ID", nullable = false)
-	private BillDetails billDetails;
+	@JoinColumn(name = "ID_DETAILS_INVOICE", nullable = false)
+	private DetailsInvoice detailsInvoice;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "SERVICE_ID", nullable = false)
+	@JoinColumn(name = "ID_SERVICE", nullable = false)
 	private Servicess servicess;
 
 }

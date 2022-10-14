@@ -26,17 +26,17 @@ public class ServiceType implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "SERTY_ID", unique = true, nullable = false, precision = 10)
-	private int sertyId;
+	@Column(name = "ID", unique = true, nullable = false, precision = 10)
+	private int id;
 
-	@Column(name = "SERVICES_TYPE", nullable = false, length = 20)
-	private String servicesType;
+	@Column(name = "NAME", nullable = false, length = 255)
+	private String name;
 
-	@Column(name = "NOTE", length = 30)
+	@Column(name = "NOTE", length = 255)
 	private String note;
 
-	@Column(name = "STATUSS", nullable = false, precision = 10)
-	private int statuss;
+	@Column(name = "STATUS", nullable = false, precision = 10)
+	private int status;
 
 	@OneToMany(mappedBy = "serviceType")
 	@JsonIgnore

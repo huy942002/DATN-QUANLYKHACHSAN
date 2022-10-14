@@ -1,4 +1,3 @@
-
 package com.fpoly.entities;
 
 import java.io.Serializable;
@@ -27,15 +26,14 @@ public class BookingType implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "ID", unique = true, nullable = false, precision = 10)
+	private int id;
 
-	@Column(name = "BOOTY_ID", unique = true, nullable = false, precision = 10)
-	private int bootyId;
+	@Column(name = "NAME", nullable = false, length = 255)
+	private String name;
 
-	@Column(name = "BOOKING_TYPE", nullable = false, length = 30)
-	private String bookingType;
-
-	@Column(name = "STATUSS", nullable = false, precision = 10)
-	private int statuss;
+	@Column(name = "STATUS", nullable = false, precision = 10)
+	private int status;
 
 	@OneToMany(mappedBy = "bookingType")
 	@JsonIgnore

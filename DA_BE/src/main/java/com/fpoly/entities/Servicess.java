@@ -28,20 +28,20 @@ public class Servicess implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "SER_ID", unique = true, nullable = false, precision = 10)
-	private int serId;
+	@Column(name = "ID", unique = true, nullable = false, precision = 10)
+	private int id;
 
-	@Column(name = "SERVICES_NAME", nullable = false, length = 20)
-	private String servicesName;
+	@Column(name = "NAME", nullable = false, length = 255)
+	private String name;
 
 	@Column(name = "PRICES", nullable = false, precision = 53)
 	private double prices;
 
-	@Column(name = "NOTE", length = 30)
+	@Column(name = "NOTE", length = 255)
 	private String note;
 
-	@Column(name = "STATUSS", nullable = false, precision = 10)
-	private int statuss;
+	@Column(name = "STATUS", nullable = false, precision = 10)
+	private int status;
 
 	@OneToMany(mappedBy = "servicess")
 	@JsonIgnore
@@ -52,7 +52,7 @@ public class Servicess implements Serializable {
 	private Set<ServiceAvailable> serviceAvailable;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "SERVICE_TYPE_ID", nullable = false)
+	@JoinColumn(name = "ID_SERVICE_TYPE", nullable = false)
 	private ServiceType serviceType;
 
 }

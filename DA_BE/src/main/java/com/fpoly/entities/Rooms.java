@@ -28,24 +28,30 @@ public class Rooms implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "ROOMS_ID", unique = true, nullable = false, precision = 10)
-	private int roomsId;
+	@Column(name = "ID", unique = true, nullable = false, precision = 10)
+	private int id;
 
-	@Column(name = "NOTE", length = 50)
+	@Column(name = "NAME", length = 255)
+	private String name;
+
+	@Column(name = "NOTE", length = 255)
 	private String note;
 
-	@Column(name = "IMG")
+	@Column(name = "IMG", length = 255)
 	private String img;
 
-	@Column(name = "STATUSS", nullable = false, precision = 10)
-	private int statuss;
+	@Column(name = "PRICES", nullable = false, precision = 53)
+	private double prices;
+
+	@Column(name = "STATUS", nullable = false, precision = 10)
+	private int status;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "KIND_OF_ROOM_ID", nullable = false)
+	@JoinColumn(name = "ID_KIND_OF_ROOM", nullable = false)
 	private KindOfRoom kindOfRoom;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "NUMBER_OF_FLOORS_ID", nullable = false)
+	@JoinColumn(name = "ID_NUMBER_OF_FLOORS", nullable = false)
 	private NumberOfFloors numberOfFloors;
 
 	@OneToMany(mappedBy = "rooms")
@@ -54,6 +60,10 @@ public class Rooms implements Serializable {
 
 	@OneToMany(mappedBy = "rooms")
 	@JsonIgnore
-	private Set<BillDetails> billDetails;
+	private Set<DetailsInvoice> detailsInvoice;
+
+	@OneToMany(mappedBy = "rooms")
+	@JsonIgnore
+	private Set<ServiceAvailable> serviceAvailable;
 
 }

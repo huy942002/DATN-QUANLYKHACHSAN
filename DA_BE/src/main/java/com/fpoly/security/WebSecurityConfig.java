@@ -70,9 +70,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		.antMatchers("/signup").permitAll()
 		.antMatchers("/user/**").authenticated()
 		.antMatchers("/admin/**").hasAnyAuthority("DIRECTOR","STAFF")
-		.antMatchers("/api/**").permitAll()
+		.antMatchers("/api/**").permitAll();
 //		.antMatchers("/api/**").hasAuthority("DIRECTOR")
-		.anyRequest().authenticated();
+//		.anyRequest().authenticated();
 //		.and()
 //		
 //		.formLogin().loginPage("/login")
