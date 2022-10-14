@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.fpoly.controllers;
+package com.fpoly.restcontrollers;
 
 import java.util.Optional;
 
@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fpoly.entities.Bills;
-import com.fpoly.repositories.irepo.IBillService;
+import com.fpoly.entities.Facilities;
+import com.fpoly.repositories.irepo.IFacilityService;
 
 /**
  *
@@ -28,49 +28,49 @@ import com.fpoly.repositories.irepo.IBillService;
  */
 @RestController
 @CrossOrigin("*")
-@RequestMapping("/api/bill")
-public class BillController {
+@RequestMapping("/api/facility")
+public class FacilityController {
 
 	@Autowired
-	IBillService repository;
+	IFacilityService repository;
 
 	// getAll
 	@GetMapping
-	public ResponseEntity<Iterable<Bills>> getAllBill() {
+	public ResponseEntity<Iterable<Facilities>> getAllFacility() {
 		return new ResponseEntity<>(repository.findAll(), HttpStatus.OK);
 	}
 
 	// add new
 	@PostMapping
-	public ResponseEntity<Bills> createNewBill(@RequestBody Bills bill) {
-		return new ResponseEntity<>(repository.save(bill), HttpStatus.OK);
+	public ResponseEntity<Facilities> createNewFacility(@RequestBody Facilities facility) {
+		return new ResponseEntity<>(repository.save(facility), HttpStatus.OK);
 	}
 
 	// getById
 	@GetMapping("/{id}")
-	public ResponseEntity<Bills> getBill(@PathVariable Integer id) {
-		Optional<Bills> billOptional = repository.findById(id);
-		return billOptional.map(bill -> new ResponseEntity<>(bill, HttpStatus.OK))
+	public ResponseEntity<Facilities> getFacility(@PathVariable Integer id) {
+		Optional<Facilities> facilityOptional = repository.findById(id);
+		return facilityOptional.map(facility -> new ResponseEntity<>(facility, HttpStatus.OK))
 				.orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
 	}
 
 	// update
 	@PutMapping("/{id}")
-	public ResponseEntity<Bills> updateBill(@PathVariable Integer id, @RequestBody Bills bill) {
-		Optional<Bills> billOptional = repository.findById(id);
-		return billOptional.map(b -> {
-			bill.setBillsId(b.getBillsId());
-			return new ResponseEntity<>(repository.save(bill), HttpStatus.OK);
+	public ResponseEntity<Facilities> updateFacility(@PathVariable Integer id, @RequestBody Facilities facility) {
+		Optional<Facilities> facilityOptional = repository.findById(id);
+		return facilityOptional.map(f -> {
+			facility.setId(f.getId());
+			return new ResponseEntity<>(repository.save(facility), HttpStatus.OK);
 		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
 	}
 
 	// delete
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Bills> deleteBill(@PathVariable Integer id) {
-		Optional<Bills> billOptional = repository.findById(id);
-		return billOptional.map(b -> {
+	public ResponseEntity<Facilities> deleteFacility(@PathVariable Integer id) {
+		Optional<Facilities> facilityOptional = repository.findById(id);
+		return facilityOptional.map(f -> {
 			repository.remove(id);
-			return new ResponseEntity<>(b, HttpStatus.OK);
+			return new ResponseEntity<>(f, HttpStatus.OK);
 		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
 	}
 

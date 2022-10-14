@@ -25,8 +25,8 @@ public class Booking implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "BOOKING_ID", unique = true, nullable = false, precision = 10)
-	private int bookingId;
+	@Column(name = "ID", unique = true, nullable = false, precision = 10)
+	private int id;
 
 	@Column(name = "DATE_OF_HIRE", nullable = false)
 	private LocalDateTime dateOfHire;
@@ -37,15 +37,15 @@ public class Booking implements Serializable {
 	@Column(name = "TIME_OUT", length = 15)
 	private String timeOut;
 
-	@Column(name = "STATUSS", nullable = false, precision = 10)
-	private int statuss;
+	@Column(name = "STATUS", nullable = false, precision = 10)
+	private int status;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "BILLS_ID", nullable = false)
+	@JoinColumn(name = "ID_BILL", nullable = false)
 	private Bills bills;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "BOOKING_TYPE_ID", nullable = false)
+	@JoinColumn(name = "ID_BOOKING_TYPE", nullable = false)
 	private BookingType bookingType;
 
 }

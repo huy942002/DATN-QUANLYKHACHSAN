@@ -26,17 +26,17 @@ public class RentalTypes implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "RETY_ID", unique = true, nullable = false, precision = 10)
-	private int retyId;
+	@Column(name = "ID", unique = true, nullable = false, precision = 10)
+	private int id;
 
-	@Column(name = "RENTAL_TYPE", nullable = false, length = 30)
-	private String rentalType;
+	@Column(name = "NAME", nullable = false, length = 255)
+	private String name;
 
-	@Column(name = "STATUSS", nullable = false, precision = 10)
-	private int statuss;
+	@Column(name = "STATUS", nullable = false, precision = 10)
+	private int status;
 
 	@OneToMany(mappedBy = "rentalTypes")
 	@JsonIgnore
-	private Set<BillDetails> billDetails;
+	private Set<DetailsOfRentalTypes> detailsOfRentalTypes;
 
 }

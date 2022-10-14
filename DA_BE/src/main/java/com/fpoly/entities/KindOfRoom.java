@@ -26,17 +26,20 @@ public class KindOfRoom implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "KOR_ID", unique = true, nullable = false, precision = 10)
-	private int korId;
+	@Column(name = "ID", unique = true, nullable = false, precision = 10)
+	private int id;
 
-	@Column(name = "ROOM_TYPE_NAME", nullable = false, length = 30)
-	private String roomTypeName;
+	@Column(name = "NAME", nullable = false, length = 255)
+	private String name;
 
-	@Column(name = "NOTE", nullable = false, length = 30)
+	@Column(name = "NOTE", length = 255)
 	private String note;
 
-	@Column(name = "STATUSS", nullable = false, precision = 10)
-	private int statuss;
+	@Column(name = "PRICES", nullable = false, precision = 53)
+	private double prices;
+
+	@Column(name = "STATUS", nullable = false, precision = 10)
+	private int status;
 
 	@OneToMany(mappedBy = "kindOfRoom")
 	@JsonIgnore

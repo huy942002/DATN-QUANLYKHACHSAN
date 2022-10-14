@@ -23,23 +23,26 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Employees implements Serializable {
+public class Personnel implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "EMPLOYEES_ID", unique = true, nullable = false, precision = 10)
-	private int employeesId;
+	@Column(name = "ID", unique = true, nullable = false, precision = 10)
+	private int id;
 
-	@Column(name = "FULLNAME", nullable = false, length = 50)
+	@Column(name = "FULLNAME", nullable = false, length = 255)
 	private String fullname;
 
 	@Column(name = "EMAIL", nullable = false, length = 50)
 	private String email;
 
-	@Column(name = "GENDER", nullable = false, length = 3)
+	@Column(name = "GENDER", nullable = false, length = 5)
 	private String gender;
+
+	@Column(name = "CITIZEN_ID_CODE", length = 12)
+	private String citizenIdCode;
 
 	@Column(name = "DATE_OF_BIRTH", nullable = false)
 	private LocalDateTime dateOfBirth;
@@ -47,21 +50,25 @@ public class Employees implements Serializable {
 	@Column(name = "PHONE_NUMBER", nullable = false, length = 12)
 	private String phoneNumber;
 
-	@Column(name = "ADDRESSS")
-	private String addresss;
+	@Column(name = "ADDRESS")
+	private String address;
 
 	@Column(name = "IMG")
 	private String img;
 
-	@Column(name = "STATUSS", nullable = false, precision = 10)
-	private int statuss;
-	
-	@ManyToOne(optional = false)
-	@JoinColumn(name = "USERS_ID", nullable = false)
-	private Users users;
+	@Column(name = "STATUS", nullable = false, precision = 10)
+	private int status;
 
-	@OneToMany(mappedBy = "employees")
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "ID_NATIONALITY", nullable = false)
+	private Nationality nationality;
+
+	@OneToMany(mappedBy = "personnel")
 	@JsonIgnore
 	private Set<Bills> bills;
+
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "ID_USER", nullable = false)
+	private Users users;
 
 }

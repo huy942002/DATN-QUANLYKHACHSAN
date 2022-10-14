@@ -3,7 +3,7 @@ const routes = {
     loginAdmin: '/admin/login',
     homeAdmin: '/admin',
     historyAdmin: '/admin/history',
-    roomAdmin: '/admin/room/:information',
+    roomAdmin: '/admin/room-check/:information',
     login: '/login',
     signup: '/signup',
     notfound: '/*',

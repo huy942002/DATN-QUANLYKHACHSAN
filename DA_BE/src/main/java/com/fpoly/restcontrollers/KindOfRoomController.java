@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.fpoly.controllers;
+package com.fpoly.restcontrollers;
 
 import java.util.Optional;
 
@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fpoly.entities.Rooms;
-import com.fpoly.repositories.irepo.IRoomService;
+import com.fpoly.entities.KindOfRoom;
+import com.fpoly.repositories.irepo.IKindOfRoomService;
 
 /**
  *
@@ -28,49 +28,49 @@ import com.fpoly.repositories.irepo.IRoomService;
  */
 @RestController
 @CrossOrigin("*")
-@RequestMapping("/api/room")
-public class RoomController {
+@RequestMapping("/api/kind-of-room")
+public class KindOfRoomController {
 
 	@Autowired
-	IRoomService repository;
+	IKindOfRoomService repository;
 
 	// getAll
 	@GetMapping
-	public ResponseEntity<Iterable<Rooms>> getAllRoom() {
+	public ResponseEntity<Iterable<KindOfRoom>> getAllKindOfRoom() {
 		return new ResponseEntity<>(repository.findAll(), HttpStatus.OK);
 	}
 
 	// add new
 	@PostMapping
-	public ResponseEntity<Rooms> createNewRoom(@RequestBody Rooms room) {
-		return new ResponseEntity<>(repository.save(room), HttpStatus.OK);
+	public ResponseEntity<KindOfRoom> createNewKindOfRoom(@RequestBody KindOfRoom kind) {
+		return new ResponseEntity<>(repository.save(kind), HttpStatus.OK);
 	}
 
 	// getById
 	@GetMapping("/{id}")
-	public ResponseEntity<Rooms> getRoom(@PathVariable Integer id) {
-		Optional<Rooms> roomOptional = repository.findById(id);
-		return roomOptional.map(room -> new ResponseEntity<>(room, HttpStatus.OK))
+	public ResponseEntity<KindOfRoom> getKindOfRoom(@PathVariable Integer id) {
+		Optional<KindOfRoom> kindOptional = repository.findById(id);
+		return kindOptional.map(kind -> new ResponseEntity<>(kind, HttpStatus.OK))
 				.orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
 	}
 
 	// update
 	@PutMapping("/{id}")
-	public ResponseEntity<Rooms> updateRoom(@PathVariable Integer id, @RequestBody Rooms room) {
-		Optional<Rooms> roomOptional = repository.findById(id);
-		return roomOptional.map(r -> {
-			room.setRoomsId(r.getRoomsId());
-			return new ResponseEntity<>(repository.save(room), HttpStatus.OK);
+	public ResponseEntity<KindOfRoom> updateKindOfRoom(@PathVariable Integer id, @RequestBody KindOfRoom kind) {
+		Optional<KindOfRoom> kindOptional = repository.findById(id);
+		return kindOptional.map(k -> {
+			kind.setId(k.getId());
+			return new ResponseEntity<>(repository.save(kind), HttpStatus.OK);
 		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
 	}
 
 	// delete
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Rooms> deleteRoom(@PathVariable Integer id) {
-		Optional<Rooms> roomOptional = repository.findById(id);
-		return roomOptional.map(r -> {
+	public ResponseEntity<KindOfRoom> deleteKindOfRoom(@PathVariable Integer id) {
+		Optional<KindOfRoom> kindOptional = repository.findById(id);
+		return kindOptional.map(k -> {
 			repository.remove(id);
-			return new ResponseEntity<>(r, HttpStatus.OK);
+			return new ResponseEntity<>(k, HttpStatus.OK);
 		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
 	}
 

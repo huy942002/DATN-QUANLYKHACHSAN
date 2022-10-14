@@ -24,18 +24,18 @@ public class FacilitiesDetails implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "FADE_ID", unique = true, nullable = false, precision = 10)
-	private int fadeId;
+	@Column(name = "ID", unique = true, nullable = false, precision = 10)
+	private int id;
 
-	@Column(name = "STATUSS", nullable = false, precision = 10)
-	private int statuss;
+	@Column(name = "STATUS", nullable = false, precision = 10)
+	private int status;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "FACILITIES_ID", nullable = false)
+	@JoinColumn(name = "ID_FACILITIES", nullable = false)
 	private Facilities facilities;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "ROOMS_ID", nullable = false)
+	@JoinColumn(name = "ID_ROOMS", nullable = false)
 	private Rooms rooms;
 
 }

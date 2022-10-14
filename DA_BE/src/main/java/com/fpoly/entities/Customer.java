@@ -29,39 +29,46 @@ public class Customer implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "CUSTOMER_ID", unique = true, nullable = false, precision = 10)
-	private int customerId;
+	@Column(name = "ID", unique = true, nullable = false, precision = 10)
+	private int id;
 
-	@Column(name = "FULLNAME", nullable = false, length = 50)
+	@Column(name = "FULLNAME", nullable = false, length = 255)
 	private String fullname;
 
-	@Column(name = "EMAIL", nullable = false, length = 50)
+	@Column(name = "EMAIL", length = 255)
 	private String email;
 
-	@Column(name = "GENDER", nullable = false, length = 3)
+	@Column(name = "CITIZEN_ID_CODE", length = 12)
+	private String citizenIdCode;
+
+	@Column(name = "GENDER", length = 5)
 	private String gender;
 
-	@Column(name = "DATE_OF_BIRTH", nullable = false)
+	@Column(name = "DATE_OF_BIRTH")
 	private LocalDateTime dateOfBirth;
 
-	@Column(name = "PHONE_NUMBER", nullable = false, length = 12)
+	@Column(name = "PHONE_NUMBER", length = 12)
 	private String phoneNumber;
 
-	@Column(name = "ADDRESSS")
-	private String addresss;
+	@Column(name = "ADDRESS", length = 255)
+	private String address;
 
-	@Column(name = "IMG")
+	@Column(name = "IMG", length = 255)
 	private String img;
 
-	@Column(name = "STATUSS", nullable = false, precision = 10)
-	private int statuss;
-	
-	@ManyToOne(optional = false)
-	@JoinColumn(name = "USERS_ID", nullable = false)
-	private Users users;
+	@Column(name = "STATUS", nullable = false, precision = 10)
+	private int status;
 
 	@OneToMany(mappedBy = "customer")
 	@JsonIgnore
 	private Set<Bills> bills;
+
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "ID_NATIONALITY", nullable = false)
+	private Nationality nationality;
+
+	@ManyToOne
+	@JoinColumn(name = "ID_USER")
+	private Users users;
 
 }

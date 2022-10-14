@@ -26,14 +26,14 @@ public class NumberOfFloors implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "NOF_ID", unique = true, nullable = false, precision = 10)
-	private int nofId;
+	@Column(name = "ID", unique = true, nullable = false, precision = 10)
+	private int id;
 
 	@Column(name = "NUMBER_OF_FLOORS", nullable = false, precision = 10)
 	private int numberOfFloors;
 
-	@Column(name = "STATUSS", nullable = false, precision = 10)
-	private int statuss;
+	@Column(name = "STATUS", nullable = false, precision = 10)
+	private int status;
 
 	@OneToMany(mappedBy = "numberOfFloors")
 	@JsonIgnore

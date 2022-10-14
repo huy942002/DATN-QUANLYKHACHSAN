@@ -29,23 +29,29 @@ public class Bills implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "BILLS_ID", unique = true, nullable = false, precision = 10)
-	private int billsId;
+	@Column(name = "ID", unique = true, nullable = false, precision = 10)
+	private int id;
 
 	@Column(name = "HIRE_DATE", nullable = false)
 	private LocalDateTime hireDate;
 
-	@Column(name = "CHECK_OUT_DAY", nullable = false)
+	@Column(name = "CHECK_OUT_DAY")
 	private LocalDateTime checkOutDay;
 
-	@Column(name = "NUMBER_OF_PEOPLE", nullable = false, precision = 10)
+	@Column(name = "NUMBER_OF_ROOM", precision = 10)
+	private int numberOfRoom;
+
+	@Column(name = "NUMBER_OF_PEOPLE", precision = 10)
 	private int numberOfPeople;
 
-	@Column(name = "DATE_OF_PAYMENT", nullable = false)
+	@Column(name = "DATE_OF_PAYMENT")
 	private LocalDateTime dateOfPayment;
 
-	@Column(name = "STATUSS", nullable = false, precision = 10)
-	private int statuss;
+	@Column(name = "TOTAL_CASH", precision = 53)
+	private double totalCash;
+
+	@Column(name = "STATUS", nullable = false, precision = 10)
+	private int status;
 
 	@OneToMany(mappedBy = "bills")
 	@JsonIgnore
@@ -53,18 +59,17 @@ public class Bills implements Serializable {
 
 	@OneToMany(mappedBy = "bills")
 	@JsonIgnore
-	private Set<BillDetails> billDetails;
+	private Set<DetailsInvoice> detailsInvoice;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "CUSTOMERS_ID", nullable = false)
+	@JoinColumn(name = "ID_CUSTOMER", nullable = false)
 	private Customer customer;
-
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "EMPLOYEES_ID", nullable = false)
-	private Employees employees;
-
-	@ManyToOne(optional = false)
-	@JoinColumn(name = "PAYMENT_TYPE_ID", nullable = false)
+	@JoinColumn(name = "ID_PAYMENT_TYPE", nullable = false)
 	private PaymentType paymentType;
+
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "ID_PERSONNEL", nullable = false)
+	private Personnel personnel;
 
 }

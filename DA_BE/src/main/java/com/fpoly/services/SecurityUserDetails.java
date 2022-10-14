@@ -41,7 +41,7 @@ public class SecurityUserDetails implements UserDetailsService {
         Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
         Set<Roles> roles = user.getRoles();
         for (Roles role : roles) {
-            grantedAuthorities.add(new SimpleGrantedAuthority(role.getRoles()));
+            grantedAuthorities.add(new SimpleGrantedAuthority(role.getName()));
         }
 
 		return new User(user.getUsername(), user.getPassword(), grantedAuthorities);

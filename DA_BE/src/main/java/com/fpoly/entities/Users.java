@@ -18,9 +18,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
+@EqualsAndHashCode(onlyExplicitlyIncluded = true) // important
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -30,23 +32,22 @@ public class Users implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@EqualsAndHashCode.Include // important, only on the PK
 	@Column(name = "ID", unique = true, nullable = false, precision = 10)
 	private int id;
 
-	@Column(name = "USERNAME", nullable = false, length = 30)
+	@Column(name = "USERNAME", nullable = false, length = 255)
 	private String username;
 
-	@Column(name = "PASSWORD", nullable = false, length = 30)
+	@Column(name = "PASSWORD", nullable = false, length = 255)
 	private String password;
 
 	@Column(name = "STATUS", nullable = false, precision = 10)
 	private int status;
 
 	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(	name = "authority", 
-				joinColumns = @JoinColumn(name = "id_user"), 
-				inverseJoinColumns = @JoinColumn(name = "id_roles"))
-	private Set<Roles> roles ;
+	@JoinTable(name = "authority", joinColumns = @JoinColumn(name = "id_user"), inverseJoinColumns = @JoinColumn(name = "id_roles"))
+	private Set<Roles> roles;
 
 	@OneToMany(mappedBy = "users")
 	@JsonIgnore
@@ -54,6 +55,6 @@ public class Users implements Serializable {
 
 	@OneToMany(mappedBy = "users")
 	@JsonIgnore
-	private Set<Employees> employees;
+	private Set<Personnel> personnel;
 
 }
