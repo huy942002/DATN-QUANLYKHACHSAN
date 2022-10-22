@@ -14,9 +14,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
+@EqualsAndHashCode(onlyExplicitlyIncluded = true) // important
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -26,6 +28,7 @@ public class Roles implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@EqualsAndHashCode.Include // important, only on the PK
 	@Column(name = "ID", unique = true, nullable = false, precision = 10)
 	private int id;
 	

@@ -1,9 +1,10 @@
 package com.fpoly.entities;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,10 +17,12 @@ import javax.persistence.OneToMany;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -45,7 +48,7 @@ public class Personnel implements Serializable {
 	private String citizenIdCode;
 
 	@Column(name = "DATE_OF_BIRTH", nullable = false)
-	private LocalDateTime dateOfBirth;
+	private LocalDate dateOfBirth;
 
 	@Column(name = "PHONE_NUMBER", nullable = false, length = 12)
 	private String phoneNumber;
@@ -67,7 +70,7 @@ public class Personnel implements Serializable {
 	@JsonIgnore
 	private Set<Bills> bills;
 
-	@ManyToOne(optional = false)
+	@ManyToOne(optional = false, cascade = CascadeType.ALL)
 	@JoinColumn(name = "ID_USER", nullable = false)
 	private Users users;
 

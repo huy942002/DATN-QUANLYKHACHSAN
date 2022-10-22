@@ -28,68 +28,49 @@ function SidebarAdmin() {
             <aside className="mt-5">
                 <Sidebar>
                     <Sidebar.Items>
-                        <Sidebar.ItemGroup>
-                            <Sidebar.Item>
-                                <Link to={config.routes.homeAdmin} className="block">
-                                    <FontAwesomeIcon icon={faHouse} className="w-6" />
-                                    <span className="mx-2">Sơ đồ khách sạn</span>
-                                </Link>
-                            </Sidebar.Item>
-                            <Sidebar.Item>
-                                <Link to={config.routes.home} className="block">
-                                    <FontAwesomeIcon icon={faBuilding} className="w-6" />
-                                    <span className="mx-2">Quản lý tầng</span>
-                                </Link>
-                            </Sidebar.Item>
-                            <Sidebar.Item>
-                                <Link to={config.routes.home} className="block">
-                                    <FontAwesomeIcon icon={faBed} className="w-6" />
-                                    <span className="mx-2">Quản lý phòng</span>
-                                </Link>
-                            </Sidebar.Item>
-                            <Sidebar.Item>
-                                <Link to={config.routes.home} className="block">
-                                    <FontAwesomeIcon icon={faPeopleGroup} className="w-6" />
-                                    <span className="mx-2">Quản lý nhân viên</span>
-                                </Link>
-                            </Sidebar.Item>
-                            <Sidebar.Item>
-                                <Link to={config.routes.home} className="block">
-                                    <FontAwesomeIcon icon={faPerson} className="w-6" />
-                                    <span className="mx-2">Quảnlý khách hàng</span>
-                                </Link>
-                            </Sidebar.Item>
-                            <Sidebar.Item>
-                                <Link to={config.routes.home} className="block">
-                                    <FontAwesomeIcon icon={faBellConcierge} className="w-6" />
-                                    <span className="mx-2">Quản lý dịch vụ</span>
-                                </Link>
-                            </Sidebar.Item>
-                            <Sidebar.Item>
-                                <Link to={config.routes.historyAdmin} className="block">
-                                    <FontAwesomeIcon icon={faClockRotateLeft} className="w-6" />
-                                    <span className="mx-2">Lịch sử</span>
-                                </Link>
-                            </Sidebar.Item>
-                            <Sidebar.Item>
-                                <Link to={config.routes.home} className="block">
-                                    <FontAwesomeIcon icon={faReceipt} className="w-6" />
-                                    <span className="mx-2">Hóa đơn</span>
-                                </Link>
-                            </Sidebar.Item>
-                            <Sidebar.Item>
-                                <Link to={config.routes.home} className="block">
-                                    <FontAwesomeIcon icon={faChartSimple} className="w-6" />
-                                    <span className="mx-2">Thống kê</span>
-                                </Link>
-                            </Sidebar.Item>
-                            <Sidebar.Item>
-                                <Link to={config.routes.home} className="block">
-                                    <FontAwesomeIcon icon={faRightFromBracket} className="w-6" />
-                                    <span className="mx-2">Đăng xuất</span>
-                                </Link>
-                            </Sidebar.Item>
-                        </Sidebar.ItemGroup>
+                        <Link to={config.routes.homeAdmin} className="block mb-2 hover:bg-gray-200 p-1 rounded-md">
+                            <FontAwesomeIcon icon={faHouse} className="w-6" />
+                            <span className="mx-2">Sơ đồ khách sạn</span>
+                        </Link>
+                        <Link to={config.routes.home} className="block mb-2 hover:bg-gray-200 p-1 rounded-md">
+                            <FontAwesomeIcon icon={faBuilding} className="w-6" />
+                            <span className="mx-2">Quản lý tầng</span>
+                        </Link>
+                        <Link to={config.routes.home} className="block mb-2 hover:bg-gray-200 p-1 rounded-md">
+                            <FontAwesomeIcon icon={faBed} className="w-6" />
+                            <span className="mx-2">Quản lý phòng</span>
+                        </Link>
+                        <Link
+                            to={config.routes.personnelManage}
+                            className="block mb-2 hover:bg-gray-200 p-1 rounded-md"
+                        >
+                            <FontAwesomeIcon icon={faPeopleGroup} className="w-6" />
+                            <span className="mx-2">Quản lý nhân viên</span>
+                        </Link>
+                        <Link to={config.routes.home} className="block mb-2 hover:bg-gray-200 p-1 rounded-md">
+                            <FontAwesomeIcon icon={faPerson} className="w-6" />
+                            <span className="mx-2">Quảnlý khách hàng</span>
+                        </Link>
+                        <Link to={config.routes.serviceManage} className="block mb-2 hover:bg-gray-200 p-1 rounded-md">
+                            <FontAwesomeIcon icon={faBellConcierge} className="w-6" />
+                            <span className="mx-2">Quản lý dịch vụ</span>
+                        </Link>
+                        <Link to={config.routes.historyAdmin} className="block mb-2 hover:bg-gray-200 p-1 rounded-md">
+                            <FontAwesomeIcon icon={faClockRotateLeft} className="w-6" />
+                            <span className="mx-2">Lịch sử</span>
+                        </Link>
+                        <Link to={config.routes.home} className="block mb-2 hover:bg-gray-200 p-1 rounded-md">
+                            <FontAwesomeIcon icon={faReceipt} className="w-6" />
+                            <span className="mx-2">Hóa đơn</span>
+                        </Link>
+                        <Link to={config.routes.home} className="block mb-2 hover:bg-gray-200 p-1 rounded-md">
+                            <FontAwesomeIcon icon={faChartSimple} className="w-6" />
+                            <span className="mx-2">Thống kê</span>
+                        </Link>
+                        <Link to={config.routes.home} className="block mb-2 hover:bg-gray-200 p-1 rounded-md">
+                            <FontAwesomeIcon icon={faRightFromBracket} className="w-6" />
+                            <span className="mx-2">Đăng xuất</span>
+                        </Link>
                     </Sidebar.Items>
                 </Sidebar>
             </aside>

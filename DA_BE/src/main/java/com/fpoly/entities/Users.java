@@ -3,6 +3,7 @@ package com.fpoly.entities;
 import java.io.Serializable;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -53,7 +54,7 @@ public class Users implements Serializable {
 	@JsonIgnore
 	private Set<Customer> customer;
 
-	@OneToMany(mappedBy = "users")
+	@OneToMany(mappedBy = "users", cascade = CascadeType.ALL)
 	@JsonIgnore
 	private Set<Personnel> personnel;
 

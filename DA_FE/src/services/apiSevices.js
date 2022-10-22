@@ -40,9 +40,9 @@ const httpPut = async (endpoint, data) => {
         });
 };
 
-const httpDelete = async (endpoint, data) => {
+const httpDelete = async (endpoint, id) => {
     return await http
-        .delete(`${config.baseUrl}${endpoint}/${data.id}`)
+        .delete(`${config.baseUrl}${endpoint}/${id}`)
         .then((res) => handleResponse(res))
         .catch((error) => {
             console.error(error);
