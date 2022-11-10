@@ -69,6 +69,14 @@ public class Personnel implements Serializable {
 	@OneToMany(mappedBy = "personnel")
 	@JsonIgnore
 	private Set<Bills> bills;
+	
+    @OneToMany(mappedBy="personnel")
+    @JsonIgnore
+    private Set<HandOver> handOver;
+    
+    @OneToMany(mappedBy="personnel")
+    @JsonIgnore
+    private Set<ResetHandOver> resetHandOver;
 
 	@ManyToOne(optional = false, cascade = CascadeType.ALL)
 	@JoinColumn(name = "ID_USER", nullable = false)

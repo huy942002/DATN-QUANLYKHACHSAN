@@ -4,6 +4,8 @@ import { Button, Modal } from 'flowbite-react';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { toast } from 'react-toastify';
+
 import { getAllServiceType, getServiceTypeById, update, add } from '~/app/reducers/serviceType';
 
 const objServiceType = {
@@ -24,8 +26,8 @@ function ServiceTypes() {
 
     useEffect(() => {
         dispatch(getAllServiceType());
-        // eslint-disable-next-line
         setServiceTypes(serviceTypee);
+        // eslint-disable-next-line
     }, [serviceTypee]);
 
     function openAddType() {
@@ -45,18 +47,21 @@ function ServiceTypes() {
     function handleDeleteByIdType() {
         setServiceTypes(serviceTypes);
         dispatch(update({ ...serviceTypes, status: '0' }));
+        toast.success('Xóa thành công', { autoClose: 2000 });
         setVisibleDeleteType(false);
     }
 
     function handleUpdateType(dataType) {
         setServiceTypes(dataType);
         dispatch(update(serviceTypes));
+        toast.success('Cập nhật thành công', { autoClose: 2000 });
         setVisibleUpdateType(false);
     }
 
     function handleAddType(dataType) {
         setServiceTypesAdd(dataType);
         dispatch(add({ ...serviceTypesAdd, status: '1' }));
+        toast.success('Thêm mới thành công', { autoClose: 2000 });
         setVisibleAddType(false);
     }
 

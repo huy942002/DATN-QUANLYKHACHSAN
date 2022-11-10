@@ -1,6 +1,8 @@
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
+import { toast } from 'react-toastify';
+
 import { Button, Modal } from 'flowbite-react';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -34,10 +36,9 @@ function Services() {
 
     useEffect(() => {
         dispatch(getAllService());
-        // eslint-disable-next-line
         dispatch(getAllServiceType());
-        // eslint-disable-next-line
         setService(servic);
+        // eslint-disable-next-line
     }, [servic]);
 
     function openAdd() {
@@ -56,12 +57,14 @@ function Services() {
     function handleDeleteById() {
         setService(service);
         dispatch(update({ ...service, status: '0' }));
+        toast.success('Xóa dịch vụ thành công', { autoClose: 2000 });
         setVisibleDelete(false);
     }
 
     function handleUpdate(data) {
         setService(data);
         dispatch(update(service));
+        toast.success('Cập nhật thành công', { autoClose: 2000 });
         setVisibleUpdate(false);
     }
 
@@ -72,6 +75,7 @@ function Services() {
         } else {
             dispatch(add({ ...serviceAdd, status: '1' }));
         }
+        toast.success('Thêm dịch vụ thành công', { autoClose: 2000 });
         setVisibleAdd(false);
     }
 

@@ -39,17 +39,23 @@ public class Bills implements Serializable {
 	private LocalDateTime checkOutDay;
 
 	@Column(name = "NUMBER_OF_ROOM", precision = 10)
-	private int numberOfRoom;
+	private Integer numberOfRoom;
 
 	@Column(name = "NUMBER_OF_PEOPLE", precision = 10)
-	private int numberOfPeople;
+	private Integer numberOfPeople;
 
 	@Column(name = "DATE_OF_PAYMENT")
 	private LocalDateTime dateOfPayment;
 
 	@Column(name = "TOTAL_CASH", precision = 53)
-	private double totalCash;
+	private Double totalCash;
+	
+	@Column(name = "TOTAL_CARD", precision = 53)
+	private Double totalCard;
 
+	@Column(name = "DEPOSITS", precision = 53)
+	private Double deposits;
+	
 	@Column(name = "STATUS", nullable = false, precision = 10)
 	private int status;
 

@@ -4,6 +4,8 @@ import config from '~/config';
 import { faChevronRight, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
+import { toast } from 'react-toastify';
+
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { add, getAllNationality, getAllPersonnel, getPersonnelById, update } from '~/app/reducers/personnel';
@@ -38,7 +40,6 @@ function PersonnelManage() {
     const [visibleAdd, setVisibleAdd] = useState(false);
     const [person, setPerson] = useState(objPersonnel);
     const [personAdd, setPersonAdd] = useState(objPersonnel);
-    const [id, setId] = useState(-1);
     const personnels = useSelector((state) => state.personnel.personnels);
     const nationalities = useSelector((state) => state.personnel.nationalities);
     const personnel = useSelector((state) => state.personnel.personnel);
@@ -47,20 +48,17 @@ function PersonnelManage() {
     useEffect(() => {
         dispatch(getAllPersonnel());
         dispatch(getAllNationality());
-        // eslint-disable-next-line
         setPerson(personnel);
         // eslint-disable-next-line
     }, [personnel]);
 
     // open the modal delete
     function getIdDelete(id) {
-        setId(id);
         dispatch(getPersonnelById(id));
         setVisibleDelete(true);
     }
     // open the modal update
     function getIdUpdate(id) {
-        setId(id);
         dispatch(getPersonnelById(id));
         setVisibleUpdate(true);
     }
@@ -73,12 +71,14 @@ function PersonnelManage() {
         setPerson(person);
         dispatch(update({ ...person, status: '0' }));
         dispatch(getAllPersonnel());
+        toast.success('Xóa nhân viên thành công', { autoClose: 2000 });
         setVisibleDelete(false);
     }
 
     function handleUpdate(data) {
         setPerson(data);
         dispatch(update(person));
+        toast.success('Cập nhật thành công', { autoClose: 2000 });
         setVisibleUpdate(false);
     }
 
@@ -96,6 +96,7 @@ function PersonnelManage() {
         } else {
             dispatch(add(personAdd));
         }
+        toast.success('Thêm nhân viên thành công', { autoClose: 2000 });
         setVisibleAdd(false);
     }
 
