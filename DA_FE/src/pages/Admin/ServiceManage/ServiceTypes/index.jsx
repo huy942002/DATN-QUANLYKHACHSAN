@@ -1,3 +1,6 @@
+import { Field, Form, Formik } from 'formik';
+import * as Yup from 'yup';
+
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Modal } from 'flowbite-react';
@@ -6,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { toast } from 'react-toastify';
 
-import { getAllServiceType, getServiceTypeById, update, add } from '~/app/reducers/serviceType';
+import { add, getAllServiceType, getServiceTypeById, update } from '~/app/reducers/serviceType';
 
 const objServiceType = {
     name: '',
@@ -14,12 +17,17 @@ const objServiceType = {
     status: '',
 };
 
+const ServiceTypeSchema = Yup.object().shape({
+    name: Yup.string().required('Loại dịch vụ không được để trống'),
+    note: Yup.string().required('Ghi chú không được để trống'),
+    status: Yup.string(),
+});
+
 function ServiceTypes() {
     const [visibleDeleteType, setVisibleDeleteType] = useState(false);
     const [visibleUpdateType, setVisibleUpdateType] = useState(false);
     const [visibleAddType, setVisibleAddType] = useState(false);
     const [serviceTypes, setServiceTypes] = useState(objServiceType);
-    const [serviceTypesAdd, setServiceTypesAdd] = useState(objServiceType);
     const serviceTypess = useSelector((state) => state.serviceType.serviceTypes);
     const serviceTypee = useSelector((state) => state.serviceType.serviceType);
     const dispatch = useDispatch();
@@ -52,15 +60,13 @@ function ServiceTypes() {
     }
 
     function handleUpdateType(dataType) {
-        setServiceTypes(dataType);
-        dispatch(update(serviceTypes));
+        dispatch(update(dataType));
         toast.success('Cập nhật thành công', { autoClose: 2000 });
         setVisibleUpdateType(false);
     }
 
     function handleAddType(dataType) {
-        setServiceTypesAdd(dataType);
-        dispatch(add({ ...serviceTypesAdd, status: '1' }));
+        dispatch(add({ ...dataType, status: '1' }));
         toast.success('Thêm mới thành công', { autoClose: 2000 });
         setVisibleAddType(false);
     }
@@ -87,9 +93,6 @@ function ServiceTypes() {
                         <thead className="text-xs text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                             <tr>
                                 <th scope="col" className="py-3 px-6">
-                                    ID
-                                </th>
-                                <th scope="col" className="py-3 px-6">
                                     Tên loại dịch vụ
                                 </th>
                                 <th scope="col" className="py-3 px-6">
@@ -106,15 +109,9 @@ function ServiceTypes() {
                         <tbody>
                             {serviceTypess.map((x) => (
                                 <tr className="bg-white dark:bg-gray-800" key={x.id}>
-                                    <th
-                                        scope="row"
-                                        className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                                    >
-                                        {x.id}
-                                    </th>
                                     <td className="py-4 px-6">{x.name}</td>
                                     <td className="py-4 px-6">{x.note}</td>
-                                    <td className="py-4 px-6">{x.status}</td>
+                                    <td className="py-4 px-6">{x.status === 1 ? 'Hoạt động' : 'Không tồn tại'}</td>
                                     <td className="py-4 px-6">
                                         <button
                                             type="button"
@@ -169,147 +166,137 @@ function ServiceTypes() {
                     <Modal show={visibleUpdateType} size="4xl" popup={true} onClose={() => setVisibleUpdateType(false)}>
                         <Modal.Header />
                         <Modal.Body>
-                            <form>
-                                <div className="grid grid-cols-2 gap-5">
-                                    <div>
-                                        <label
-                                            htmlFor="name"
-                                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                        >
-                                            Tên loại dịch vụ
-                                        </label>
-                                        <input
-                                            type="text"
-                                            id="name"
-                                            name="name"
-                                            value={serviceTypes.name || ''}
-                                            onChange={(e) => setServiceTypes({ ...serviceTypes, name: e.target.value })}
-                                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label
-                                            htmlFor="status"
-                                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                        >
-                                            Trạng thái
-                                        </label>
-                                        <input
-                                            type="text"
-                                            id="status"
-                                            name="status"
-                                            disabled
-                                            value={serviceTypes.status || '' === 1 ? 'Hoạt động' : ''}
-                                            onChange={(e) =>
-                                                setServiceTypes({ ...serviceTypes, status: e.target.value })
-                                            }
-                                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        />
-                                    </div>
-                                    <div className="col-start-1 col-end-3">
-                                        <label
-                                            htmlFor="note"
-                                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                        >
-                                            Ghi chú
-                                        </label>
-                                        <textarea
-                                            type="text"
-                                            id="note"
-                                            rows={5}
-                                            name="note"
-                                            value={serviceTypes.note || ''}
-                                            onChange={(e) => setServiceTypes({ ...serviceTypes, note: e.target.value })}
-                                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="flex justify-center gap-4 mt-6">
-                                    <Button
-                                        onClick={() => {
-                                            handleUpdateType(serviceTypes);
-                                        }}
-                                    >
-                                        Cập nhật
-                                    </Button>
-                                    <Button color="gray" onClick={() => setVisibleUpdateType(false)}>
-                                        Đóng
-                                    </Button>
-                                </div>
-                            </form>
+                            {(
+                                <Formik
+                                    enableReinitialize
+                                    initialValues={{
+                                        ...serviceTypes,
+                                        name: serviceTypes.name || '',
+                                        note: serviceTypes.note || '',
+                                    }}
+                                    validationSchema={ServiceTypeSchema}
+                                    onSubmit={(values) => {
+                                        handleUpdateType(values);
+                                    }}
+                                >
+                                    {({ errors, touched, values }) => (
+                                        <Form>
+                                            <div className="grid grid-cols-2 gap-5">
+                                                <div>
+                                                    <label
+                                                        htmlFor="name"
+                                                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                    >
+                                                        Tên loại dịch vụ
+                                                    </label>
+                                                    <Field
+                                                        name="name"
+                                                        className={`
+                                                        bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                        ${
+                                                            errors.name && touched.name
+                                                                ? 'border-2 border-rose-600'
+                                                                : ''
+                                                        } `}
+                                                    />
+                                                    {errors.name && touched.name ? (
+                                                        <div className="text-sm text-red-600 mt-2">{errors.name}</div>
+                                                    ) : null}
+                                                </div>
+                                                <div className="col-start-1 col-end-3">
+                                                    <label
+                                                        htmlFor="note"
+                                                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                    >
+                                                        Ghi chú
+                                                    </label>
+                                                    <Field
+                                                        name="note"
+                                                        as="textarea"
+                                                        className={`
+                                                        bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                        ${
+                                                            errors.note && touched.note
+                                                                ? 'border-2 border-rose-600'
+                                                                : ''
+                                                        } `}
+                                                    />
+                                                    {errors.note && touched.note ? (
+                                                        <div className="text-sm text-red-600 mt-2">{errors.note}</div>
+                                                    ) : null}
+                                                </div>
+                                            </div>
+                                            <div className="flex justify-center gap-4 mt-6">
+                                                <Button type="submit">Cập nhật</Button>
+                                                <Button color="gray" onClick={() => setVisibleAddType(false)}>
+                                                    Đóng
+                                                </Button>
+                                            </div>
+                                        </Form>
+                                    )}
+                                </Formik>
+                            ) || ''}
                         </Modal.Body>
                     </Modal>
                     {/* Modal add */}
                     <Modal show={visibleAddType} size="4xl" popup={true} onClose={() => setVisibleAddType(false)}>
                         <Modal.Header />
                         <Modal.Body>
-                            <form>
-                                <div className="grid grid-cols-2 gap-5">
-                                    <div>
-                                        <label
-                                            htmlFor="name"
-                                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                        >
-                                            Tên loại dịch vụ
-                                        </label>
-                                        <input
-                                            type="text"
-                                            id="name"
-                                            name="name"
-                                            onChange={(e) =>
-                                                setServiceTypesAdd({ ...serviceTypesAdd, name: e.target.value })
-                                            }
-                                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label
-                                            htmlFor="status"
-                                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                        >
-                                            Trạng thái
-                                        </label>
-                                        <input
-                                            type="text"
-                                            id="status"
-                                            name="status"
-                                            value={'1'}
-                                            disabled
-                                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        />
-                                    </div>
-                                    <div className="col-start-1 col-end-3">
-                                        <label
-                                            htmlFor="note"
-                                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                        >
-                                            Ghi chú
-                                        </label>
-                                        <textarea
-                                            type="text"
-                                            id="note"
-                                            rows={5}
-                                            name="note"
-                                            onChange={(e) =>
-                                                setServiceTypesAdd({ ...serviceTypesAdd, note: e.target.value })
-                                            }
-                                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="flex justify-center gap-4 mt-6">
-                                    <Button
-                                        onClick={() => {
-                                            handleAddType(serviceTypesAdd);
-                                        }}
-                                    >
-                                        Thêm
-                                    </Button>
-                                    <Button color="gray" onClick={() => setVisibleAddType(false)}>
-                                        Đóng
-                                    </Button>
-                                </div>
-                            </form>
+                            <Formik
+                                initialValues={objServiceType}
+                                validationSchema={ServiceTypeSchema}
+                                onSubmit={(values) => {
+                                    handleAddType(values);
+                                }}
+                            >
+                                {({ errors, touched }) => (
+                                    <Form>
+                                        <div className="grid grid-cols-2 gap-5">
+                                            <div>
+                                                <label
+                                                    htmlFor="name"
+                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                >
+                                                    Tên loại dịch vụ
+                                                </label>
+                                                <Field
+                                                    name="name"
+                                                    className={`
+                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                    ${errors.name && touched.name ? 'border-2 border-rose-600' : ''} `}
+                                                />
+                                                {errors.name && touched.name ? (
+                                                    <div className="text-sm text-red-600 mt-2">{errors.name}</div>
+                                                ) : null}
+                                            </div>
+                                            <div className="col-start-1 col-end-3">
+                                                <label
+                                                    htmlFor="note"
+                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                >
+                                                    Ghi chú
+                                                </label>
+                                                <Field
+                                                    name="note"
+                                                    as="textarea"
+                                                    className={`
+                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                    ${errors.note && touched.note ? 'border-2 border-rose-600' : ''} `}
+                                                />
+                                                {errors.note && touched.note ? (
+                                                    <div className="text-sm text-red-600 mt-2">{errors.note}</div>
+                                                ) : null}
+                                            </div>
+                                        </div>
+                                        <div className="flex justify-center gap-4 mt-6">
+                                            <Button type="submit">Thêm</Button>
+                                            <Button color="gray" onClick={() => setVisibleAddType(false)}>
+                                                Đóng
+                                            </Button>
+                                        </div>
+                                    </Form>
+                                )}
+                            </Formik>
                         </Modal.Body>
                     </Modal>
                 </div>
