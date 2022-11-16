@@ -76,7 +76,7 @@ function ServiceTypes() {
         <div>
             <div className="grid grid-cols-6">
                 <div className="col-start-1 flex justify-center items-center">
-                    <p>Tìm kiếm dịch vụ</p>
+                    <p>Tìm kiếm loại dịch vụ</p>
                 </div>
                 <div className="col-start-2 col-end-6">
                     <div className="relative">
