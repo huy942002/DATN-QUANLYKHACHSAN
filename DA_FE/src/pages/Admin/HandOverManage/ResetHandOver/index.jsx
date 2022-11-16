@@ -19,6 +19,7 @@ function ResetHandOver() {
 
     useEffect(() => {
         dispatch(getAllResetHandOver());
+        // eslint-disable-next-line
     }, []);
 
     useEffect(() => {
@@ -44,8 +45,7 @@ function ResetHandOver() {
                                 <FontAwesomeIcon icon={faMagnifyingGlass} />
                             </div>
                             <input
-                                type="text"
-                                id="email-address-icon"
+                                type="search"
                                 onChange={(e) => setTimeout(() => setValueSearch2(e.target.value), 1000)}
                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                 placeholder="Tìm kiếm..."

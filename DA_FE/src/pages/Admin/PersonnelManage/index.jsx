@@ -1,7 +1,10 @@
+import { Field, Form, Formik } from 'formik';
+import * as Yup from 'yup';
+
 import { Link } from 'react-router-dom';
 import config from '~/config';
 
-import { faChevronRight, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faChevronRight, faMagnifyingGlass, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { toast } from 'react-toastify';
@@ -22,24 +25,40 @@ const objPersonnel = {
     address: '',
     img: '',
     status: '',
-    nationality: {
-        id: '',
-        name: '',
-        status: '',
-    },
+    nationality: '',
     users: {
         username: '',
         password: '',
-        status: 1,
-        roles: [],
+        status: '',
+        roles: '',
     },
 };
+
+const PersonnelSchema = Yup.object().shape({
+    fullname: Yup.string().required('Tên nhân viên không được để trống'),
+    email: Yup.string().email('Sai định dạng email').required('Email không được để trống'),
+    gender: Yup.string().nullable(),
+    citizenIdCode: Yup.number().typeError('CCCD/CMNT phải là số').required('CMND/CCCD không được để trống'),
+    dateOfBirth: Yup.string().required('Ngày sinh không được để trống'),
+    phoneNumber: Yup.string().required('Số điện thoại không được để trống'),
+    address: Yup.string().required('Địa chỉ không được để trống'),
+    img: Yup.string().required('Ảnh không được để trống'),
+    status: Yup.string().nullable(),
+    nationality: Yup.number().nullable(),
+    users: Yup.object({
+        username: Yup.string().required('Username không được để trống'),
+        password: Yup.string().required('Mật khẩu không được để trống'),
+        status: Yup.string().nullable(),
+        roles: Yup.array().nullable(),
+    }),
+});
+
 function PersonnelManage() {
     const [visibleDelete, setVisibleDelete] = useState(false);
     const [visibleUpdate, setVisibleUpdate] = useState(false);
     const [visibleAdd, setVisibleAdd] = useState(false);
     const [person, setPerson] = useState(objPersonnel);
-    const [personAdd, setPersonAdd] = useState(objPersonnel);
+    const [valueSearch, setValueSearch] = useState('');
     const personnels = useSelector((state) => state.personnel.personnels);
     const nationalities = useSelector((state) => state.personnel.nationalities);
     const personnel = useSelector((state) => state.personnel.personnel);
@@ -76,26 +95,26 @@ function PersonnelManage() {
     }
 
     function handleUpdate(data) {
-        setPerson(data);
-        dispatch(update(person));
+        dispatch(
+            update({ ...data, nationality: nationalities.filter((nat) => nat.id === Number(data.nationality))[0] }),
+        );
         toast.success('Cập nhật thành công', { autoClose: 2000 });
         setVisibleUpdate(false);
     }
 
     function handleAdd(data) {
-        setPersonAdd(data);
-        if (personAdd.gender === '' && personAdd.nationality.id === '') {
-            // default no change gender and nationality
-            dispatch(add({ ...personAdd, gender: 'Nam', nationality: nationalities[0] }));
-        } else if (personAdd.gender === '') {
-            // default no change gender
-            dispatch(add({ ...personAdd, gender: 'Nam' }));
-        } else if (personAdd.nationality.id === '') {
-            // default no change nationality
-            dispatch(add({ ...personAdd, nationality: nationalities[0] }));
-        } else {
-            dispatch(add(personAdd));
-        }
+        dispatch(
+            add({
+                ...data,
+                status: 1,
+                gender: data.gender === '' ? 'Nam' : data.gender,
+                users: { ...data.users, status: 1, roles: [] },
+                nationality: nationalities.filter(
+                    (nat) =>
+                        nat.id === (data.nationality === undefined ? nationalities[0].id : Number(data.nationality)),
+                )[0],
+            }),
+        );
         toast.success('Thêm nhân viên thành công', { autoClose: 2000 });
         setVisibleAdd(false);
     }
@@ -120,9 +139,28 @@ function PersonnelManage() {
                     </li>
                 </ol>
             </nav>
-
-            <div className="grid grid-cols-6">
-                <div className="col-start-6">
+            <div className="grid grid-cols-6 gap-3 pt-8 px-3">
+                <div className="col-start-1 col-end-7">
+                    <hr />
+                </div>
+                <div className="col-start-1 flex justify-center items-center">
+                    <p>Tìm kiếm nhân viên</p>
+                </div>
+                <div className="col-start-2 col-end-6">
+                    <div className="relative">
+                        <div className="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
+                            <FontAwesomeIcon icon={faMagnifyingGlass} />
+                        </div>
+                        <input
+                            type="text"
+                            id="email-address-icon"
+                            onChange={(e) => setTimeout(() => setValueSearch(e.target.value), 1000)}
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            placeholder="Tìm kiếm..."
+                        />
+                    </div>
+                </div>
+                <div className="col-start-6 flex justify-center items-center">
                     <button
                         type="button"
                         onClick={() => {
@@ -141,13 +179,7 @@ function PersonnelManage() {
                         <thead className="text-xs text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                             <tr>
                                 <th scope="col" className="py-3 px-6">
-                                    ID
-                                </th>
-                                <th scope="col" className="py-3 px-6">
                                     Avatar
-                                </th>
-                                <th scope="col" className="py-3 px-6">
-                                    Họ tên
                                 </th>
                                 <th scope="col" className="py-3 px-6">
                                     Username
@@ -168,9 +200,6 @@ function PersonnelManage() {
                                     SĐT
                                 </th>
                                 <th scope="col" className="py-3 px-6">
-                                    CCCD/CMTND
-                                </th>
-                                <th scope="col" className="py-3 px-6">
                                     Trạng thái
                                 </th>
                                 <th scope="col" className="py-3 px-6" colSpan={2}>
@@ -179,55 +208,49 @@ function PersonnelManage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {personnels.map((x) => (
-                                <tr className="bg-white dark:bg-gray-800" key={x.id}>
-                                    <th
-                                        scope="row"
-                                        className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                                    >
-                                        {x.id}
-                                    </th>
-                                    <td className="py-4 px-6">
-                                        <img
-                                            src="https://i.pravatar.cc/100"
-                                            alt={x.fullname}
-                                            className="rounded-sm"
-                                            width={100}
-                                        />
-                                    </td>
-                                    <td className="py-4 px-6">{x.fullname}</td>
-                                    <td className="py-4 px-6">{x.users.username}</td>
-                                    <td className="py-4 px-6">{x.email}</td>
-                                    <td className="py-4 px-6">{x.address}</td>
-                                    <td className="py-4 px-6">{x.gender}</td>
-                                    <td className="py-4 px-6">{x.dateOfBirth}</td>
-                                    <td className="py-4 px-6">{x.phoneNumber}</td>
-                                    <td className="py-4 px-6">{x.citizenIdCode}</td>
-                                    <td className="py-4 px-6">{x.status}</td>
-                                    <td className="py-4 px-6">
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                getIdUpdate(x.id);
-                                            }}
-                                            className="py-2 px-2 text-sm font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
-                                        >
-                                            <span className="mx-2">Sửa</span>
-                                        </button>
-                                    </td>
-                                    <td className="py-4 px-2">
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                getIdDelete(x.id);
-                                            }}
-                                            className="py-2 px-2 text-sm font-medium text-center text-white bg-red-700 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
-                                        >
-                                            <span className="mx-2">Xóa</span>
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
+                            {personnels
+                                .filter((x) => x.users.username.toLowerCase().includes(valueSearch))
+                                .map((x) => (
+                                    <tr className="bg-white dark:bg-gray-800" key={x.id}>
+                                        <td className="py-4 px-6">
+                                            <img
+                                                src="https://i.pravatar.cc/100"
+                                                alt={x.fullname}
+                                                className="rounded-sm"
+                                                width={50}
+                                            />
+                                        </td>
+                                        <td className="py-4 px-6">{x.users.username}</td>
+                                        <td className="py-4 px-6">{x.email}</td>
+                                        <td className="py-4 px-6">{x.address}</td>
+                                        <td className="py-4 px-6">{x.gender}</td>
+                                        <td className="py-4 px-6">{x.dateOfBirth}</td>
+                                        <td className="py-4 px-6">{x.phoneNumber}</td>
+                                        <td className="py-4 px-6">{x.status === 1 ? 'Hoạt động' : 'Không tồn tại'}</td>
+                                        <td className="py-4 px-6">
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    getIdUpdate(x.id);
+                                                }}
+                                                className="py-2 px-2 text-sm font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+                                            >
+                                                <span className="mx-2">Sửa</span>
+                                            </button>
+                                        </td>
+                                        <td className="py-4 px-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    getIdDelete(x.id);
+                                                }}
+                                                className="py-2 px-2 text-sm font-medium text-center text-white bg-red-700 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
+                                            >
+                                                <span className="mx-2">Xóa</span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
                         </tbody>
                     </table>
                     {/* Modal delete */}
@@ -258,408 +281,573 @@ function PersonnelManage() {
                     <Modal show={visibleUpdate} size="6xl" popup={true} onClose={() => setVisibleUpdate(false)}>
                         <Modal.Header />
                         <Modal.Body>
-                            <form>
-                                <div className="grid grid-cols-3 gap-5">
-                                    <div>
-                                        <label
-                                            htmlFor="fullname"
-                                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                        >
-                                            Họ tên
-                                        </label>
-                                        <input
-                                            type="text"
-                                            id="fullname"
-                                            name="fullname"
-                                            value={person.fullname || ''}
-                                            onChange={(e) => setPerson({ ...person, fullname: e.target.value })}
-                                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label
-                                            htmlFor="email"
-                                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                        >
-                                            Email
-                                        </label>
-                                        <input
-                                            type="email"
-                                            id="email"
-                                            name="email"
-                                            value={person.email || ''}
-                                            onChange={(e) => setPerson({ ...person, email: e.target.value })}
-                                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label
-                                            htmlFor="phoneNumber"
-                                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                        >
-                                            Số điện thoại
-                                        </label>
-                                        <input
-                                            type="text"
-                                            id="phoneNumber"
-                                            name="phoneNumber"
-                                            value={person.phoneNumber || ''}
-                                            onChange={(e) => setPerson({ ...person, phoneNumber: e.target.value })}
-                                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label
-                                            htmlFor="citizenIdCode"
-                                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                        >
-                                            CCCD/CMTND
-                                        </label>
-                                        <input
-                                            type="text"
-                                            id="citizenIdCode"
-                                            name="citizenIdCode"
-                                            value={person.citizenIdCode || ''}
-                                            onChange={(e) => setPerson({ ...person, citizenIdCode: e.target.value })}
-                                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label
-                                            htmlFor="dateOfBirth"
-                                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                        >
-                                            Ngày sinh
-                                        </label>
-                                        <input
-                                            type="date"
-                                            id="dateOfBirth"
-                                            name="dateOfBirth"
-                                            value={person.dateOfBirth || ''}
-                                            onChange={(e) => setPerson({ ...person, dateOfBirth: e.target.value })}
-                                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label
-                                            htmlFor="address"
-                                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                        >
-                                            Địa chỉ
-                                        </label>
-                                        <input
-                                            type="text"
-                                            id="address"
-                                            name="address"
-                                            value={person.address || ''}
-                                            onChange={(e) => setPerson({ ...person, address: e.target.value })}
-                                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label
-                                            htmlFor="status"
-                                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                        >
-                                            Trạng thái
-                                        </label>
-                                        <input
-                                            type="text"
-                                            id="status"
-                                            name="status"
-                                            disabled
-                                            value={person.status || '' === 1 ? 'Hoạt động' : ''}
-                                            onChange={(e) => setPerson({ ...person, status: e.target.value })}
-                                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label
-                                            htmlFor="img"
-                                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                        >
-                                            Ảnh
-                                        </label>
-                                        <input
-                                            type="text"
-                                            id="img"
-                                            name="img"
-                                            value={person.img || ''}
-                                            onChange={(e) => setPerson({ ...person, img: e.target.value })}
-                                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label
-                                            htmlFor="gender"
-                                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                        >
-                                            Giới tính
-                                        </label>
-                                        <select
-                                            name="gender"
-                                            id="gender"
-                                            value={person.gender || ''}
-                                            className="w-full p-1 rounded"
-                                            onChange={(e) => setPerson({ ...person, gender: e.target.value })}
-                                        >
-                                            <option value="Nam">Nam</option>
-                                            <option value="Nữ">Nữ</option>
-                                            <option value="Khác">Khác</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div className="flex justify-center gap-4 mt-6">
-                                    <Button
-                                        onClick={() => {
-                                            handleUpdate(person);
-                                        }}
-                                    >
-                                        Cập nhật
-                                    </Button>
-                                    <Button color="gray" onClick={() => setVisibleUpdate(false)}>
-                                        Đóng
-                                    </Button>
-                                </div>
-                            </form>
+                            <Formik
+                                enableReinitialize
+                                initialValues={{
+                                    ...person,
+                                    fullname: person.fullname || '',
+                                    email: person.email || '',
+                                    citizenIdCode: person.citizenIdCode || '',
+                                    phoneNumber: person.phoneNumber || '',
+                                    dateOfBirth: person.dateOfBirth || '',
+                                    address: person.address || '',
+                                    img: person.img || '',
+                                    nationality: person.nationality?.id,
+                                    gender: person.gender || '',
+                                    users: person.users || '',
+                                }}
+                                validationSchema={PersonnelSchema}
+                                onSubmit={(values) => {
+                                    handleUpdate(values);
+                                }}
+                            >
+                                {({ errors, touched }) => (
+                                    <Form>
+                                        <div className="grid grid-cols-3 gap-5">
+                                            <div className="col-start-1 col-end-4">Thông tin chung</div>
+                                            <div>
+                                                <label
+                                                    htmlFor="fullname"
+                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                >
+                                                    Họ tên
+                                                </label>
+                                                <Field
+                                                    name="fullname"
+                                                    className={`
+                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                    ${
+                                                        errors.fullname && touched.fullname
+                                                            ? 'border-2 border-rose-600'
+                                                            : ''
+                                                    } `}
+                                                />
+                                                {errors.fullname && touched.fullname ? (
+                                                    <div className="text-sm text-red-600 mt-2">{errors.fullname}</div>
+                                                ) : null}
+                                            </div>
+                                            <div>
+                                                <label
+                                                    htmlFor="email"
+                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                >
+                                                    Email
+                                                </label>
+                                                <Field
+                                                    type="email"
+                                                    name="email"
+                                                    className={`
+                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                    ${
+                                                        errors.email && touched.email ? 'border-2 border-rose-600' : ''
+                                                    } `}
+                                                />
+                                                {errors.email && touched.email ? (
+                                                    <div className="text-sm text-red-600 mt-2">{errors.email}</div>
+                                                ) : null}
+                                            </div>
+                                            <div>
+                                                <label
+                                                    htmlFor="phoneNumber"
+                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                >
+                                                    Số điện thoại
+                                                </label>
+                                                <Field
+                                                    name="phoneNumber"
+                                                    className={`
+                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                    ${
+                                                        errors.phoneNumber && touched.phoneNumber
+                                                            ? 'border-2 border-rose-600'
+                                                            : ''
+                                                    } `}
+                                                />
+                                                {errors.phoneNumber && touched.phoneNumber ? (
+                                                    <div className="text-sm text-red-600 mt-2">
+                                                        {errors.phoneNumber}
+                                                    </div>
+                                                ) : null}
+                                            </div>
+                                            <div>
+                                                <label
+                                                    htmlFor="citizenIdCode"
+                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                >
+                                                    CCCD/CMTND
+                                                </label>
+                                                <Field
+                                                    name="citizenIdCode"
+                                                    className={`
+                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                    ${
+                                                        errors.citizenIdCode && touched.citizenIdCode
+                                                            ? 'border-2 border-rose-600'
+                                                            : ''
+                                                    } `}
+                                                />
+                                                {errors.citizenIdCode && touched.citizenIdCode ? (
+                                                    <div className="text-sm text-red-600 mt-2">
+                                                        {errors.citizenIdCode}
+                                                    </div>
+                                                ) : null}
+                                            </div>
+                                            <div>
+                                                <label
+                                                    htmlFor="dateOfBirth"
+                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                >
+                                                    Ngày sinh
+                                                </label>
+                                                <Field
+                                                    type="date"
+                                                    name="dateOfBirth"
+                                                    className={`
+                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                    ${
+                                                        errors.dateOfBirth && touched.dateOfBirth
+                                                            ? 'border-2 border-rose-600'
+                                                            : ''
+                                                    } `}
+                                                />
+                                                {errors.dateOfBirth && touched.dateOfBirth ? (
+                                                    <div className="text-sm text-red-600 mt-2">
+                                                        {errors.dateOfBirth}
+                                                    </div>
+                                                ) : null}
+                                            </div>
+                                            <div>
+                                                <label
+                                                    htmlFor="address"
+                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                >
+                                                    Địa chỉ
+                                                </label>
+                                                <Field
+                                                    name="address"
+                                                    className={`
+                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                    ${
+                                                        errors.address && touched.address
+                                                            ? 'border-2 border-rose-600'
+                                                            : ''
+                                                    } `}
+                                                />
+                                                {errors.address && touched.address ? (
+                                                    <div className="text-sm text-red-600 mt-2">{errors.address}</div>
+                                                ) : null}
+                                            </div>
+                                            <div>
+                                                <label
+                                                    htmlFor="img"
+                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                >
+                                                    Ảnh
+                                                </label>
+                                                <Field
+                                                    name="img"
+                                                    className={`
+                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                    ${errors.img && touched.img ? 'border-2 border-rose-600' : ''} `}
+                                                />
+                                                {errors.img && touched.img ? (
+                                                    <div className="text-sm text-red-600 mt-2">{errors.img}</div>
+                                                ) : null}
+                                            </div>
+                                            <div>
+                                                <label
+                                                    htmlFor="gender"
+                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                >
+                                                    Giới tính
+                                                </label>
+                                                <Field
+                                                    as="select"
+                                                    name="gender"
+                                                    className={`
+                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                    ${
+                                                        errors.gender && touched.gender
+                                                            ? 'border-2 border-rose-600'
+                                                            : ''
+                                                    } `}
+                                                >
+                                                    <option value="Nam">Nam</option>
+                                                    <option value="Nữ">Nữ</option>
+                                                    <option value="Khác">Khác</option>
+                                                </Field>
+                                                {errors.gender && touched.gender ? (
+                                                    <div className="text-sm text-red-600 mt-2">{errors.gender}</div>
+                                                ) : null}
+                                            </div>
+                                            <div>
+                                                <label
+                                                    htmlFor="nationality"
+                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                >
+                                                    Quốc gia
+                                                </label>
+                                                <Field
+                                                    as="select"
+                                                    name="nationality"
+                                                    className={`
+                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                    ${
+                                                        errors.nationality && touched.nationality
+                                                            ? 'border-2 border-rose-600'
+                                                            : ''
+                                                    } `}
+                                                >
+                                                    {nationalities.map((x) => (
+                                                        <option key={x.id} value={x.id}>
+                                                            {x.name}
+                                                        </option>
+                                                    ))}
+                                                </Field>
+                                                {errors.nationality && touched.nationality ? (
+                                                    <div className="text-sm text-red-600 mt-2">
+                                                        {errors.nationality}
+                                                    </div>
+                                                ) : null}
+                                            </div>
+                                            <div className="col-start-1 col-end-4">Thông tin đăng nhập</div>
+                                            <div>
+                                                <label
+                                                    htmlFor="username"
+                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                >
+                                                    Username
+                                                </label>
+                                                <Field
+                                                    name="users.username"
+                                                    className={`
+                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                    ${
+                                                        errors.users?.username && touched.users?.username
+                                                            ? 'border-2 border-rose-600'
+                                                            : ''
+                                                    } `}
+                                                />
+                                                {errors.users?.username && touched.users?.username ? (
+                                                    <div className="text-sm text-red-600 mt-2">
+                                                        {errors.users?.username}
+                                                    </div>
+                                                ) : null}
+                                            </div>
+                                            <div>
+                                                <label
+                                                    htmlFor="password"
+                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                >
+                                                    Password
+                                                </label>
+                                                <Field
+                                                    type="password"
+                                                    name="users.password"
+                                                    className={`
+                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                    ${
+                                                        errors.users?.password && touched.users?.password
+                                                            ? 'border-2 border-rose-600'
+                                                            : ''
+                                                    } `}
+                                                />
+                                                {errors.users?.password && touched.users?.password ? (
+                                                    <div className="text-sm text-red-600 mt-2">
+                                                        {errors.users?.password}
+                                                    </div>
+                                                ) : null}
+                                            </div>
+                                        </div>
+                                        <div className="flex justify-center gap-4 mt-6">
+                                            <Button type="submit">Cập nhật</Button>
+                                            <Button color="gray" onClick={() => setVisibleUpdate(false)}>
+                                                Đóng
+                                            </Button>
+                                        </div>
+                                    </Form>
+                                )}
+                            </Formik>
                         </Modal.Body>
                     </Modal>
                     {/* modal add */}
                     <Modal show={visibleAdd} size="6xl" popup={true} onClose={() => setVisibleAdd(false)}>
                         <Modal.Header />
                         <Modal.Body>
-                            <form>
-                                <div className="grid grid-cols-3 gap-5">
-                                    <div>
-                                        <label
-                                            htmlFor="fullname"
-                                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                        >
-                                            Họ tên
-                                        </label>
-                                        <input
-                                            type="text"
-                                            id="fullname"
-                                            name="fullname"
-                                            onChange={(e) => setPersonAdd({ ...personAdd, fullname: e.target.value })}
-                                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label
-                                            htmlFor="email"
-                                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                        >
-                                            Email
-                                        </label>
-                                        <input
-                                            type="email"
-                                            id="email"
-                                            name="email"
-                                            onChange={(e) => setPersonAdd({ ...personAdd, email: e.target.value })}
-                                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label
-                                            htmlFor="phoneNumber"
-                                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                        >
-                                            Số điện thoại
-                                        </label>
-                                        <input
-                                            type="text"
-                                            id="phoneNumber"
-                                            name="phoneNumber"
-                                            onChange={(e) =>
-                                                setPersonAdd({ ...personAdd, phoneNumber: e.target.value })
-                                            }
-                                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label
-                                            htmlFor="citizenIdCode"
-                                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                        >
-                                            CCCD/CMTND
-                                        </label>
-                                        <input
-                                            type="text"
-                                            id="citizenIdCode"
-                                            name="citizenIdCode"
-                                            onChange={(e) =>
-                                                setPersonAdd({ ...personAdd, citizenIdCode: e.target.value })
-                                            }
-                                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label
-                                            htmlFor="dateOfBirth"
-                                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                        >
-                                            Ngày sinh
-                                        </label>
-                                        <input
-                                            type="date"
-                                            id="dateOfBirth"
-                                            name="dateOfBirth"
-                                            onChange={(e) =>
-                                                setPersonAdd({ ...personAdd, dateOfBirth: e.target.value })
-                                            }
-                                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label
-                                            htmlFor="address"
-                                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                        >
-                                            Địa chỉ
-                                        </label>
-                                        <input
-                                            type="text"
-                                            id="address"
-                                            name="address"
-                                            onChange={(e) => setPersonAdd({ ...personAdd, address: e.target.value })}
-                                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label
-                                            htmlFor="status"
-                                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                        >
-                                            Trạng thái
-                                        </label>
-                                        <input
-                                            type="text"
-                                            id="status"
-                                            name="status"
-                                            value={1}
-                                            disabled
-                                            onChange={(e) => setPersonAdd({ ...personAdd, status: e.target.value })}
-                                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label
-                                            htmlFor="username"
-                                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                        >
-                                            Username
-                                        </label>
-                                        <input
-                                            type="text"
-                                            id="username"
-                                            name="username"
-                                            onChange={(e) =>
-                                                setPersonAdd({
-                                                    ...personAdd,
-                                                    users: { ...personAdd.users, username: e.target.value },
-                                                })
-                                            }
-                                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label
-                                            htmlFor="password"
-                                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                        >
-                                            Password
-                                        </label>
-                                        <input
-                                            type="password"
-                                            id="password"
-                                            name="password"
-                                            onChange={(e) =>
-                                                setPersonAdd({
-                                                    ...personAdd,
-                                                    users: { ...personAdd.users, password: e.target.value },
-                                                })
-                                            }
-                                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label
-                                            htmlFor="img"
-                                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                        >
-                                            Ảnh
-                                        </label>
-                                        <input
-                                            type="text"
-                                            id="img"
-                                            name="img"
-                                            onChange={(e) => setPersonAdd({ ...personAdd, img: e.target.value })}
-                                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label
-                                            htmlFor="gender"
-                                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                        >
-                                            Giới tính
-                                        </label>
-                                        <select
-                                            name="gender"
-                                            id="gender"
-                                            className="w-full p-1 rounded"
-                                            onChange={(e) => setPersonAdd({ ...personAdd, gender: e.target.value })}
-                                        >
-                                            <option value="Nam">Nam</option>
-                                            <option value="Nữ">Nữ</option>
-                                            <option value="Khác">Khác</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label
-                                            htmlFor="nationality"
-                                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                        >
-                                            Quốc gia
-                                        </label>
-                                        <select
-                                            name="nationality"
-                                            id="nationality"
-                                            className="w-full p-1 rounded"
-                                            onChange={(e) => {
-                                                const index = e.target.options[e.target.selectedIndex].id;
-                                                setPersonAdd({
-                                                    ...personAdd,
-                                                    nationality: {
-                                                        id: nationalities[index].id,
-                                                        name: nationalities[index].name,
-                                                        status: nationalities[index].status,
-                                                    },
-                                                });
-                                            }}
-                                        >
-                                            {nationalities.map((x, index) => (
-                                                <option key={x.id} value={x.name} id={index}>
-                                                    {x.name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                </div>
-                                <div className="flex justify-center gap-4 mt-6">
-                                    <Button
-                                        onClick={() => {
-                                            handleAdd(personAdd);
-                                        }}
-                                    >
-                                        Thêm
-                                    </Button>
-                                    <Button color="gray" onClick={() => setVisibleAdd(false)}>
-                                        Đóng
-                                    </Button>
-                                </div>
-                            </form>
+                            <Formik
+                                initialValues={{ ...objPersonnel, nationality: nationalities[0]?.id }}
+                                validationSchema={PersonnelSchema}
+                                onSubmit={(values) => {
+                                    handleAdd(values);
+                                }}
+                            >
+                                {({ errors, touched }) => (
+                                    <Form>
+                                        <div className="grid grid-cols-3 gap-5">
+                                            <div className="col-start-1 col-end-4">Thông tin chung</div>
+                                            <div>
+                                                <label
+                                                    htmlFor="fullname"
+                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                >
+                                                    Họ tên
+                                                </label>
+                                                <Field
+                                                    name="fullname"
+                                                    className={`
+                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                    ${
+                                                        errors.fullname && touched.fullname
+                                                            ? 'border-2 border-rose-600'
+                                                            : ''
+                                                    } `}
+                                                />
+                                                {errors.fullname && touched.fullname ? (
+                                                    <div className="text-sm text-red-600 mt-2">{errors.fullname}</div>
+                                                ) : null}
+                                            </div>
+                                            <div>
+                                                <label
+                                                    htmlFor="email"
+                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                >
+                                                    Email
+                                                </label>
+                                                <Field
+                                                    type="email"
+                                                    name="email"
+                                                    className={`
+                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                    ${
+                                                        errors.email && touched.email ? 'border-2 border-rose-600' : ''
+                                                    } `}
+                                                />
+                                                {errors.email && touched.email ? (
+                                                    <div className="text-sm text-red-600 mt-2">{errors.email}</div>
+                                                ) : null}
+                                            </div>
+                                            <div>
+                                                <label
+                                                    htmlFor="phoneNumber"
+                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                >
+                                                    Số điện thoại
+                                                </label>
+                                                <Field
+                                                    name="phoneNumber"
+                                                    className={`
+                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                    ${
+                                                        errors.phoneNumber && touched.phoneNumber
+                                                            ? 'border-2 border-rose-600'
+                                                            : ''
+                                                    } `}
+                                                />
+                                                {errors.phoneNumber && touched.phoneNumber ? (
+                                                    <div className="text-sm text-red-600 mt-2">
+                                                        {errors.phoneNumber}
+                                                    </div>
+                                                ) : null}
+                                            </div>
+                                            <div>
+                                                <label
+                                                    htmlFor="citizenIdCode"
+                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                >
+                                                    CCCD/CMTND
+                                                </label>
+                                                <Field
+                                                    name="citizenIdCode"
+                                                    className={`
+                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                    ${
+                                                        errors.citizenIdCode && touched.citizenIdCode
+                                                            ? 'border-2 border-rose-600'
+                                                            : ''
+                                                    } `}
+                                                />
+                                                {errors.citizenIdCode && touched.citizenIdCode ? (
+                                                    <div className="text-sm text-red-600 mt-2">
+                                                        {errors.citizenIdCode}
+                                                    </div>
+                                                ) : null}
+                                            </div>
+                                            <div>
+                                                <label
+                                                    htmlFor="dateOfBirth"
+                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                >
+                                                    Ngày sinh
+                                                </label>
+                                                <Field
+                                                    type="date"
+                                                    name="dateOfBirth"
+                                                    className={`
+                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                    ${
+                                                        errors.dateOfBirth && touched.dateOfBirth
+                                                            ? 'border-2 border-rose-600'
+                                                            : ''
+                                                    } `}
+                                                />
+                                                {errors.dateOfBirth && touched.dateOfBirth ? (
+                                                    <div className="text-sm text-red-600 mt-2">
+                                                        {errors.dateOfBirth}
+                                                    </div>
+                                                ) : null}
+                                            </div>
+                                            <div>
+                                                <label
+                                                    htmlFor="address"
+                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                >
+                                                    Địa chỉ
+                                                </label>
+                                                <Field
+                                                    name="address"
+                                                    className={`
+                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                    ${
+                                                        errors.address && touched.address
+                                                            ? 'border-2 border-rose-600'
+                                                            : ''
+                                                    } `}
+                                                />
+                                                {errors.address && touched.address ? (
+                                                    <div className="text-sm text-red-600 mt-2">{errors.address}</div>
+                                                ) : null}
+                                            </div>
+                                            <div>
+                                                <label
+                                                    htmlFor="img"
+                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                >
+                                                    Ảnh
+                                                </label>
+                                                <Field
+                                                    name="img"
+                                                    className={`
+                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                    ${errors.img && touched.img ? 'border-2 border-rose-600' : ''} `}
+                                                />
+                                                {errors.img && touched.img ? (
+                                                    <div className="text-sm text-red-600 mt-2">{errors.img}</div>
+                                                ) : null}
+                                            </div>
+                                            <div>
+                                                <label
+                                                    htmlFor="gender"
+                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                >
+                                                    Giới tính
+                                                </label>
+                                                <Field
+                                                    as="select"
+                                                    name="gender"
+                                                    className={`
+                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                    ${
+                                                        errors.gender && touched.gender
+                                                            ? 'border-2 border-rose-600'
+                                                            : ''
+                                                    } `}
+                                                >
+                                                    <option value="Nam">Nam</option>
+                                                    <option value="Nữ">Nữ</option>
+                                                    <option value="Khác">Khác</option>
+                                                </Field>
+                                                {errors.gender && touched.gender ? (
+                                                    <div className="text-sm text-red-600 mt-2">{errors.gender}</div>
+                                                ) : null}
+                                            </div>
+                                            <div>
+                                                <label
+                                                    htmlFor="nationality"
+                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                >
+                                                    Quốc gia
+                                                </label>
+                                                <Field
+                                                    as="select"
+                                                    name="nationality"
+                                                    className={`
+                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                    ${
+                                                        errors.nationality && touched.nationality
+                                                            ? 'border-2 border-rose-600'
+                                                            : ''
+                                                    } `}
+                                                >
+                                                    {nationalities.map((x) => (
+                                                        <option key={x.id} value={x.id}>
+                                                            {x.name}
+                                                        </option>
+                                                    ))}
+                                                </Field>
+                                                {errors.nationality && touched.nationality ? (
+                                                    <div className="text-sm text-red-600 mt-2">
+                                                        {errors.nationality}
+                                                    </div>
+                                                ) : null}
+                                            </div>
+                                            <div className="col-start-1 col-end-4">Thông tin đăng nhập</div>
+                                            <div>
+                                                <label
+                                                    htmlFor="username"
+                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                >
+                                                    Username
+                                                </label>
+                                                <Field
+                                                    name="users.username"
+                                                    className={`
+                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                    ${
+                                                        errors.users?.username && touched.users?.username
+                                                            ? 'border-2 border-rose-600'
+                                                            : ''
+                                                    } `}
+                                                />
+                                                {errors.users?.username && touched.users?.username ? (
+                                                    <div className="text-sm text-red-600 mt-2">
+                                                        {errors.users?.username}
+                                                    </div>
+                                                ) : null}
+                                            </div>
+                                            <div>
+                                                <label
+                                                    htmlFor="password"
+                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                >
+                                                    Password
+                                                </label>
+                                                <Field
+                                                    type="password"
+                                                    name="users.password"
+                                                    className={`
+                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                    ${
+                                                        errors.users?.password && touched.users?.password
+                                                            ? 'border-2 border-rose-600'
+                                                            : ''
+                                                    } `}
+                                                />
+                                                {errors.users?.password && touched.users?.password ? (
+                                                    <div className="text-sm text-red-600 mt-2">
+                                                        {errors.users?.password}
+                                                    </div>
+                                                ) : null}
+                                            </div>
+                                        </div>
+                                        <div className="flex justify-center gap-4 mt-6">
+                                            <Button type="submit">Thêm</Button>
+                                            <Button color="gray" onClick={() => setVisibleAdd(false)}>
+                                                Đóng
+                                            </Button>
+                                        </div>
+                                    </Form>
+                                )}
+                            </Formik>
                         </Modal.Body>
                     </Modal>
                 </div>

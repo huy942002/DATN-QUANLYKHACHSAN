@@ -1,7 +1,7 @@
 import { Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faMagnifyingGlass, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { toast } from 'react-toastify';
@@ -33,7 +33,7 @@ function Services() {
     const [visibleUpdate, setVisibleUpdate] = useState(false);
     const [visibleAdd, setVisibleAdd] = useState(false);
     const [service, setService] = useState(objService);
-
+    const [valueSearch, setValueSearch] = useState('');
     const services = useSelector((state) => state.service.services);
     const servic = useSelector((state) => state.service.service);
     const serviceType = useSelector((state) => state.serviceType.serviceTypes);
@@ -89,7 +89,23 @@ function Services() {
     return (
         <div>
             <div className="grid grid-cols-6">
-                <div className="col-start-6">
+                <div className="col-start-1 flex justify-center items-center">
+                    <p>Tìm kiếm dịch vụ</p>
+                </div>
+                <div className="col-start-2 col-end-6">
+                    <div className="relative">
+                        <div className="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
+                            <FontAwesomeIcon icon={faMagnifyingGlass} />
+                        </div>
+                        <input
+                            type="search"
+                            onChange={(e) => setTimeout(() => setValueSearch(e.target.value), 1000)}
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            placeholder="Tìm kiếm..."
+                        />
+                    </div>
+                </div>
+                <div className="col-start-6 flex justify-center items-center">
                     <button
                         type="button"
                         onClick={() => {
@@ -128,37 +144,39 @@ function Services() {
                             </tr>
                         </thead>
                         <tbody>
-                            {services.map((x) => (
-                                <tr className="bg-white dark:bg-gray-800" key={x.id}>
-                                    <td className="py-4 px-6">{x.name}</td>
-                                    <td className="py-4 px-6">{x.prices}</td>
-                                    <td className="py-4 px-6">{x.note}</td>
-                                    <td className="py-4 px-6">{x.status === 1 ? 'Hoạt động' : 'Không tồn tại'}</td>
-                                    <td className="py-4 px-6">{x.serviceType.name}</td>
-                                    <td className="py-4 px-6">
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                getIdUpdate(x.id);
-                                            }}
-                                            className="py-2 px-2 text-sm font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
-                                        >
-                                            <span className="mx-2">Sửa</span>
-                                        </button>
-                                    </td>
-                                    <td className="py-4 px-2">
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                getIdDelete(x.id);
-                                            }}
-                                            className="py-2 px-2 text-sm font-medium text-center text-white bg-red-700 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
-                                        >
-                                            <span className="mx-2">Xóa</span>
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
+                            {services
+                                .filter((x) => x.name.toLowerCase().includes(valueSearch))
+                                .map((x) => (
+                                    <tr className="bg-white dark:bg-gray-800" key={x.id}>
+                                        <td className="py-4 px-6">{x.name}</td>
+                                        <td className="py-4 px-6">{x.prices}</td>
+                                        <td className="py-4 px-6">{x.note}</td>
+                                        <td className="py-4 px-6">{x.status === 1 ? 'Hoạt động' : 'Không tồn tại'}</td>
+                                        <td className="py-4 px-6">{x.serviceType.name}</td>
+                                        <td className="py-4 px-6">
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    getIdUpdate(x.id);
+                                                }}
+                                                className="py-2 px-2 text-sm font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+                                            >
+                                                <span className="mx-2">Sửa</span>
+                                            </button>
+                                        </td>
+                                        <td className="py-4 px-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    getIdDelete(x.id);
+                                                }}
+                                                className="py-2 px-2 text-sm font-medium text-center text-white bg-red-700 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
+                                            >
+                                                <span className="mx-2">Xóa</span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
                         </tbody>
                     </table>
                     {/* Modal delete */}
