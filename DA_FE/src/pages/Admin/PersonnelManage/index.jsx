@@ -4,7 +4,7 @@ import * as Yup from 'yup';
 import { Link } from 'react-router-dom';
 import config from '~/config';
 
-import { faChevronRight, faMagnifyingGlass, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faChevronRight, faMagnifyingGlass, faPlus, faSackDollar } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { toast } from 'react-toastify';
@@ -12,8 +12,10 @@ import { toast } from 'react-toastify';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { add, getAllNationality, getAllPersonnel, getPersonnelById, update } from '~/app/reducers/personnel';
+import { update as updateHandOver } from '~/app/reducers/handOver';
 
 import { Button, Modal } from 'flowbite-react';
+import { getAllHandOver } from '~/app/reducers/handOver';
 
 const objPersonnel = {
     fullname: '',
@@ -57,16 +59,23 @@ function PersonnelManage() {
     const [visibleDelete, setVisibleDelete] = useState(false);
     const [visibleUpdate, setVisibleUpdate] = useState(false);
     const [visibleAdd, setVisibleAdd] = useState(false);
+    const [visibleMoneyFirst, setVisibleMoneyFirst] = useState(false);
     const [person, setPerson] = useState(objPersonnel);
     const [valueSearch, setValueSearch] = useState('');
+    const handOvers = useSelector((state) => state.handOver.handOvers);
     const personnels = useSelector((state) => state.personnel.personnels);
     const nationalities = useSelector((state) => state.personnel.nationalities);
     const personnel = useSelector((state) => state.personnel.personnel);
     const dispatch = useDispatch();
 
+    const userLogin = handOvers
+        .filter((x) => x.status === 0)
+        .reduce((prev, current) => (prev.dateTimeStart > current.dateTimeStart ? prev : current), {});
+
     useEffect(() => {
         dispatch(getAllPersonnel());
         dispatch(getAllNationality());
+        dispatch(getAllHandOver());
         setPerson(personnel);
         // eslint-disable-next-line
     }, [personnel]);
@@ -84,6 +93,11 @@ function PersonnelManage() {
     // open the modal add
     function openAdd() {
         setVisibleAdd(true);
+    }
+
+    // open the modal money first
+    function openMoneyFirst() {
+        setVisibleMoneyFirst(true);
     }
 
     function handleDeleteById() {
@@ -117,6 +131,12 @@ function PersonnelManage() {
         );
         toast.success('Thêm nhân viên thành công', { autoClose: 2000 });
         setVisibleAdd(false);
+    }
+
+    function handleFirstMoney(data) {
+        dispatch(updateHandOver({ ...userLogin, moneyFirst: Number(data.money) }));
+        toast.success('Cập nhật thành công', { autoClose: 2000 });
+        setVisibleMoneyFirst(false);
     }
 
     return (
@@ -170,6 +190,18 @@ function PersonnelManage() {
                     >
                         <FontAwesomeIcon icon={faPlus} />
                         <span className="mx-2">Thêm</span>
+                    </button>
+                </div>
+                <div className="col-start-7">
+                    <button
+                        type="button"
+                        onClick={() => {
+                            openMoneyFirst();
+                        }}
+                        className="py-2 px-3 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                    >
+                        <FontAwesomeIcon icon={faSackDollar} />
+                        <span className="mx-2">Tiền đầu ca</span>
                     </button>
                 </div>
             </div>
@@ -562,6 +594,55 @@ function PersonnelManage() {
                                         <div className="flex justify-center gap-4 mt-6">
                                             <Button type="submit">Cập nhật</Button>
                                             <Button color="gray" onClick={() => setVisibleUpdate(false)}>
+                                                Đóng
+                                            </Button>
+                                        </div>
+                                    </Form>
+                                )}
+                            </Formik>
+                        </Modal.Body>
+                    </Modal>
+                    {/* modal money first */}
+                    <Modal show={visibleMoneyFirst} size="xl" popup={true} onClose={() => setVisibleMoneyFirst(false)}>
+                        <Modal.Header />
+                        <Modal.Body>
+                            <Formik
+                                enableReinitialize
+                                initialValues={{ money: userLogin.moneyFirst || 0 }}
+                                validationSchema={Yup.object().shape({
+                                    money: Yup.number()
+                                        .positive('Tiền đầu ca phải lớn hơn không')
+                                        .typeError('Tiền đầu ca phải là số')
+                                        .required('Tiền đầu ca không để để trống'),
+                                })}
+                                onSubmit={(values) => {
+                                    handleFirstMoney(values);
+                                }}
+                            >
+                                {({ errors, touched }) => (
+                                    <Form>
+                                        <div>
+                                            <label
+                                                htmlFor="money"
+                                                className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                            >
+                                                Tiền đầu ca
+                                            </label>
+                                            <Field
+                                                name="money"
+                                                className={`
+                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                    ${
+                                                        errors.money && touched.money ? 'border-2 border-rose-600' : ''
+                                                    } `}
+                                            />
+                                            {errors.money && touched.money ? (
+                                                <div className="text-sm text-red-600 mt-2">{errors.money}</div>
+                                            ) : null}
+                                        </div>
+                                        <div className="flex justify-center gap-4 mt-6">
+                                            <Button type="submit">Cập nhật tiền</Button>
+                                            <Button color="gray" onClick={() => setVisibleMoneyFirst(false)}>
                                                 Đóng
                                             </Button>
                                         </div>

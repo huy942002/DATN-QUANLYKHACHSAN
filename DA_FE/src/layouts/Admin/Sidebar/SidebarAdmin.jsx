@@ -63,7 +63,7 @@ function SidebarAdmin() {
                         </Link>
                         <Link to={config.routes.handOverManage} className="block mb-2 hover:bg-gray-200 p-1 rounded-md">
                             <FontAwesomeIcon icon={faListCheck} className="w-6" />
-                            <span className="mx-2">Quản lý giao ca</span>
+                            <span className="mx-2">Lịch sử giao ca</span>
                         </Link>
                         <Link to={config.routes.historyAdmin} className="block mb-2 hover:bg-gray-200 p-1 rounded-md">
                             <FontAwesomeIcon icon={faClockRotateLeft} className="w-6" />

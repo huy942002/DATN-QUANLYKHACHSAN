@@ -23,8 +23,9 @@ const objHandOver = {
     totalCash: '',
     totalMoneyCard: '',
     surcharge: '',
+    moneyHandOver: '',
     moneyReal: '',
-    moneyFirst: 500000,
+    moneyFirst: '',
     note: '',
     status: '',
     personnel: {},
@@ -43,8 +44,9 @@ const objResetHandOver = {
 
 function HandOver() {
     const [visibleReset, setVisibleReset] = useState(false);
+    const [visibleConfirm, setVisibleConfirm] = useState(false);
+    const [visibleConfirmReset, setVisibleConfirmReset] = useState(false);
     const [now, setNow] = useState('');
-    const [password, setPassword] = useState('');
     const [passwordReset, setPasswordReset] = useState('');
     const [handOver, setHandOver] = useState(objHandOver);
     const [resetHandOver, setResetHandOver] = useState(objResetHandOver);
@@ -71,36 +73,42 @@ function HandOver() {
         setVisibleReset(true);
     }
 
+    function showConfirm() {
+        setVisibleConfirm(true);
+    }
+
+    function showConfirmReset() {
+        setVisibleConfirmReset(true);
+    }
+
     function handleDispatch() {
         const receiverDefault = personnels.filter(
             (x) =>
                 x.users.username !== userLogin.personnel?.users.username &&
                 x.users.roles.some((i) => i.name.includes('Nhân viên')),
         )[0];
-        const moneyHandOverReal =
-            totalDeposits - handOver.moneyReal - handOver.surcharge + handOver.moneyFirst - resetMoneyFromUserLogin;
         dispatch(
             update({
                 ...userLogin,
                 dateTimeEnd: now,
+                moneyHandOver: totalDeposits - handOver.surcharge + userLogin.moneyFirst - resetMoneyFromUserLogin,
                 moneyReal: handOver.moneyReal,
                 surcharge: handOver.surcharge,
                 totalCash: userLogin.totalCash + totalDeposits,
-                totalMoneyCard: handOver.totalMoneyCard,
+                totalMoneyCard: totalCard,
                 totalMoney: totalCard + totalCash,
-                note: `${handOver.note.length === 0 ? '' : handOver.note + '.'}${
-                    moneyHandOverReal === 0
-                        ? 'Giao ca thành công'
-                        : `Chưa hoàn thành giao ca, giao ca thiếu ${moneyHandOverReal}đ`
-                }`,
+                note: `${handOver.note.length === 0 ? '' : handOver.note + '.'}`,
                 receiver: handOver.receiver === '' ? receiverDefault.users.username : handOver.receiver,
-                status: moneyHandOverReal === 0 ? 1 : 0,
+                status: handOver.surcharge === '' ? 1 : 0,
             }),
         );
 
         dispatch(
             add({
                 ...objHandOver,
+                totalCash: userLogin.totalCash + totalDeposits,
+                totalMoneyCard: totalCard,
+                totalMoney: totalCard + totalCash,
                 dateTimeStart: now,
                 dateTimeEnd: now,
                 personnel: personnels.filter(
@@ -110,8 +118,9 @@ function HandOver() {
                 )[0],
                 surcharge: 0,
                 moneyReal: 0,
+                moneyHandOver: 0,
                 note: `Đã nhận ca từ nhân viên ${userLogin.personnel.users.username} lúc ${now}`,
-                moneyFirst: handOver.moneyReal,
+                moneyFirst: 500000,
                 status: 0,
             }),
         );
@@ -121,49 +130,34 @@ function HandOver() {
         // Thời gian kết thúc ca trước = Thời gian bắt đầu ca sau
         // Thêm mới thông tin giao ca cho nhân viên nhận ca với trạng thái mặc định là giao đủ : status 1
         // Nếu nhân viên giao ca thiếu tiền thì cập nhập lại trạng thái về pending : status 0
-        // Nếu xác nhận mật khẩu không đúng thì không thực hiện
         // Tiền chênh lệch > 0 phải có ghi chú
         // Cập nhật lại trạng thái ca trước nếu pending và thời gian kết thúc là now
 
-        // check password receiver
-        const receiverDefault = personnels.filter(
-            (x) =>
-                x.users.username !== userLogin.personnel?.users.username &&
-                x.users.roles.some((i) => i.name.includes('Nhân viên')),
-        )[0];
         const moneyHandOverReal =
             totalDeposits - handOver.moneyReal - handOver.surcharge + handOver.moneyFirst - resetMoneyFromUserLogin;
         if (handOver.receiver === '') {
-            if (receiverDefault.users.password === password) {
-                // check note if surcharge have
-                if (Number(handOver.surcharge) > 0 && refNote.current.value.length === 0) {
-                    refNote.current.focus();
-                    refNote.current.style.borderColor = 'red';
-                    toast.error('Vui lòng ghi chú phụ thu', { autoClose: 2000 });
-                } else {
-                    refNote.current.style.borderColor = 'rgb(209 213 219)';
-                    handleDispatch();
-                    toast.success('Giao ca thành công', { autoClose: 2000 });
-                }
+            // check note if surcharge have
+            if (Number(handOver.surcharge) > 0 && refNote.current.value.length === 0) {
+                refNote.current.focus();
+                refNote.current.style.borderColor = 'red';
+                toast.error('Vui lòng ghi chú phụ thu', { autoClose: 2000 });
             } else {
-                toast.error('Mật khẩu xác nhận sai', { autoClose: 2000 });
+                refNote.current.style.borderColor = 'rgb(209 213 219)';
+                handleDispatch();
+                toast.success('Giao ca thành công', { autoClose: 2000 });
             }
         } else {
-            const receiver = personnels.filter((x) => x.users.username === handOver.receiver);
-            if (receiver[0].users.password === password) {
-                // check note if surcharge have
-                if (moneyHandOverReal !== 0 && refNote.current.value.length === 0) {
-                    refNote.current.focus();
-                    refNote.current.style.borderColor = 'red';
-                } else {
-                    refNote.current.style.borderColor = 'rgb(209 213 219)';
-                    handleDispatch();
-                    toast.success('Giao ca thành công', { autoClose: 2000 });
-                }
+            // check note if surcharge have
+            if (moneyHandOverReal !== 0 && refNote.current.value.length === 0) {
+                refNote.current.focus();
+                refNote.current.style.borderColor = 'red';
             } else {
-                toast.error('Mật khẩu xác nhận sai', { autoClose: 2000 });
+                refNote.current.style.borderColor = 'rgb(209 213 219)';
+                handleDispatch();
+                toast.success('Giao ca thành công', { autoClose: 2000 });
             }
         }
+        setVisibleConfirm(false);
     }
 
     function handleResetHandOver() {
@@ -206,6 +200,7 @@ function HandOver() {
                 toast.error('Mật khẩu xác nhận sai', { autoClose: 2000 });
             }
         }
+        setVisibleConfirmReset(false);
     }
 
     return (
@@ -245,19 +240,24 @@ function HandOver() {
                         </span>
                     </div>
                     <div>
-                        <span>Tiền đầu ca : {handOver.moneyFirst.toLocaleString()}đ</span>
+                        <span>
+                            Tổng tiền trong ca : {(totalCard + totalCash + handOver.moneyFirst).toLocaleString()}đ
+                        </span>
                     </div>
                     <div>
-                        <span>Tiền trong ca : {(totalCard + totalCash).toLocaleString()}đ</span>
+                        <span>Tiền đầu ca : {userLogin.moneyFirst?.toLocaleString()}đ</span>
                     </div>
                     <div>
-                        <span>Tiền phòng trả trước : {totalDeposits.toLocaleString()}đ</span>
-                    </div>
-                    <div>
-                        <span>Tiền mặt giao ca : {(totalCash + totalDeposits).toLocaleString()}đ</span>
+                        <span>Tiền phòng trả trước (tiền mặt) : {totalDeposits.toLocaleString()}đ</span>
                     </div>
                     <div>
                         <span>Tiền thẻ & chuyển khoản : {totalCard.toLocaleString()}đ</span>
+                    </div>
+                    <div>
+                        <span>Tiền mặt : {totalCash.toLocaleString()}đ</span>
+                    </div>
+                    <div>
+                        <span>Tiền đã reset : {resetMoneyFromUserLogin.toLocaleString()}đ </span>
                     </div>
                     <div>
                         <label
@@ -272,10 +272,7 @@ function HandOver() {
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         />
                     </div>
-                    <div>
-                        <span>Tiền đã reset : {resetMoneyFromUserLogin.toLocaleString()}đ </span>
-                    </div>
-                    <div>
+                    <div className="col-start-2 col-end-4">
                         <label
                             htmlFor="note"
                             className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
@@ -286,6 +283,7 @@ function HandOver() {
                             type="text"
                             id="note"
                             name="note"
+                            rows={4}
                             ref={refNote}
                             onChange={(e) => {
                                 setHandOver({ ...handOver, note: e.target.value });
@@ -301,7 +299,7 @@ function HandOver() {
                         <div>
                             <span>Nhân viên</span>
                             <select
-                                className="w-full p-1 rounded"
+                                className=" bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                 onChange={(e) => {
                                     const index = e.target.options[e.target.selectedIndex].id;
                                     setHandOver({
@@ -328,41 +326,12 @@ function HandOver() {
                             </select>
                         </div>
                         <div>
-                            <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-                                Mật khẩu xác nhận
-                            </label>
-                            <input
-                                type="password"
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            />
-                        </div>
-                        <div>
-                            <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-                                Tiền thực nhận (VNĐ)
-                            </label>
-                            <input
-                                type="number"
-                                onChange={(e) =>
-                                    setHandOver({
-                                        ...handOver,
-                                        totalMoney: totalCard + totalCash,
-                                        totalCash: totalCash,
-                                        totalMoneyCard: totalCard,
-                                        moneyReal: Number(e.target.value),
-                                    })
-                                }
-                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            />
-                        </div>
-                        <div>
                             <span>
-                                Tiền chênh lệch :{' '}
+                                Tiền mặt giao ca :
                                 {(
                                     totalDeposits -
-                                    handOver.moneyReal -
                                     handOver.surcharge +
-                                    handOver.moneyFirst -
+                                    userLogin.moneyFirst -
                                     resetMoneyFromUserLogin
                                 ).toLocaleString()}
                                 đ
@@ -374,7 +343,7 @@ function HandOver() {
                     <div>
                         <button
                             type="button"
-                            onClick={() => handleHandOver()}
+                            onClick={() => showConfirm()}
                             className="py-2 px-3 w-full text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                         >
                             <FontAwesomeIcon icon={faHandshake} />
@@ -401,7 +370,7 @@ function HandOver() {
                                     <div>
                                         <span>Quản lý</span>
                                         <select
-                                            className="w-full p-1 rounded"
+                                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                             onChange={(e) => {
                                                 const index = e.target.options[e.target.selectedIndex].id;
                                                 setResetHandOver({
@@ -497,10 +466,63 @@ function HandOver() {
                                     </div>
                                 </div>
                                 <div className="flex justify-center mt-6 gap-4">
-                                    <Button onClick={() => handleResetHandOver()}>Xác nhận</Button>
+                                    <Button onClick={() => showConfirmReset()}>Xác nhận</Button>
                                     <Button color="gray" onClick={() => setVisibleReset(false)}>
                                         Không, đóng
                                     </Button>
+                                </div>
+                            </Modal.Body>
+                        </Modal>
+                        {/* Modal confirm hand over */}
+                        <Modal show={visibleConfirm} size="md" popup={true} onClose={() => setVisibleConfirm(false)}>
+                            <Modal.Header />
+                            <Modal.Body>
+                                <div className="text-center">
+                                    <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+                                        Bạn có muốn giao ca ?
+                                    </h3>
+                                    <div className="flex justify-center gap-4">
+                                        <Button
+                                            color="failure"
+                                            onClick={() => {
+                                                handleHandOver();
+                                            }}
+                                        >
+                                            Đồng ý
+                                        </Button>
+                                        <Button color="gray" onClick={() => setVisibleConfirm(false)}>
+                                            Không, đóng
+                                        </Button>
+                                    </div>
+                                </div>
+                            </Modal.Body>
+                        </Modal>
+                        {/* Modal confirm reset hand over */}
+                        <Modal
+                            show={visibleConfirmReset}
+                            size="md"
+                            popup={true}
+                            onClose={() => setVisibleConfirmReset(false)}
+                        >
+                            <Modal.Header />
+                            <Modal.Body>
+                                <div className="text-center">
+                                    <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+                                        Bạn có muốn reset ca ?
+                                    </h3>
+                                    <div className="flex justify-center gap-4">
+                                        <Button
+                                            color="failure"
+                                            onClick={() => {
+                                                handleResetHandOver();
+                                            }}
+                                        >
+                                            Đồng ý
+                                        </Button>
+                                        <Button color="gray" onClick={() => setVisibleConfirmReset(false)}>
+                                            Không, đóng
+                                        </Button>
+                                    </div>
                                 </div>
                             </Modal.Body>
                         </Modal>

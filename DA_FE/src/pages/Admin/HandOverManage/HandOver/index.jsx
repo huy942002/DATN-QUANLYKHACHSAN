@@ -3,7 +3,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Modal } from 'flowbite-react';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getAllHandOver, getHandOverById } from '~/app/reducers/handOver';
+
+import { toast } from 'react-toastify';
+
+import { getAllHandOver, update, getHandOverById } from '~/app/reducers/handOver';
 
 const objHandOver = {
     receiver: '',
@@ -14,6 +17,7 @@ const objHandOver = {
     totalCash: '',
     surcharge: '',
     moneyReal: '',
+    moneyHandOver: '',
     moneyFirst: '',
     note: '',
     status: '',
@@ -27,7 +31,9 @@ const objSearch = {
 
 function HandOver() {
     const [visible, setVisible] = useState(false);
+    const [visibleConfirm, setVisibleConfirm] = useState(false);
     const [handOver, setHandOver] = useState(objHandOver);
+    const [id, setId] = useState('');
     const [valueSearch, setValueSearch] = useState('');
     const [obSearh, setObSearch] = useState(objSearch);
     const handOvers = useSelector((state) => state.handOver.handOvers);
@@ -51,8 +57,20 @@ function HandOver() {
     }
 
     function showInfo(id) {
+        setId(id);
         dispatch(getHandOverById(id));
         setVisible(true);
+    }
+
+    function showConfirm() {
+        setVisibleConfirm(true);
+    }
+
+    function handleHandOverConfirm() {
+        // update status to 1
+        dispatch(update({ ...handOvers.find((x) => x.id === Number(id)), status: 1 }));
+        toast.success('Xác thực thành công', { autoClose: 2000 });
+        setVisibleConfirm(false);
     }
 
     return (
@@ -155,14 +173,14 @@ function HandOver() {
                             </tbody>
                         </table>
                         {/* Modal show info */}
-                        <Modal show={visible} size="4xl" popup={true} onClose={() => setVisible(false)}>
+                        <Modal show={visible} size="6xl" popup={true} onClose={() => setVisible(false)}>
                             <Modal.Header>
                                 <p>Thông tin chi tiết</p>
                             </Modal.Header>
                             <hr />
                             <Modal.Body>
                                 <div className="mt-3">
-                                    <div className="grid grid-cols-2 gap-x-8 gap-y-4">
+                                    <div className="grid grid-cols-3 gap-x-8 gap-y-4">
                                         <div>
                                             <span>Nhân viên giao ca : {handOver.personnel?.fullname}</span>
                                         </div>
@@ -190,7 +208,29 @@ function HandOver() {
                                             <span>Phụ thu : {handOver.surcharge?.toLocaleString()}đ</span>
                                         </div>
                                         <div>
-                                            <span>Thực nhận : {handOver.moneyReal?.toLocaleString()}đ</span>
+                                            <span>
+                                                Tiền đã reset :
+                                                {(handOver.totalMoney -
+                                                    handOver.totalMoneyCard -
+                                                    handOver.totalCash -
+                                                    handOver.moneyFirst <
+                                                0
+                                                    ? 0
+                                                    : handOver.totalMoney -
+                                                      handOver.totalMoneyCard -
+                                                      handOver.totalCash -
+                                                      handOver.moneyFirst
+                                                ).toLocaleString()}
+                                                đ
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <span>Thực nhận ca trước : {handOver.moneyReal?.toLocaleString()}đ</span>
+                                        </div>
+                                        <div>
+                                            <span>
+                                                Số tiền mặt đã giao ca : {handOver.moneyHandOver?.toLocaleString()}đ
+                                            </span>
                                         </div>
                                         <div>
                                             <span
@@ -200,7 +240,8 @@ function HandOver() {
                                                         : 'text-red-600 font-bold'
                                                 }`}
                                             >
-                                                Trạng thái : {handOver.status === 1 ? 'Đã giao ca' : 'Pending'}
+                                                Trạng thái :{' '}
+                                                {handOver.status === 1 ? 'Đã giao ca' : 'Giao ca thiếu tiền'}
                                             </span>
                                         </div>
                                         <div>
@@ -215,12 +256,31 @@ function HandOver() {
                                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                             />
                                         </div>
-                                    </div>
-                                    <div className="grid grid-cols-3 mt-8">
-                                        <div className="col-start-3">
-                                            <Button onClick={() => setVisible(false)}>Đóng</Button>
+                                        <div className="col-start-3 flex justify-center items-center">
+                                            <button
+                                                onClick={showConfirm}
+                                                className="py-2 px-2 w-full text-sm font-medium text-center text-white focus:ring-4 focus:outline-none bg-green-700 rounded-lg hover:bg-green-800 focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+                                            >
+                                                Xác thực tiền giao ca
+                                            </button>
                                         </div>
                                     </div>
+                                </div>
+                            </Modal.Body>
+                        </Modal>
+                        {/* Modal show info */}
+                        <Modal show={visibleConfirm} size="2xl" popup={true} onClose={() => setVisibleConfirm(false)}>
+                            <Modal.Header>
+                                <p>Xác thực giao ca</p>
+                            </Modal.Header>
+                            <hr />
+                            <Modal.Body>
+                                <div className="mt-3">Bạn có chắc muốn xác thực ca này ?</div>
+                                <div className="flex justify-center mt-6 gap-4">
+                                    <Button onClick={handleHandOverConfirm}>Đồng ý</Button>
+                                    <Button color="gray" onClick={() => setVisibleConfirm(false)}>
+                                        Không, đóng
+                                    </Button>
                                 </div>
                             </Modal.Body>
                         </Modal>
