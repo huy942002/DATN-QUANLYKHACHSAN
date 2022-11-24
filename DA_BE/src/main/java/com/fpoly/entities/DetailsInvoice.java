@@ -16,10 +16,12 @@ import javax.persistence.OneToMany;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -32,11 +34,17 @@ public class DetailsInvoice implements Serializable {
 	@Column(name = "ID", unique = true, nullable = false, precision = 10)
 	private int id;
 
+	@Column(name = "HIRE_DATE", nullable = false)
+	private LocalDateTime hireDate;
+
+	@Column(name = "CHECK_OUT_DAY")
+	private LocalDateTime checkOutDay;
+
 	@Column(name = "NUMBER_OF_DAYS_OF_RENT")
-	private LocalDateTime numberOfDaysOfRent;
+	private int numberOfDaysOfRent;
 
 	@Column(name = "NUMBER_OF_HOURS_TO_RENT", length = 10)
-	private String numberOfHoursToRent;
+	private int numberOfHoursToRent;
 
 	@Column(name = "NUMBER_OF_PEOPLE", precision = 10)
 	private int numberOfPeople;
@@ -56,11 +64,11 @@ public class DetailsInvoice implements Serializable {
 	private Set<ServiceDetails> serviceDetails;
 
 	@ManyToOne(optional = false)
+	@JoinColumn(name = "ID_RENTAL_TYPES", nullable = false)
+	private RentalTypes rentalTypes;
+
+	@ManyToOne(optional = false)
 	@JoinColumn(name = "ID_ROOMS", nullable = false)
 	private Rooms rooms;
-
-	@OneToMany(mappedBy = "detailsInvoice")
-	@JsonIgnore
-	private Set<DetailsOfRentalTypes> detailsOfRentalTypes;
 
 }

@@ -1,3 +1,5 @@
+// Generated with g9.
+
 package com.fpoly.entities;
 
 import java.io.Serializable;
@@ -13,11 +15,13 @@ import javax.persistence.OneToMany;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true) // important
 @AllArgsConstructor
 @NoArgsConstructor

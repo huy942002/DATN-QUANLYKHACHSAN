@@ -1,7 +1,7 @@
 package com.fpoly.entities;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -16,10 +16,12 @@ import javax.persistence.OneToMany;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -45,7 +47,7 @@ public class Customer implements Serializable {
 	private String gender;
 
 	@Column(name = "DATE_OF_BIRTH")
-	private LocalDateTime dateOfBirth;
+	private LocalDate dateOfBirth;
 
 	@Column(name = "PHONE_NUMBER", length = 12)
 	private String phoneNumber;

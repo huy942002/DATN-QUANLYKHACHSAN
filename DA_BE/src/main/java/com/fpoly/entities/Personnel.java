@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -69,16 +68,16 @@ public class Personnel implements Serializable {
 	@OneToMany(mappedBy = "personnel")
 	@JsonIgnore
 	private Set<Bills> bills;
-	
-    @OneToMany(mappedBy="personnel")
-    @JsonIgnore
-    private Set<HandOver> handOver;
-    
-    @OneToMany(mappedBy="personnel")
-    @JsonIgnore
-    private Set<ResetHandOver> resetHandOver;
 
-	@ManyToOne(optional = false, cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "personnel")
+	@JsonIgnore
+	private Set<HandOver> handOver;
+
+	@OneToMany(mappedBy = "personnel")
+	@JsonIgnore
+	private Set<ResetHandOver> resetHandOver;
+
+	@ManyToOne(optional = false)
 	@JoinColumn(name = "ID_USER", nullable = false)
 	private Users users;
 

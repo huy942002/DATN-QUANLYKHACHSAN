@@ -10,13 +10,13 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -29,20 +29,25 @@ public class KindOfRoom implements Serializable {
 	@Column(name = "ID", unique = true, nullable = false, precision = 10)
 	private int id;
 
-	@Column(name = "NAME", nullable = false, length = 255)
-	private String name;
+	@Column(name = "ROOM_TYPE_NAME", nullable = false, length = 50)
+	private String roomTypeName;
 
 	@Column(name = "NOTE", length = 255)
 	private String note;
 
-	@Column(name = "PRICES", nullable = false, precision = 53)
-	private double prices;
+	@Column(name = "PRICE_BY_DAY", nullable = false, precision = 53)
+	private double priceByDay;
+
+	@Column(name = "HOURLY_PRICE", nullable = false, precision = 53)
+	private double hourlyPrice;
 
 	@Column(name = "STATUS", nullable = false, precision = 10)
 	private int status;
 
 	@OneToMany(mappedBy = "kindOfRoom")
-	@JsonIgnore
 	private Set<Rooms> rooms;
+
+	@OneToMany(mappedBy = "kindOfRoom")
+	private Set<Booking> booking;
 
 }

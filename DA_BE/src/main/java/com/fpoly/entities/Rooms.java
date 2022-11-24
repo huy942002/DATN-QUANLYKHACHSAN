@@ -15,10 +15,12 @@ import javax.persistence.OneToMany;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -40,8 +42,14 @@ public class Rooms implements Serializable {
 	@Column(name = "IMG", length = 255)
 	private String img;
 
-	@Column(name = "PRICES", nullable = false, precision = 53)
-	private double prices;
+	@Column(name = "IMG1", length = 255)
+	private String img1;
+
+	@Column(name = "IMG2", length = 255)
+	private String img2;
+
+	@Column(name = "IMG3", length = 255)
+	private String img3;
 
 	@Column(name = "STATUS", nullable = false, precision = 10)
 	private int status;

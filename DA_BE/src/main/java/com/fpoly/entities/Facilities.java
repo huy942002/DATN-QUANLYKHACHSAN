@@ -13,10 +13,12 @@ import javax.persistence.OneToMany;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -24,19 +26,19 @@ public class Facilities implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "ID", unique = true, nullable = false, precision = 10)
-	private int id;
-
-	@Column(name = "NAME", nullable = false, length = 255)
-	private String name;
-
-	@Column(name = "STATUS", nullable = false, precision = 10)
-	private int status;
-
-	@OneToMany(mappedBy = "facilities")
-	@JsonIgnore
-	private Set<FacilitiesDetails> facilitiesDetails;
+    @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @Column(name="ID", unique=true, nullable=false, precision=10)
+    private int id;
+    
+    @Column(name="NAME", nullable=false, length=255)
+    private String name;
+    
+    @Column(name="STATUS", nullable=false, precision=10)
+    private int status;
+    
+    @OneToMany(mappedBy="facilities")
+    @JsonIgnore
+    private Set<FacilitiesDetails> facilitiesDetails;
 
 }

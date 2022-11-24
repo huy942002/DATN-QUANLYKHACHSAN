@@ -13,14 +13,16 @@ import javax.persistence.OneToMany;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class BookingType implements Serializable {
+public class RoomRefundConditions implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -29,14 +31,14 @@ public class BookingType implements Serializable {
 	@Column(name = "ID", unique = true, nullable = false, precision = 10)
 	private int id;
 
-	@Column(name = "NAME", nullable = false, length = 255)
-	private String name;
+	@Column(name = "REFUND_CONDITIONS", nullable = false, length = 255)
+	private String refundConditions;
 
 	@Column(name = "STATUS", nullable = false, precision = 10)
 	private int status;
 
-	@OneToMany(mappedBy = "bookingType")
+	@OneToMany(mappedBy = "roomRefundConditions")
 	@JsonIgnore
-	private Set<Booking> booking;
+	private Set<Bills> bills;
 
 }

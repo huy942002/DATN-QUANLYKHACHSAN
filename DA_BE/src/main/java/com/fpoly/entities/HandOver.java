@@ -12,10 +12,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -37,6 +39,9 @@ public class HandOver implements Serializable {
 	@Column(name = "DATE_TIME_END", nullable = false)
 	private LocalDateTime dateTimeEnd;
 
+	@Column(name = "MONEY_FIRST", nullable = false, precision = 53)
+	private double moneyFirst;
+
 	@Column(name = "TOTAL_MONEY", nullable = false, precision = 53)
 	private double totalMoney;
 
@@ -48,15 +53,12 @@ public class HandOver implements Serializable {
 
 	@Column(name = "SURCHARGE", nullable = false, precision = 53)
 	private double surcharge;
-	
+
 	@Column(name = "MONEY_REAL", nullable = false, precision = 53)
 	private double moneyReal;
-	
+
 	@Column(name = "MONEY_HAND_OVER", nullable = false, precision = 53)
 	private double moneyHandOver;
-	
-	@Column(name = "MONEY_FIRST", nullable = false, precision = 53)
-	private double moneyFirst;
 
 	@Column(name = "NOTE", length = 255)
 	private String note;
