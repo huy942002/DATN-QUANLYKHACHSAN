@@ -81,6 +81,22 @@ function HandOver() {
         setVisibleConfirmReset(true);
     }
 
+    function formatDate(date) {
+        var d = new Date(date),
+            month = '' + (d.getMonth() + 1),
+            day = '' + d.getDate(),
+            year = '' + d.getFullYear(),
+            hours = '' + d.getHours(),
+            minutes = '' + d.getMinutes();
+
+        if (month.length < 2) month = '0' + month;
+        if (day.length < 2) day = '0' + day;
+        if (hours.length < 2) hours = '0' + hours;
+        if (minutes.length < 2) minutes = '0' + minutes;
+
+        return [year, month, day].join('-') + ' ' + hours + ':' + minutes;
+    }
+
     function handleDispatch() {
         const receiverDefault = personnels.filter(
             (x) =>
@@ -90,7 +106,7 @@ function HandOver() {
         dispatch(
             update({
                 ...userLogin,
-                dateTimeEnd: now,
+                dateTimeEnd: formatDate(now),
                 moneyHandOver: totalDeposits - handOver.surcharge + userLogin.moneyFirst - resetMoneyFromUserLogin,
                 moneyReal: handOver.moneyReal,
                 surcharge: handOver.surcharge,
@@ -109,8 +125,8 @@ function HandOver() {
                 totalCash: userLogin.totalCash + totalDeposits,
                 totalMoneyCard: totalCard,
                 totalMoney: totalCard + totalCash,
-                dateTimeStart: now,
-                dateTimeEnd: now,
+                dateTimeStart: formatDate(now),
+                dateTimeEnd: formatDate(now),
                 personnel: personnels.filter(
                     (x) =>
                         x.users.username ===
@@ -119,7 +135,7 @@ function HandOver() {
                 surcharge: 0,
                 moneyReal: 0,
                 moneyHandOver: 0,
-                note: `Đã nhận ca từ nhân viên ${userLogin.personnel.users.username} lúc ${now}`,
+                note: `Đã nhận ca từ nhân viên ${userLogin.personnel.users.username} lúc ${formatDate(now)}`,
                 moneyFirst: 500000,
                 status: 0,
             }),
@@ -127,12 +143,6 @@ function HandOver() {
     }
 
     function handleHandOver() {
-        // Thời gian kết thúc ca trước = Thời gian bắt đầu ca sau
-        // Thêm mới thông tin giao ca cho nhân viên nhận ca với trạng thái mặc định là giao đủ : status 1
-        // Nếu nhân viên giao ca thiếu tiền thì cập nhập lại trạng thái về pending : status 0
-        // Tiền chênh lệch > 0 phải có ghi chú
-        // Cập nhật lại trạng thái ca trước nếu pending và thời gian kết thúc là now
-
         const moneyHandOverReal =
             totalDeposits - handOver.moneyReal - handOver.surcharge + handOver.moneyFirst - resetMoneyFromUserLogin;
         if (handOver.receiver === '') {
@@ -174,7 +184,7 @@ function HandOver() {
                         ...resetHandOver,
                         totalMoney: handOver.moneyFirst + totalDeposits,
                         dateTimeStart: userLogin.dateTimeStart,
-                        dateTimeEnd: now,
+                        dateTimeEnd: formatDate(now),
                         personnel: userLogin.personnel,
                     }),
                 );
@@ -190,7 +200,7 @@ function HandOver() {
                         ...resetHandOver,
                         totalMoney: handOver.moneyFirst + totalDeposits,
                         dateTimeStart: userLogin.dateTimeStart,
-                        dateTimeEnd: now,
+                        dateTimeEnd: formatDate(now),
                         personnel: userLogin.personnel,
                     }),
                 );
@@ -236,7 +246,7 @@ function HandOver() {
                     <div className="col-start-2 col-end-4">
                         <span className="bg-blue-100 text-blue-800 font-medium inline-flex items-center px-2 py-0.5 rounded dark:bg-blue-200 dark:text-blue-800">
                             <FontAwesomeIcon icon={faClock} className="mr-2" />
-                            {userLogin.dateTimeStart} đến {now}
+                            {userLogin.dateTimeStart} đến {formatDate(now)}
                         </span>
                     </div>
                     <div>
@@ -328,11 +338,13 @@ function HandOver() {
                         <div>
                             <span>
                                 Tiền mặt giao ca :
-                                {(
-                                    totalDeposits -
-                                    handOver.surcharge +
-                                    userLogin.moneyFirst -
-                                    resetMoneyFromUserLogin
+                                {(totalDeposits - handOver.surcharge + userLogin.moneyFirst - resetMoneyFromUserLogin >=
+                                0
+                                    ? totalDeposits -
+                                      handOver.surcharge +
+                                      userLogin.moneyFirst -
+                                      resetMoneyFromUserLogin
+                                    : 0
                                 ).toLocaleString()}
                                 đ
                             </span>
@@ -409,7 +421,7 @@ function HandOver() {
                                     <div>
                                         <span className="bg-blue-100 text-blue-800 font-medium inline-flex items-center px-2 py-0.5 rounded dark:bg-blue-200 dark:text-blue-800">
                                             <FontAwesomeIcon icon={faClock} className="mr-2" />
-                                            {userLogin.dateTimeStart} đến {now}
+                                            {userLogin.dateTimeStart} đến {formatDate(now)}
                                         </span>
                                     </div>
                                     <div>

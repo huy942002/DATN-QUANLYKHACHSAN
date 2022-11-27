@@ -11,6 +11,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,9 +36,11 @@ public class ResetHandOver implements Serializable {
 	private String receiver;
 
 	@Column(name = "DATE_TIME_START", nullable = false)
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm")
 	private LocalDateTime dateTimeStart;
 
 	@Column(name = "DATE_TIME_END", nullable = false)
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm")
 	private LocalDateTime dateTimeEnd;
 
 	@Column(name = "TOTAL_MONEY", nullable = false, precision = 53)

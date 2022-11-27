@@ -13,6 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
@@ -41,15 +42,18 @@ public class Bills implements Serializable {
 	private int numberOfKids;
 
 	@Column(name = "HIRE_DATE", nullable = false)
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm")
 	private LocalDateTime hireDate;
 
 	@Column(name = "CHECK_OUT_DAY")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm")
 	private LocalDateTime checkOutDay;
 
 	@Column(name = "DEPOSITS", precision = 53)
 	private double deposits;
 
 	@Column(name = "DATE_OF_PAYMENT")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm")
 	private LocalDateTime dateOfPayment;
 
 	@Column(name = "TOTAL_CASH", precision = 53)

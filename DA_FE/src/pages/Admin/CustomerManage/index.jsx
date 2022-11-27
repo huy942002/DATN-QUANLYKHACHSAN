@@ -4,22 +4,18 @@ import * as Yup from 'yup';
 import { Link } from 'react-router-dom';
 import config from '~/config';
 
-import { faChevronRight, faMagnifyingGlass, faPlus, faSackDollar } from '@fortawesome/free-solid-svg-icons';
+import { faChevronRight, faMagnifyingGlass, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { toast } from 'react-toastify';
 
-import bcrypt from 'bcryptjs';
-
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { add, getAllNationality, getAllPersonnel, getPersonnelById, update } from '~/app/reducers/personnel';
-import { update as updateHandOver } from '~/app/reducers/handOver';
+import { add, getAllNationality, getAllCustomer, getCustomerById, update } from '~/app/reducers/customer';
 
 import { Button, Modal } from 'flowbite-react';
-import { getAllHandOver } from '~/app/reducers/handOver';
 
-const objPersonnel = {
+const objCustomer = {
     fullname: '',
     email: '',
     gender: '',
@@ -38,8 +34,8 @@ const objPersonnel = {
     },
 };
 
-const PersonnelSchema = Yup.object().shape({
-    fullname: Yup.string().required('Tên nhân viên không được để trống'),
+const CustomerSchema = Yup.object().shape({
+    fullname: Yup.string().required('Tên khách hàng không được để trống'),
     email: Yup.string().email('Sai định dạng email').required('Email không được để trống'),
     gender: Yup.string().nullable(),
     citizenIdCode: Yup.number().typeError('CCCD/CMNT phải là số').required('CMND/CCCD không được để trống'),
@@ -57,39 +53,32 @@ const PersonnelSchema = Yup.object().shape({
     }),
 });
 
-function PersonnelManage() {
+function CustomerManage() {
     const [visibleDelete, setVisibleDelete] = useState(false);
     const [visibleUpdate, setVisibleUpdate] = useState(false);
     const [visibleAdd, setVisibleAdd] = useState(false);
-    const [visibleMoneyFirst, setVisibleMoneyFirst] = useState(false);
-    const [person, setPerson] = useState(objPersonnel);
+    const [custom, setCustom] = useState(objCustomer);
     const [valueSearch, setValueSearch] = useState('');
-    const handOvers = useSelector((state) => state.handOver.handOvers);
-    const personnels = useSelector((state) => state.personnel.personnels);
-    const nationalities = useSelector((state) => state.personnel.nationalities);
-    const personnel = useSelector((state) => state.personnel.personnel);
+    const customers = useSelector((state) => state.customer.customers);
+    const nationalities = useSelector((state) => state.customer.nationalities);
+    const customer = useSelector((state) => state.customer.customer);
     const dispatch = useDispatch();
 
-    const userLogin = handOvers
-        .filter((x) => x.status === 0)
-        .reduce((prev, current) => (prev.dateTimeStart > current.dateTimeStart ? prev : current), {});
-
     useEffect(() => {
-        dispatch(getAllPersonnel());
+        dispatch(getAllCustomer());
         dispatch(getAllNationality());
-        dispatch(getAllHandOver());
-        setPerson(personnel);
+        setCustom(customer);
         // eslint-disable-next-line
-    }, [personnel]);
+    }, [customer]);
 
     // open the modal delete
     function getIdDelete(id) {
-        dispatch(getPersonnelById(id));
+        dispatch(getCustomerById(id));
         setVisibleDelete(true);
     }
     // open the modal update
     function getIdUpdate(id) {
-        dispatch(getPersonnelById(id));
+        dispatch(getCustomerById(id));
         setVisibleUpdate(true);
     }
     // open the modal add
@@ -97,16 +86,11 @@ function PersonnelManage() {
         setVisibleAdd(true);
     }
 
-    // open the modal money first
-    function openMoneyFirst() {
-        setVisibleMoneyFirst(true);
-    }
-
     function handleDeleteById() {
-        setPerson(person);
-        dispatch(update({ ...person, status: '0' }));
-        dispatch(getAllPersonnel());
-        toast.success('Xóa nhân viên thành công', { autoClose: 2000 });
+        setCustom(custom);
+        dispatch(update({ ...custom, status: '0' }));
+        dispatch(getAllCustomer());
+        toast.success('Xóa khách hàng thành công', { autoClose: 2000 });
         setVisibleDelete(false);
     }
 
@@ -119,28 +103,20 @@ function PersonnelManage() {
     }
 
     function handleAdd(data) {
-        const hashedPass = bcrypt.hashSync(data.users.password, 10);
-        console.log(hashedPass);
         dispatch(
             add({
                 ...data,
                 status: 1,
                 gender: data.gender === '' ? 'Nam' : data.gender,
-                users: { ...data.users, status: 1, password: bcrypt.hashSync(data.users.password, 10), roles: [] },
+                users: { ...data.users, status: 1, roles: [] },
                 nationality: nationalities.filter(
                     (nat) =>
                         nat.id === (data.nationality === undefined ? nationalities[0].id : Number(data.nationality)),
                 )[0],
             }),
         );
-        toast.success('Thêm nhân viên thành công', { autoClose: 2000 });
+        toast.success('Thêm khách hàng thành công', { autoClose: 2000 });
         setVisibleAdd(false);
-    }
-
-    function handleFirstMoney(data) {
-        dispatch(updateHandOver({ ...userLogin, moneyFirst: Number(data.money) }));
-        toast.success('Cập nhật thành công', { autoClose: 2000 });
-        setVisibleMoneyFirst(false);
     }
 
     return (
@@ -158,7 +134,7 @@ function PersonnelManage() {
                     <li>
                         <div className="flex items-center">
                             <FontAwesomeIcon icon={faChevronRight} />
-                            <span className="px-2">Quản lý nhân viên</span>
+                            <span className="px-2">Quản lý khách hàng</span>
                         </div>
                     </li>
                 </ol>
@@ -168,7 +144,7 @@ function PersonnelManage() {
                     <hr />
                 </div>
                 <div className="col-start-1 flex justify-center items-center">
-                    <p>Tìm kiếm nhân viên</p>
+                    <p>Tìm kiếm theo tên</p>
                 </div>
                 <div className="col-start-2 col-end-6">
                     <div className="relative">
@@ -194,18 +170,6 @@ function PersonnelManage() {
                     >
                         <FontAwesomeIcon icon={faPlus} />
                         <span className="mx-2">Thêm</span>
-                    </button>
-                </div>
-                <div className="col-start-7">
-                    <button
-                        type="button"
-                        onClick={() => {
-                            openMoneyFirst();
-                        }}
-                        className="py-2 px-3 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                    >
-                        <FontAwesomeIcon icon={faSackDollar} />
-                        <span className="mx-2">Tiền đầu ca</span>
                     </button>
                 </div>
             </div>
@@ -244,7 +208,7 @@ function PersonnelManage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {personnels
+                            {customers
                                 .filter((x) => x.users.username.toLowerCase().includes(valueSearch))
                                 .map((x) => (
                                     <tr className="bg-white dark:bg-gray-800" key={x.id}>
@@ -295,7 +259,7 @@ function PersonnelManage() {
                         <Modal.Body>
                             <div className="text-center">
                                 <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                                    Xác nhận xóa nhân viên ?
+                                    Xác nhận xóa khách hàng ?
                                 </h3>
                                 <div className="flex justify-center gap-4">
                                     <Button
@@ -320,316 +284,21 @@ function PersonnelManage() {
                             <Formik
                                 enableReinitialize
                                 initialValues={{
-                                    ...person,
-                                    fullname: person.fullname || '',
-                                    email: person.email || '',
-                                    citizenIdCode: person.citizenIdCode || '',
-                                    phoneNumber: person.phoneNumber || '',
-                                    dateOfBirth: person.dateOfBirth || '',
-                                    address: person.address || '',
-                                    img: person.img || '',
-                                    nationality: person.nationality?.id,
-                                    gender: person.gender || '',
-                                    users: person.users || '',
+                                    ...custom,
+                                    fullname: custom.fullname || '',
+                                    email: custom.email || '',
+                                    citizenIdCode: custom.citizenIdCode || '',
+                                    phoneNumber: custom.phoneNumber || '',
+                                    dateOfBirth: custom.dateOfBirth || '',
+                                    address: custom.address || '',
+                                    img: custom.img || '',
+                                    nationality: custom.nationality?.id,
+                                    gender: custom.gender || '',
+                                    users: custom.users || '',
                                 }}
-                                validationSchema={PersonnelSchema}
+                                validationSchema={CustomerSchema}
                                 onSubmit={(values) => {
                                     handleUpdate(values);
-                                }}
-                            >
-                                {({ errors, touched }) => (
-                                    <Form>
-                                        <div className="grid grid-cols-3 gap-5">
-                                            <div className="col-start-1 col-end-4">Thông tin chung</div>
-                                            <div>
-                                                <label
-                                                    htmlFor="fullname"
-                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                                >
-                                                    Họ tên
-                                                </label>
-                                                <Field
-                                                    name="fullname"
-                                                    className={`
-                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
-                                                    ${
-                                                        errors.fullname && touched.fullname
-                                                            ? 'border-2 border-rose-600'
-                                                            : ''
-                                                    } `}
-                                                />
-                                                {errors.fullname && touched.fullname ? (
-                                                    <div className="text-sm text-red-600 mt-2">{errors.fullname}</div>
-                                                ) : null}
-                                            </div>
-                                            <div>
-                                                <label
-                                                    htmlFor="email"
-                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                                >
-                                                    Email
-                                                </label>
-                                                <Field
-                                                    type="email"
-                                                    name="email"
-                                                    className={`
-                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
-                                                    ${
-                                                        errors.email && touched.email ? 'border-2 border-rose-600' : ''
-                                                    } `}
-                                                />
-                                                {errors.email && touched.email ? (
-                                                    <div className="text-sm text-red-600 mt-2">{errors.email}</div>
-                                                ) : null}
-                                            </div>
-                                            <div>
-                                                <label
-                                                    htmlFor="phoneNumber"
-                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                                >
-                                                    Số điện thoại
-                                                </label>
-                                                <Field
-                                                    name="phoneNumber"
-                                                    className={`
-                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
-                                                    ${
-                                                        errors.phoneNumber && touched.phoneNumber
-                                                            ? 'border-2 border-rose-600'
-                                                            : ''
-                                                    } `}
-                                                />
-                                                {errors.phoneNumber && touched.phoneNumber ? (
-                                                    <div className="text-sm text-red-600 mt-2">
-                                                        {errors.phoneNumber}
-                                                    </div>
-                                                ) : null}
-                                            </div>
-                                            <div>
-                                                <label
-                                                    htmlFor="citizenIdCode"
-                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                                >
-                                                    CCCD/CMTND
-                                                </label>
-                                                <Field
-                                                    name="citizenIdCode"
-                                                    className={`
-                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
-                                                    ${
-                                                        errors.citizenIdCode && touched.citizenIdCode
-                                                            ? 'border-2 border-rose-600'
-                                                            : ''
-                                                    } `}
-                                                />
-                                                {errors.citizenIdCode && touched.citizenIdCode ? (
-                                                    <div className="text-sm text-red-600 mt-2">
-                                                        {errors.citizenIdCode}
-                                                    </div>
-                                                ) : null}
-                                            </div>
-                                            <div>
-                                                <label
-                                                    htmlFor="dateOfBirth"
-                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                                >
-                                                    Ngày sinh
-                                                </label>
-                                                <Field
-                                                    type="date"
-                                                    name="dateOfBirth"
-                                                    className={`
-                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
-                                                    ${
-                                                        errors.dateOfBirth && touched.dateOfBirth
-                                                            ? 'border-2 border-rose-600'
-                                                            : ''
-                                                    } `}
-                                                />
-                                                {errors.dateOfBirth && touched.dateOfBirth ? (
-                                                    <div className="text-sm text-red-600 mt-2">
-                                                        {errors.dateOfBirth}
-                                                    </div>
-                                                ) : null}
-                                            </div>
-                                            <div>
-                                                <label
-                                                    htmlFor="address"
-                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                                >
-                                                    Địa chỉ
-                                                </label>
-                                                <Field
-                                                    name="address"
-                                                    className={`
-                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
-                                                    ${
-                                                        errors.address && touched.address
-                                                            ? 'border-2 border-rose-600'
-                                                            : ''
-                                                    } `}
-                                                />
-                                                {errors.address && touched.address ? (
-                                                    <div className="text-sm text-red-600 mt-2">{errors.address}</div>
-                                                ) : null}
-                                            </div>
-                                            <div>
-                                                <label
-                                                    htmlFor="img"
-                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                                >
-                                                    Ảnh
-                                                </label>
-                                                <Field
-                                                    name="img"
-                                                    className={`
-                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
-                                                    ${errors.img && touched.img ? 'border-2 border-rose-600' : ''} `}
-                                                />
-                                                {errors.img && touched.img ? (
-                                                    <div className="text-sm text-red-600 mt-2">{errors.img}</div>
-                                                ) : null}
-                                            </div>
-                                            <div>
-                                                <label
-                                                    htmlFor="gender"
-                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                                >
-                                                    Giới tính
-                                                </label>
-                                                <Field
-                                                    as="select"
-                                                    name="gender"
-                                                    className={`
-                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
-                                                    ${
-                                                        errors.gender && touched.gender
-                                                            ? 'border-2 border-rose-600'
-                                                            : ''
-                                                    } `}
-                                                >
-                                                    <option value="Nam">Nam</option>
-                                                    <option value="Nữ">Nữ</option>
-                                                    <option value="Khác">Khác</option>
-                                                </Field>
-                                                {errors.gender && touched.gender ? (
-                                                    <div className="text-sm text-red-600 mt-2">{errors.gender}</div>
-                                                ) : null}
-                                            </div>
-                                            <div>
-                                                <label
-                                                    htmlFor="nationality"
-                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                                >
-                                                    Quốc gia
-                                                </label>
-                                                <Field
-                                                    as="select"
-                                                    name="nationality"
-                                                    className={`
-                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
-                                                    ${
-                                                        errors.nationality && touched.nationality
-                                                            ? 'border-2 border-rose-600'
-                                                            : ''
-                                                    } `}
-                                                >
-                                                    {nationalities.map((x) => (
-                                                        <option key={x.id} value={x.id}>
-                                                            {x.name}
-                                                        </option>
-                                                    ))}
-                                                </Field>
-                                                {errors.nationality && touched.nationality ? (
-                                                    <div className="text-sm text-red-600 mt-2">
-                                                        {errors.nationality}
-                                                    </div>
-                                                ) : null}
-                                            </div>
-                                            <div className="col-start-1 col-end-4">Thông tin đăng nhập</div>
-                                            <div>
-                                                <label
-                                                    htmlFor="username"
-                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                                >
-                                                    Username
-                                                </label>
-                                                <Field
-                                                    disabled
-                                                    name="users.username"
-                                                    className="mb-6 bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className="flex justify-center gap-4 mt-6">
-                                            <Button type="submit">Cập nhật</Button>
-                                            <Button color="gray" onClick={() => setVisibleUpdate(false)}>
-                                                Đóng
-                                            </Button>
-                                        </div>
-                                    </Form>
-                                )}
-                            </Formik>
-                        </Modal.Body>
-                    </Modal>
-                    {/* modal money first */}
-                    <Modal show={visibleMoneyFirst} size="xl" popup={true} onClose={() => setVisibleMoneyFirst(false)}>
-                        <Modal.Header />
-                        <Modal.Body>
-                            <Formik
-                                enableReinitialize
-                                initialValues={{ money: userLogin.moneyFirst || 0 }}
-                                validationSchema={Yup.object().shape({
-                                    money: Yup.number()
-                                        .positive('Tiền đầu ca phải lớn hơn không')
-                                        .typeError('Tiền đầu ca phải là số')
-                                        .required('Tiền đầu ca không để để trống'),
-                                })}
-                                onSubmit={(values) => {
-                                    handleFirstMoney(values);
-                                }}
-                            >
-                                {({ errors, touched }) => (
-                                    <Form>
-                                        <div>
-                                            <label
-                                                htmlFor="money"
-                                                className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                            >
-                                                Tiền đầu ca
-                                            </label>
-                                            <Field
-                                                name="money"
-                                                className={`
-                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
-                                                    ${
-                                                        errors.money && touched.money ? 'border-2 border-rose-600' : ''
-                                                    } `}
-                                            />
-                                            {errors.money && touched.money ? (
-                                                <div className="text-sm text-red-600 mt-2">{errors.money}</div>
-                                            ) : null}
-                                        </div>
-                                        <div className="flex justify-center gap-4 mt-6">
-                                            <Button type="submit">Cập nhật tiền</Button>
-                                            <Button color="gray" onClick={() => setVisibleMoneyFirst(false)}>
-                                                Đóng
-                                            </Button>
-                                        </div>
-                                    </Form>
-                                )}
-                            </Formik>
-                        </Modal.Body>
-                    </Modal>
-                    {/* modal add */}
-                    <Modal show={visibleAdd} size="6xl" popup={true} onClose={() => setVisibleAdd(false)}>
-                        <Modal.Header />
-                        <Modal.Body>
-                            <Formik
-                                initialValues={{ ...objPersonnel, nationality: nationalities[0]?.id }}
-                                validationSchema={PersonnelSchema}
-                                onSubmit={(values) => {
-                                    handleAdd(values);
                                 }}
                             >
                                 {({ errors, touched }) => (
@@ -891,6 +560,286 @@ function PersonnelManage() {
                                             </div>
                                         </div>
                                         <div className="flex justify-center gap-4 mt-6">
+                                            <Button type="submit">Cập nhật</Button>
+                                            <Button color="gray" onClick={() => setVisibleUpdate(false)}>
+                                                Đóng
+                                            </Button>
+                                        </div>
+                                    </Form>
+                                )}
+                            </Formik>
+                        </Modal.Body>
+                    </Modal>
+                    {/* modal add */}
+                    <Modal show={visibleAdd} size="6xl" popup={true} onClose={() => setVisibleAdd(false)}>
+                        <Modal.Header />
+                        <Modal.Body>
+                            <Formik
+                                initialValues={{ ...objCustomer, nationality: nationalities[0]?.id }}
+                                validationSchema={CustomerSchema}
+                                onSubmit={(values) => {
+                                    handleAdd(values);
+                                }}
+                            >
+                                {({ errors, touched }) => (
+                                    <Form>
+                                        <div className="grid grid-cols-3 gap-5">
+                                            <div className="col-start-1 col-end-4">Thông tin chung</div>
+                                            <div>
+                                                <label
+                                                    htmlFor="fullname"
+                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                >
+                                                    Họ tên
+                                                </label>
+                                                <Field
+                                                    name="fullname"
+                                                    className={`
+                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                    ${
+                                                        errors.filename && touched.filename
+                                                            ? 'border-2 border-rose-600'
+                                                            : ''
+                                                    } `}
+                                                />
+                                                {errors.filename && touched.filename ? (
+                                                    <div className="text-sm text-red-600 mt-2">{errors.filename}</div>
+                                                ) : null}
+                                            </div>
+                                            <div>
+                                                <label
+                                                    htmlFor="email"
+                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                >
+                                                    Email
+                                                </label>
+                                                <Field
+                                                    type="email"
+                                                    name="email"
+                                                    className={`
+                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                    ${
+                                                        errors.email && touched.email ? 'border-2 border-rose-600' : ''
+                                                    } `}
+                                                />
+                                                {errors.email && touched.email ? (
+                                                    <div className="text-sm text-red-600 mt-2">{errors.email}</div>
+                                                ) : null}
+                                            </div>
+                                            <div>
+                                                <label
+                                                    htmlFor="phoneNumber"
+                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                >
+                                                    Số điện thoại
+                                                </label>
+                                                <Field
+                                                    name="phoneNumber"
+                                                    className={`
+                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                    ${
+                                                        errors.phoneNumber && touched.phoneNumber
+                                                            ? 'border-2 border-rose-600'
+                                                            : ''
+                                                    } `}
+                                                />
+                                                {errors.phoneNumber && touched.phoneNumber ? (
+                                                    <div className="text-sm text-red-600 mt-2">
+                                                        {errors.phoneNumber}
+                                                    </div>
+                                                ) : null}
+                                            </div>
+                                            <div>
+                                                <label
+                                                    htmlFor="citizenIdCode"
+                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                >
+                                                    CCCD/CMTND
+                                                </label>
+                                                <Field
+                                                    name="citizenIdCode"
+                                                    className={`
+                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                    ${
+                                                        errors.citizenIdCode && touched.citizenIdCode
+                                                            ? 'border-2 border-rose-600'
+                                                            : ''
+                                                    } `}
+                                                />
+                                                {errors.citizenIdCode && touched.citizenIdCode ? (
+                                                    <div className="text-sm text-red-600 mt-2">
+                                                        {errors.citizenIdCode}
+                                                    </div>
+                                                ) : null}
+                                            </div>
+                                            <div>
+                                                <label
+                                                    htmlFor="dateOfBirth"
+                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                >
+                                                    Ngày sinh
+                                                </label>
+                                                <Field
+                                                    type="date"
+                                                    name="dateOfBirth"
+                                                    className={`
+                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                    ${
+                                                        errors.dateOfBirth && touched.dateOfBirth
+                                                            ? 'border-2 border-rose-600'
+                                                            : ''
+                                                    } `}
+                                                />
+                                                {errors.dateOfBirth && touched.dateOfBirth ? (
+                                                    <div className="text-sm text-red-600 mt-2">
+                                                        {errors.dateOfBirth}
+                                                    </div>
+                                                ) : null}
+                                            </div>
+                                            <div>
+                                                <label
+                                                    htmlFor="address"
+                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                >
+                                                    Địa chỉ
+                                                </label>
+                                                <Field
+                                                    name="address"
+                                                    className={`
+                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                    ${
+                                                        errors.address && touched.address
+                                                            ? 'border-2 border-rose-600'
+                                                            : ''
+                                                    } `}
+                                                />
+                                                {errors.address && touched.address ? (
+                                                    <div className="text-sm text-red-600 mt-2">{errors.address}</div>
+                                                ) : null}
+                                            </div>
+                                            <div>
+                                                <label
+                                                    htmlFor="img"
+                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                >
+                                                    Ảnh
+                                                </label>
+                                                <Field
+                                                    name="img"
+                                                    className={`
+                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                    ${errors.img && touched.img ? 'border-2 border-rose-600' : ''} `}
+                                                />
+                                                {errors.img && touched.img ? (
+                                                    <div className="text-sm text-red-600 mt-2">{errors.img}</div>
+                                                ) : null}
+                                            </div>
+                                            <div>
+                                                <label
+                                                    htmlFor="gender"
+                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                >
+                                                    Giới tính
+                                                </label>
+                                                <Field
+                                                    as="select"
+                                                    name="gender"
+                                                    className={`
+                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                    ${
+                                                        errors.gender && touched.gender
+                                                            ? 'border-2 border-rose-600'
+                                                            : ''
+                                                    } `}
+                                                >
+                                                    <option value="Nam">Nam</option>
+                                                    <option value="Nữ">Nữ</option>
+                                                    <option value="Khác">Khác</option>
+                                                </Field>
+                                                {errors.gender && touched.gender ? (
+                                                    <div className="text-sm text-red-600 mt-2">{errors.gender}</div>
+                                                ) : null}
+                                            </div>
+                                            <div>
+                                                <label
+                                                    htmlFor="nationality"
+                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                >
+                                                    Quốc gia
+                                                </label>
+                                                <Field
+                                                    as="select"
+                                                    name="nationality"
+                                                    className={`
+                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                    ${
+                                                        errors.nationality && touched.nationality
+                                                            ? 'border-2 border-rose-600'
+                                                            : ''
+                                                    } `}
+                                                >
+                                                    {nationalities.map((x) => (
+                                                        <option key={x.id} value={x.id}>
+                                                            {x.name}
+                                                        </option>
+                                                    ))}
+                                                </Field>
+                                                {errors.nationality && touched.nationality ? (
+                                                    <div className="text-sm text-red-600 mt-2">
+                                                        {errors.nationality}
+                                                    </div>
+                                                ) : null}
+                                            </div>
+                                            <div className="col-start-1 col-end-4">Thông tin đăng nhập</div>
+                                            <div>
+                                                <label
+                                                    htmlFor="username"
+                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                >
+                                                    Username
+                                                </label>
+                                                <Field
+                                                    name="users.username"
+                                                    className={`
+                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                    ${
+                                                        errors.users?.username && touched.users?.username
+                                                            ? 'border-2 border-rose-600'
+                                                            : ''
+                                                    } `}
+                                                />
+                                                {errors.users?.username && touched.users?.username ? (
+                                                    <div className="text-sm text-red-600 mt-2">
+                                                        {errors.users?.username}
+                                                    </div>
+                                                ) : null}
+                                            </div>
+                                            <div>
+                                                <label
+                                                    htmlFor="password"
+                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                >
+                                                    Password
+                                                </label>
+                                                <Field
+                                                    type="password"
+                                                    name="users.password"
+                                                    className={`
+                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                    ${
+                                                        errors.users?.password && touched.users?.password
+                                                            ? 'border-2 border-rose-600'
+                                                            : ''
+                                                    } `}
+                                                />
+                                                {errors.users?.password && touched.users?.password ? (
+                                                    <div className="text-sm text-red-600 mt-2">
+                                                        {errors.users?.password}
+                                                    </div>
+                                                ) : null}
+                                            </div>
+                                        </div>
+                                        <div className="flex justify-center gap-4 mt-6">
                                             <Button type="submit">Thêm</Button>
                                             <Button color="gray" onClick={() => setVisibleAdd(false)}>
                                                 Đóng
@@ -907,4 +856,4 @@ function PersonnelManage() {
     );
 }
 
-export default PersonnelManage;
+export default CustomerManage;

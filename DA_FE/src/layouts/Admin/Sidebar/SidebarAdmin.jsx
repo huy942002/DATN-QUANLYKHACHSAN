@@ -49,7 +49,7 @@ function SidebarAdmin() {
                             <FontAwesomeIcon icon={faPeopleGroup} className="w-6" />
                             <span className="mx-2">Quản lý nhân viên</span>
                         </Link>
-                        <Link to={config.routes.home} className="block mb-2 hover:bg-gray-200 p-1 rounded-md">
+                        <Link to={config.routes.customerManage} className="block mb-2 hover:bg-gray-200 p-1 rounded-md">
                             <FontAwesomeIcon icon={faPerson} className="w-6" />
                             <span className="mx-2">Quảnlý khách hàng</span>
                         </Link>
