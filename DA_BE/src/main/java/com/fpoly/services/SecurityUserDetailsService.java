@@ -25,7 +25,7 @@ import com.fpoly.repositories.repo.UserRepository;
  *
  */
 @Service
-public class SecurityUserDetails implements UserDetailsService {
+public class SecurityUserDetailsService implements UserDetailsService {
 
 	@Autowired
 	private UserRepository userRepo;

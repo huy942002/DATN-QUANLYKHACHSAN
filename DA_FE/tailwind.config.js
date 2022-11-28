@@ -5,7 +5,7 @@ module.exports = {
     theme: {
         extend: {
             backgroundImage: {
-                'login-hotel': "url('/src/assets/images/background.jpeg')",
+                'admin-login-hotel': "url('/src/assets/images/bg.svg')",
             },
         },
     },

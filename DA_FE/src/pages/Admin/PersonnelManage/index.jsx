@@ -120,7 +120,6 @@ function PersonnelManage() {
 
     function handleAdd(data) {
         const hashedPass = bcrypt.hashSync(data.users.password, 10);
-        console.log(hashedPass);
         dispatch(
             add({
                 ...data,
