@@ -2,10 +2,17 @@ import { Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 
 import logo from '~/assets/images/logo250x250.png';
+import { toast } from 'react-toastify';
+
+import http from '~/services/apiSevices';
 
 import { faEnvelope } from '@fortawesome/free-regular-svg-icons';
 import { faLock, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useEffect, useState } from 'react';
+
+import { post } from '~/app/reducers/loginAdmin';
+import { useDispatch, useSelector } from 'react-redux';
 
 const objLogin = {
     username: '',
@@ -18,8 +25,22 @@ const LoginSchema = Yup.object().shape({
 });
 
 function LoginAdmin() {
+    const [token, setToken] = useState('');
+    const tokens = useSelector((state) => state.loginAdmin.tokens);
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        setToken(tokens);
+    }, [tokens]);
+
     function handleLogin(data) {
-        console.log(data);
+        dispatch(post(data));
+        console.log(token);
+        // if (token) {
+        //     toast.success('Đăng nhập thành công', { autoClose: 2000 });
+        // } else {
+        //     toast.error('Sai tên tài và hoặc mật khẩu', { autoClose: 2000 });
+        // }
     }
 
     return (

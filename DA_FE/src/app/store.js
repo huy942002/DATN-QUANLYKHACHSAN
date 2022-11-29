@@ -11,6 +11,7 @@ import rentalType from './reducers/rentalType';
 import numberOfFloor from './reducers/numberOfFloor';
 import handOverBill from './reducers/handOverBill';
 import nationality from './reducers/nationality';
+import loginAdmin from './reducers/loginAdmin';
 import resetHandOver from './reducers/resetHandOver';
 import customer from './reducers/customer';
 
@@ -24,6 +25,7 @@ const reducer = combineReducers({
     handOver: handOver,
     rentalType: rentalType,
     nationality: nationality,
+    loginAdmin: loginAdmin,
     handOverBill: handOverBill,
     resetHandOver: resetHandOver,
     customer: customer,

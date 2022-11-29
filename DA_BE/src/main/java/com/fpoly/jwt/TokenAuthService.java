@@ -27,7 +27,7 @@ public class TokenAuthService {
 	@Autowired
 	private SecurityUserDetailsService userDetails;
 
-	public static final String AUTH_HEADER_NAME = "x-auth-token";
+	public static final String AUTH_HEADER_NAME = "token";
 
 	public void addJwtTokenToHeader(HttpServletResponse response, UserAuthentication authentication) {
 		final UserDetails user = authentication.getDetails();
