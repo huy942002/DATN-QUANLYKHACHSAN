@@ -21,6 +21,8 @@ import Notfound from '~/pages/Notfound';
 import SearchRoom from '~/pages/Customer/SearchRoom';
 import RoomDetail from '~/pages/Customer/RoomDetail';
 
+// const isAuth = Boolean(window.localStorage.getItem('token') !== null ? true : false);
+
 // Routes public
 
 const publicRoutes = [

@@ -1,18 +1,17 @@
 import { Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 
-import logo from '~/assets/images/logo250x250.png';
 import { toast } from 'react-toastify';
+import logo from '~/assets/images/logo250x250.png';
 
-import http from '~/services/apiSevices';
+import axios from 'axios';
 
-import { faEnvelope } from '@fortawesome/free-regular-svg-icons';
 import { faLock, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-import { post } from '~/app/reducers/loginAdmin';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 const objLogin = {
     username: '',
@@ -24,24 +23,24 @@ const LoginSchema = Yup.object().shape({
     password: Yup.string().required('Mật khẩu không được để trống'),
 });
 
+const url = 'http://localhost:8080/api/auth/login';
+
 function LoginAdmin() {
-    const [token, setToken] = useState('');
-    const tokens = useSelector((state) => state.loginAdmin.tokens);
-    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
-    useEffect(() => {
-        setToken(tokens);
-    }, [tokens]);
-
-    function handleLogin(data) {
-        dispatch(post(data));
-        console.log(token);
-        // if (token) {
-        //     toast.success('Đăng nhập thành công', { autoClose: 2000 });
-        // } else {
-        //     toast.error('Sai tên tài và hoặc mật khẩu', { autoClose: 2000 });
-        // }
-    }
+    const handleLogin = async (data) => {
+        await axios
+            .post(url, data)
+            .then((res) => {
+                navigate('/admin');
+                window.localStorage.setItem('token', res.headers.token);
+                window.location.reload();
+            })
+            .catch((error) => {
+                toast.error('Sai thông tin đăng nhập', { autoClose: 2000 });
+                throw Error(error);
+            });
+    };
 
     return (
         <div className="grid grid-cols-3 gap-4 place-content-center p-8 bg-admin-login-hotel bg-cover h-screen">

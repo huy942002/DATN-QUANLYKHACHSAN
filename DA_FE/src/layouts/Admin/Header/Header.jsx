@@ -4,6 +4,8 @@ import * as Yup from 'yup';
 import { Link } from 'react-router-dom';
 import config from '~/config';
 
+import jwt_decode from 'jwt-decode';
+
 import { toast } from 'react-toastify';
 
 import { Dropdown, Avatar, Modal, Button } from 'flowbite-react';
@@ -23,6 +25,8 @@ const ConfirmSchema = Yup.object().shape({
     moneyReal: Yup.number().typeError('Tiền phải là số').required('Tiền thực nhận không được để trống'),
     note: Yup.string().required('Ghi chú không được để trống'),
 });
+
+const token = window.localStorage.getItem('token');
 
 function Header() {
     const [notice, setNotice] = useState(false);
@@ -153,7 +157,7 @@ function Header() {
                             <Dropdown.Item>Sign out</Dropdown.Item>
                         </Dropdown>
                         <div className="font-medium dark:text-white">
-                            <div>Jese Leos</div>
+                            <div>{jwt_decode(token).sub}</div>
                             <div className="text-sm text-gray-500 dark:text-gray-400">Joined in August 2014</div>
                         </div>
                     </div>

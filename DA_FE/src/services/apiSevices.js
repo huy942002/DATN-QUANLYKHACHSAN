@@ -53,7 +53,6 @@ const httpDelete = async (endpoint, id) => {
 const handleResponse = (response) => {
     // You can handle 400 errors as well.
     if (response.status === 200) {
-        localStorage.setItem('token', response.headers.token);
         return response.data;
     } else {
         throw Error(response.data | 'error');
