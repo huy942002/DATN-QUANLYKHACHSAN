@@ -2,29 +2,37 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import http from '~/services/apiSevices';
 
-export const getAllFacility = createAsyncThunk('facility/getAllFacility', () => {
-    return http.httpGet('facility');
+// Generates pending, fulfilled and rejected action types
+
+export const getAllKindOfRoom = createAsyncThunk('KindOfRoom/getAllKindOfRoom', () => {
+    return http.httpGet('kind-of-room');
 });
+
+// export const deleteById = createAsyncThunk('personnel/deleteById', (id) => {
+//     return http.httpDelete('personnel', id);
+// });
+
+// Slice
 const slice = createSlice({
-    name: 'facility',
+    name: 'kindOfRoom',
     initialState: {
-        facilities: [],
+        kindOfRoom: [],
         error: '',
         loading: false,
     },
     extraReducers: (builder) => {
         // getAllPersonnel
-        builder.addCase(getAllFacility.pending, (state) => {
+        builder.addCase(getAllKindOfRoom.pending, (state) => {
             state.loading = true;
         });
-        builder.addCase(getAllFacility.fulfilled, (state, action) => {
+        builder.addCase(getAllKindOfRoom.fulfilled, (state, action) => {
             state.loading = false;
-            state.facilities = action.payload;
+            state.kindOfRoom = action.payload;
             state.error = '';
         });
-        builder.addCase(getAllFacility.rejected, (state, action) => {
+        builder.addCase(getAllKindOfRoom.rejected, (state, action) => {
             state.loading = false;
-            state.facilities = [];
+            state.kindOfRoom = [];
             state.error = action.error.message;
         });
 
@@ -44,5 +52,4 @@ const slice = createSlice({
         // });
     },
 });
-
 export default slice.reducer;

@@ -20,6 +20,10 @@ export const add = createAsyncThunk('service/add', (data) => {
     return http.httpPost('service', data);
 });
 
+export const addsv = createAsyncThunk('service-available/addsv', (data) => {
+    return http.httpPost('service-available', data);
+});
+
 // Slice
 const slice = createSlice({
     name: 'service',

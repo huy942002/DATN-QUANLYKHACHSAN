@@ -10,8 +10,6 @@ import RoomDetailAdmin from '~/pages/Admin/RoomDetailAdmin';
 import PersonnelManage from '~/pages/Admin/PersonnelManage';
 import ServiceManage from '~/pages/Admin/ServiceManage';
 import HandOver from '~/pages/Admin/HandOver';
-import NumberOfFloor from '~/pages/Admin/NumberOfFloorManage';
-import Facilities from '~/pages/Admin/FacilityManage';
 import RentalTypes from '~/pages/Admin/RentalTypeManage';
 import CustomerManage from '~/pages/Admin/CustomerManage';
 import HandOverManage from '~/pages/Admin/HandOverManage';
@@ -20,8 +18,9 @@ import Signup from '~/pages/Signup';
 import Notfound from '~/pages/Notfound';
 import SearchRoom from '~/pages/Customer/SearchRoom';
 import RoomDetail from '~/pages/Customer/RoomDetail';
-
-// const isAuth = Boolean(window.localStorage.getItem('token') !== null ? true : false);
+import RoomManage from '~/pages/Admin/RoomManage';
+import CreateRoomManage from '~/pages/Admin/CreateRoomManage';
+import CreateOptionRoomManage from '~/pages/Admin/CreateOptionRoomManage';
 
 // Routes public
 
@@ -36,10 +35,11 @@ const publicRoutes = [
     { path: config.routes.serviceManage, component: ServiceManage },
     { path: config.routes.handOver, component: HandOver },
     { path: config.routes.customerManage, component: CustomerManage },
+    { path: config.routes.roomManage, component: RoomManage },
+    { path: config.routes.createRoomManage, component: CreateRoomManage },
+    { path: config.routes.createOptionRoomManage, component: CreateOptionRoomManage },
     { path: config.routes.handOverManage, component: HandOverManage },
-    { path: config.routes.numberOfFloorManage, component: NumberOfFloor },
     { path: config.routes.nationality, component: Nationality },
-    { path: config.routes.facilityManage, component: Facilities },
     { path: config.routes.rentalTypeManage, component: RentalTypes },
     { path: config.routes.room, component: RoomDetail, layout: null },
     { path: config.routes.searchRoom, component: SearchRoom, layout: null },

@@ -29,8 +29,9 @@ const slice = createSlice({
         builder.addCase(getAllHandOverBill.fulfilled, (state, action) => {
             const now = new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000)
                 .toISOString()
-                .slice(0, 19);
-            const dateOfLogin = '2022-10-13T00:00:00';
+                .replace('T', ' ')
+                .slice(0, 17);
+            const dateOfLogin = '2022-10-13 00:00';
             state.loading = false;
             state.bills = action.payload.filter((x) => x.status === 1);
             state.bills

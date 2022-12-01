@@ -38,7 +38,7 @@ function SidebarAdmin() {
                             <FontAwesomeIcon icon={faBuilding} className="w-6" />
                             <span className="mx-2">Quản lý tầng</span>
                         </Link>
-                        <Link to={config.routes.home} className="block mb-2 hover:bg-gray-200 p-1 rounded-md">
+                        <Link to={config.routes.roomManage} className="block mb-2 hover:bg-gray-200 p-1 rounded-md">
                             <FontAwesomeIcon icon={faBed} className="w-6" />
                             <span className="mx-2">Quản lý phòng</span>
                         </Link>

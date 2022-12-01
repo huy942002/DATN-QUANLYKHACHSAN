@@ -10,13 +10,27 @@ import {
     faRestroom,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+// import { useEffect, useState } from 'react';
 import { useState } from 'react';
 import { ControlledMenu, MenuItem, useMenuState } from '@szhsin/react-menu';
 import '@szhsin/react-menu/dist/index.css';
 
 import { Link } from 'react-router-dom';
 
+// import http from '~/services/apiSevices';
+
 function HomeAdmin() {
+    // const [listRoom, setListRoom] = useState([]);
+
+    // useEffect(() => {
+    //     const fetch = async () => {
+    //         const result = await http.httpGet('room');
+    //         setListRoom(result);
+    //     };
+
+    //     fetch();
+    // }, []);
+    // console.log(listRoom);
     const [menuProps, toggleMenu] = useMenuState();
     const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
 

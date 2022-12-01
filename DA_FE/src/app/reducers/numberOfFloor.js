@@ -4,89 +4,88 @@ import http from '~/services/apiSevices';
 
 // Generates pending, fulfilled and rejected action types
 
-export const getAllNumberOfFloor = createAsyncThunk('number-of-floor/getAllNumberOfFloor', () => {
+export const getAllNumberOfFloors = createAsyncThunk('numberOfFloors/getAllNumberOfFloors', () => {
     return http.httpGet('number-of-floor');
 });
 
-export const getNumberOfFloorById = createAsyncThunk('number-of-floor/getNumberOfFloorById', (id) => {
+export const getByIdNumberOfFloors = createAsyncThunk('numberOfFloors/getByIdNumberOfFloors', (id) => {
     return http.httpGet(`number-of-floor/${id}`);
 });
 
-export const update = createAsyncThunk('number-of-floor/update', (data) => {
-    return http.httpPut(`number-of-floor/${data.id}`, data);
-});
-
-export const add = createAsyncThunk('number-of-floor/add', (data) => {
+export const AddNBF = createAsyncThunk('numberOfFloors/AddNBF', (data) => {
     return http.httpPost('number-of-floor', data);
 });
+
+export const AddNBFop = createAsyncThunk('numberOfFloors/AddNBF', (data) => {
+    return http.httpPost(`number-of-floor/${data.sl}`, data.NumberOfFloorss);
+});
+
+// export const deleteById = createAsyncThunk('personnel/deleteById', (id) => {
+//     return http.httpDelete('personnel', id);
+// });
 
 // Slice
 const slice = createSlice({
     name: 'numberOfFloor',
     initialState: {
         numberOfFloors: [],
-        numberOfFloor: {},
+        NumberOfFloor: {},
         error: '',
         loading: false,
     },
     extraReducers: (builder) => {
-        // getAllNumberOfFloor
-        builder.addCase(getAllNumberOfFloor.pending, (state) => {
+        // getAllPersonnel
+        builder.addCase(getAllNumberOfFloors.pending, (state) => {
             state.loading = true;
         });
-        builder.addCase(getAllNumberOfFloor.fulfilled, (state, action) => {
+        builder.addCase(getAllNumberOfFloors.fulfilled, (state, action) => {
             state.loading = false;
-            state.numberOfFloors = action.payload.filter((x) => x.status === 1);
+            state.numberOfFloors = action.payload;
             state.error = '';
         });
-        builder.addCase(getAllNumberOfFloor.rejected, (state, action) => {
+        builder.addCase(getAllNumberOfFloors.rejected, (state, action) => {
             state.loading = false;
             state.numberOfFloors = [];
             state.error = action.error.message;
         });
 
-        // getById
-        builder.addCase(getNumberOfFloorById.pending, (state) => {
+        // deleteById
+        // builder.addCase(deleteById.pending, (state) => {
+        //     state.loading = true;
+        // });
+        // builder.addCase(deleteById.fulfilled, (state, action) => {
+        //     state.loading = false;
+        //     if (action.payload.id) {
+        //         state.personnel = state.personnel.filter((item) => item.id !== action.payload.id);
+        //     }
+        // });
+        // builder.addCase(deleteById.rejected, (state, action) => {
+        //     state.loading = false;
+        //     state.error = action.error.message;
+        // });
+
+        builder.addCase(getByIdNumberOfFloors.pending, (state) => {
             state.loading = true;
         });
-        builder.addCase(getNumberOfFloorById.fulfilled, (state, action) => {
+        builder.addCase(getByIdNumberOfFloors.fulfilled, (state, action) => {
             state.loading = false;
             state.numberOfFloor = action.payload;
             state.error = '';
         });
-        builder.addCase(getNumberOfFloorById.rejected, (state, action) => {
+        builder.addCase(getByIdNumberOfFloors.rejected, (state, action) => {
             state.loading = false;
             state.numberOfFloor = {};
             state.error = action.error.message;
         });
 
-        // update
-        builder.addCase(update.pending, (state) => {
+        builder.addCase(AddNBF.pending, (state) => {
             state.loading = true;
         });
-        builder.addCase(update.fulfilled, (state, action) => {
-            state.loading = false;
-            if (action.payload.id) {
-                state.numberOfFloors = state.numberOfFloors.map((item) =>
-                    item.id === action.payload.id ? action.payload : item,
-                );
-            }
-            state.numberOfFloors = state.numberOfFloors.filter((x) => x.status === 1);
-        });
-        builder.addCase(update.rejected, (state, action) => {
-            state.loading = false;
-            state.error = action.error.message;
-        });
-
-        // add
-        builder.addCase(add.pending, (state) => {
-            state.loading = true;
-        });
-        builder.addCase(add.fulfilled, (state, action) => {
+        builder.addCase(AddNBF.fulfilled, (state, action) => {
             state.loading = false;
             state.numberOfFloors.push(action.payload);
         });
-        builder.addCase(add.rejected, (state, action) => {
+        builder.addCase(AddNBF.rejected, (state, action) => {
             state.loading = false;
             state.error = action.error.message;
         });
