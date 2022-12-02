@@ -6,12 +6,15 @@ import 'react-toastify/dist/ReactToastify.css';
 import reportWebVitals from './reportWebVitals';
 import { ToastContainer } from 'react-toastify';
 import { Provider } from 'react-redux';
+import { ConfigProvider } from 'antd';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <Provider store={store}>
-        <App />
-        <ToastContainer />
+        <ConfigProvider theme={{token: {colorPrimary: '#00b96b',}}}>
+            <App />
+            <ToastContainer />
+        </ConfigProvider>
     </Provider>,
 );
 

@@ -19,5 +19,6 @@ const routes = {
     login: '/login',
     signup: '/signup',
     notfound: '/*',
+    roomPlan: "/admin/room-plan",
 };
 export default routes;

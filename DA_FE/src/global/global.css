@@ -9,10 +9,14 @@
     padding: 0;
     margin: 0;
     box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
 }
 
-/* width */ 
+/* Custom antd */
+.ant-btn-primary {
+    background-color: #00b96b;
+}
+
+/* width */
 ::-webkit-scrollbar {
     width: 6px;
 }
@@ -31,4 +35,17 @@
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
     background: #57606f;
+}
+
+::selection {
+    background: #00b96b; 
+    color: white;
+}
+::-moz-selection {
+    background: #00b96b; 
+    color: white;
+}
+::-webkit-selection {
+    background: #00b96b; 
+    color: white;
 }

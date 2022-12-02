@@ -1,7 +1,7 @@
-import jwt_decode from 'jwt-decode';
+// import jwt_decode from 'jwt-decode';
 
-const token = window.localStorage.getItem('token');
+// const token = window.localStorage.getItem('token');
 
-const currentUser = jwt_decode(token).sub;
+// const currentUser = jwt_decode(token).sub;
 
-export default { currentUser };
+// export default { currentUser };

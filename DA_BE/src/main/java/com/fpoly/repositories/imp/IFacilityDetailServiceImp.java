@@ -3,8 +3,10 @@
  */
 package com.fpoly.repositories.imp;
 
+import java.util.List;
 import java.util.Optional;
 
+import com.fpoly.entities.Rooms;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,4 +45,8 @@ public class IFacilityDetailServiceImp implements IFacilityDetailService {
 		facilitydetailRepo.deleteById(id);
 	}
 
+	@Override
+	public List<FacilitiesDetails> findByRoomsAndStatus(Rooms rooms, int status) {
+		return facilitydetailRepo.findByRoomsAndStatus(rooms, status);
+	}
 }

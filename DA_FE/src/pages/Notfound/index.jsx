@@ -1,12 +1,26 @@
-// import config from '~/config';
-
-// import { Link } from 'react-router-dom';
+import { Button, Result } from "antd";
+import { useNavigate } from "react-router-dom";
 
 function Home() {
+
+    const navigate = new useNavigate();
+
     return (
-        <div className="flex justify-center items-center h-screen">
-            <div className="text-2xl">404 Not Found</div>
-        </div>
+        <Result
+            status="404"
+            title="404"
+            subTitle="Xin lỗi, trang bạn truy cập không tồn tại!"
+            extra={
+                <Button
+                    onClick={() => {
+                        navigate('/admin');
+                    }}
+                    type="primary"
+                >
+                    Trở về trang chủ
+                </Button>
+            }
+        />
     );
 }
 

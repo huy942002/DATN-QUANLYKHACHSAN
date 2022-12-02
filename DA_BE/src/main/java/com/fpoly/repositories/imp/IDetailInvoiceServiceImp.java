@@ -3,8 +3,11 @@
  */
 package com.fpoly.repositories.imp;
 
+import java.util.List;
 import java.util.Optional;
 
+import com.fpoly.entities.Bills;
+import com.fpoly.entities.Rooms;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,4 +46,13 @@ public class IDetailInvoiceServiceImp implements IDetailInvoiceService {
 		voiceRepo.deleteById(id);
 	}
 
+	@Override
+	public DetailsInvoice findByRoomsAndStatus(Rooms rooms, int status) {
+		return voiceRepo.findByRoomsAndStatus(rooms, status);
+	}
+
+	@Override
+	public List<DetailsInvoice> findByBillsAndStatus(Bills bills, int status) {
+		return voiceRepo.findByBillsAndStatus(bills, status);
+	}
 }
