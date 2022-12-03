@@ -30,36 +30,6 @@ function Room({ room, roomPlan, setRoomPlan, roomChoose, setRoomChoose }) {
     //End Gen Data
 
     //Function
-    //End Function
-
-    //Util
-    const formatCurrency = (value) => {
-        return value.toLocaleString('it-IT', {style : 'currency', currency : 'VND'});
-    };
-    //End Util
-
-    const genFacilitiesDetailsList = () => {
-        let string = '- Trang thiết bị: ';
-        room.facilitiesDetailsList.forEach((element, index) => {
-            if (index + 1 === room.facilitiesDetailsList.length) {
-                string += element.facilities.name + '.';
-            } else {
-                string += element.facilities.name + ', ';
-            }
-        });
-        return string;
-    };
-    const genServiceAvailableList = () => {
-        let string = '- Đồ có sẵn: ';
-        room.serviceAvailableList.map((element, index) => {
-            if (index + 1 === room.serviceAvailableList.length) {
-                string += element.servicess.name + ' (' + element.quantity + ') ' + '.';
-            } else {
-                string += element.servicess.name + ' (' + element.quantity + ') ' + ', ';
-            }
-        });
-        return string;
-    };
     const addRoom = (room) => {
         setRoomChoose([...roomChoose, room]);
         setRoomPlan(
@@ -69,38 +39,15 @@ function Room({ room, roomPlan, setRoomPlan, roomChoose, setRoomChoose }) {
             })),
         );
     };
+    //End Function
+
+    //Util
+    const formatCurrency = (value) => {
+        return value.toLocaleString('it-IT', {style : 'currency', currency : 'VND'});
+    };
+    //End Util
 
     return (
-            // <div
-            //     className={`h-[150px] rounded-[2px] cursor-default grid grid-cols-3 grid-rows-2 items-center text-base text-white
-            //     ${room.rooms.status === 1 ? 'bg-status-1' : ''}
-            //     ${room.rooms.status === 2 ? 'bg-status-2' : ''}
-            //     ${room.rooms.status === 3 ? 'bg-status-3' : ''}`}
-            //     onClick={() => {
-            //         addRoom(room.rooms);
-            //     }}
-            // >
-            //     <div className="w-full h-full p-4">
-            //         <div
-            //             className={`rounded-[2px] h-full w-full flex items-center justify-center font-semibold
-            //             ${room.rooms.status === 1 ? 'bg-status-1.5' : ''}
-            //             ${room.rooms.status === 2 ? 'bg-status-2.5' : ''}
-            //             ${room.rooms.status === 3 ? 'bg-status-3.5' : ''}`}
-            //         >
-            //             {room.rooms.name}
-            //         </div>
-            //     </div>
-            //     <div className="w-full h-full p-4 pl-0 col-span-2">
-            //         <div
-            //             className={`rounded-[2px] h-full w-full flex items-center justify-center font-semibold
-            //             ${room.rooms.status === 1 ? 'bg-status-1.5' : ''}
-            //             ${room.rooms.status === 2 ? 'bg-status-2.5' : ''}
-            //             ${room.rooms.status === 3 ? 'bg-status-3.5' : ''}`}
-            //         >
-            //             {room.rooms.kindOfRoom.name}
-            //         </div>
-            //     </div>
-            // </div>
         <Card onClick={() => addRoom(room.rooms)} className="hover:border-design-greenLight cursor-pointer">
             <div className='flex items-center'>
                 <div className='bg-design-greenLight rounded-full p-2 text-white h-10 w-10 flex justify-center items-center'>

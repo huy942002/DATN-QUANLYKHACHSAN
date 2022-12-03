@@ -3,6 +3,7 @@
  */
 package com.fpoly.repositories.imp;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,11 @@ public class IBillServiceImp implements IBillService {
 	@Override
 	public void remove(Integer id) {
 		billRepo.deleteById(id);
+	}
+
+	@Override
+	public List<Bills> getAllBillByStatus (Integer status) {
+		return billRepo.findByStatus(status);
 	}
 
 }

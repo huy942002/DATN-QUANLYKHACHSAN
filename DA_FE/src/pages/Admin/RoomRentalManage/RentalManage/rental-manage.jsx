@@ -5,9 +5,6 @@ import { useState, useEffect } from 'react';
 import Personnel from '~/models/Personnel/Personnel';
 import Customer from '~/models/Customer/Customer';
 import DetailInvoice from '~/models/DetailInvoice/DetailInvoice';
-import CustomerInformation from './TabInformation/customer-information';
-import CheckInInformation from './TabInformation/check-in-information';
-import ListRoom from './TabInformation/list-room';
 import RoomServices from './TabService/room-services';
 import Services from './TabService/services';
 import Bill from '~/models/Bill/Bill';
@@ -15,6 +12,10 @@ import axios from 'axios';
 import { StepBackwardOutlined } from '@ant-design/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMoneyCheckDollar } from '@fortawesome/free-solid-svg-icons';
+import CustomerInformation from './TabInformation/customer-information';
+import ListRoom from './TabInformation/list-room';
+import dayjs  from 'dayjs';
+import CheckInInformation from './TabInformation/check-in-information';
 
 const { TabPane } = Tabs;
 const { RangePicker } = DatePicker;
@@ -34,37 +35,78 @@ const RentalManage = () => {
     const [confirmLoading, setConfirmLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const { idRoomChoose, type } = useParams();
+
+    const dateNow = new Date();
+    const dateTomorrow = new Date().setDate(dateNow.getDate() + 1);
+    const [roomPlan, setRoomPlan] = useState();
+    const [rentalTypes, setRentalTypes] = useState();
+    const [nationalityList, setNationalityList] = useState();
+    const [billActiveList, setBillActiveList] = useState();
+
+    const [personnel, setPersonnel] = useState(new Personnel());
+    const [bill, setBill] = useState(new Bill());
+    const [customer, setCustomer] = useState(new Customer());
     const [detailInvoices, setDetailInvoices] = useState([]);
     const [serviceDetails, setServiceDetails] = useState([]);
     //End Data
 
     //Created
+    useEffect(() => {
+        window.scrollTo(0, 0);
+        getRoomPlan();
+        getAllRentalType();
+        getAllNationality();
+        getAllBillActive();
+        if (type === 'details') {
+            checkData();
+        }
+    }, []);
+    useEffect(() => {
+        if(roomPlan && rentalTypes) {
+            if(type === "check-in") {
+                addRoomDetail();
+                setBill({ ...bill, personnel: personnel });
+            }
+        }
+    }, [roomPlan, rentalTypes])
     //End Created
 
     //Gen Data
     //End Gen Data
 
     //Function
+    const getRoomPlan = async () => {
+        await axios.get('http://localhost:8080/api/room-rental-manage/get-room-plan')
+                .then(res => {
+                    setRoomPlan(res.data);
+                }).catch(err => {});
+    }
+    const getAllRentalType = async () => {
+        await axios.get('http://localhost:8080/api/rental-type')
+                .then(res => {
+                    setRentalTypes(res.data);
+                }).catch(err => {});
+    }
+    const getAllNationality = async () => {
+        await axios.get('http://localhost:8080/api/nationality')
+                .then(res => {
+                    setNationalityList(res.data);
+                }).catch(err => {});
+    }
+    const getAllBillActive = async () => {
+        await axios.get('http://localhost:8080/api/room-rental-manage/all-bill-active')
+                .then(res => {
+                    setBillActiveList(res.data);
+                }).catch(err => {});
+    }
     //End Function
 
     //Util
     //End Util
-    const roomPlan = useSelector((state) => state.roomPlan.roomPlan);
-    const rentalTypes = useSelector((state) => state.rentalType.rentalTypes);
-    const [personnel, setPersonnel] = useState(new Personnel());
-    const [bill, setBill] = useState(new Bill());
-    const [customer, setCustomer] = useState(new Customer());
-    useEffect(() => {
-        window.scrollTo(0, 0);
-        if (type === 'details') {
-            checkData();
-        }
-        if (type === 'check-in') {
-            addRoomDetail();
-            setBill({ ...bill, personnel: personnel });
-        }
-    }, []);
-
+    // const roomPlan = useSelector((state) => state.roomPlan.roomPlan);
+    // const rentalTypes = useSelector((state) => state.rentalType.rentalTypes);
+    
+    
     const addRoomDetail = () => {
         //Add room
         if (detailInvoices.length === 0) {
@@ -73,21 +115,17 @@ const RentalManage = () => {
             newDetailInvoice.facilitiesDetailsList = getRoomChoose().facilitiesDetailsList;
             newDetailInvoice.serviceAvailableList = getRoomChoose().serviceAvailableList;
             newDetailInvoice.key = getRoomChoose().rooms.id;
+            newDetailInvoice.hireDate = dayjs(dateNow).format('YYYY-MM-DD') + " 12:00";
+            newDetailInvoice.checkOutDay = dayjs(dateTomorrow).format('YYYY-MM-DD') + " 12:00";
+            newDetailInvoice.rentalTypes = rentalTypes[0];
             return setDetailInvoices([...detailInvoices, newDetailInvoice]);
         }
     };
 
     const checkData = async () => {
-        const response = await axios.get('http://localhost:8080/api/system-management/details/' + idRoomChoose);
+        const response = await axios.get('http://localhost:8080/api/room-rental-manage/details/' + idRoomChoose);
         setDetailInvoices(
-            response.data.detailsInvoiceList.map((element) => {
-                return {
-                    ...element,
-                    facilitiesDetailsList: getRoomByRoomPlan(element.rooms.id).facilitiesDetailsList,
-                    serviceAvailableList: getRoomByRoomPlan(element.rooms.id).serviceAvailableList,
-                    key: element.rooms.id,
-                };
-            }),
+            response.data.detailsInvoiceList
         );
         // //Set Detail Invoice
         // const detailInvoicesResponse = response.data.detailsInvoiceList;
@@ -108,33 +146,37 @@ const RentalManage = () => {
 
     const getRoomByRoomPlan = (idRoom) => {
         let room = null;
-        roomPlan.forEach((element) => {
-            element.listRoom.forEach((element) => {
-                if (element.rooms.id === Number(idRoom)) {
-                    room = element;
-                }
+        if(roomPlan) {
+            roomPlan.forEach((element) => {
+                element.listRoom.forEach((element) => {
+                    if (element.rooms.id === Number(idRoom)) {
+                        room = element;
+                    }
+                });
             });
-        });
+        }
         return room;
     };
 
     const getRoomChoose = () => {
         let roomChoose = null;
-        roomPlan.forEach((element) => {
-            element.listRoom.forEach((element) => {
-                if (element.rooms.id === Number(idRoomChoose)) {
-                    roomChoose = element;
-                }
+        if(roomPlan) {
+            roomPlan.forEach((element) => {
+                element.listRoom.forEach((element) => {
+                    if (element.rooms.id === Number(idRoomChoose)) {
+                        roomChoose = element;
+                    }
+                });
             });
-        });
+        }
         return roomChoose;
     };
 
     const triggerAction = async () => {
-        // console.log(customer);
-        // console.log(bill);
-        // console.log(detailInvoices);
-        // console.log(serviceDetails);
+        console.log(customer);
+        console.log(bill);
+        console.log(detailInvoices);
+        console.log(serviceDetails);
         setConfirmLoading(true);
         messageApi.open({
             key,
@@ -142,7 +184,7 @@ const RentalManage = () => {
             content: 'Vui lòng chờ...',
         });
         if (type === 'check-in') {
-            await axios.post('http://localhost:8080/api/system-management/check-in', {
+            await axios.post('http://localhost:8080/api/room-rental-manage/check-in', {
                 customer: customer,
                 bill: bill,
                 detailInvoices: detailInvoices,
@@ -157,8 +199,8 @@ const RentalManage = () => {
                             content: 'Check in thành công!',
                             duration: 2,
                         });
+                        navigate('/admin/room-plan');
                     }, 1000);
-                    navigate('/admin');
                 }
             }).catch(err => {
                 setTimeout(() => {
@@ -175,7 +217,7 @@ const RentalManage = () => {
             });
         }
         if (type === 'details') {
-            const response = await axios.post('http://localhost:8080/api/system-management/update-detail', {
+            const response = await axios.post('http://localhost:8080/api/room-rental-manage/update-detail', {
                 detailInvoices: detailInvoices,
                 serviceDetails: serviceDetails,
             }).then(res => {
@@ -211,7 +253,7 @@ const RentalManage = () => {
             { contextHolder }
             <div>
                 <div className="text-lg font-semibold mb-3">
-                    { type === "check-in" && <span>Check in - { getRoomChoose().rooms.name }</span> }
+                    { type === "check-in" && <span>Check in - { getRoomChoose() && getRoomChoose().rooms.name }</span> }
                     { type === "details" && <span>Chi tiết thuê phòng - Khách hàng: { bill.customer ? bill.customer.fullname : "" }</span> }
                 </div>
                 <Tabs defaultActiveKey="1" size="large">
@@ -222,6 +264,8 @@ const RentalManage = () => {
                                 setCustomer={setCustomer}
                                 type={type}
                                 setBill={setBill}
+                                nationalityList={nationalityList}
+                                billActiveList={billActiveList}
                             ></CustomerInformation>
                         </div>
                         <div className='col-span-7'>
@@ -233,6 +277,8 @@ const RentalManage = () => {
                                 type={type}
                                 open={open}
                                 setOpen={setOpen}
+                                dateNow={dateNow}
+                                rentalTypeList={rentalTypes}
                             ></CheckInInformation>
                         </div>
                     </TabPane>
@@ -243,6 +289,9 @@ const RentalManage = () => {
                             serviceDetails={serviceDetails}
                             setServiceDetails={setServiceDetails}
                             bill={bill}
+                            rentalTypeList={rentalTypes}
+                            dateNow={dateNow}
+                            dateTomorrow={dateTomorrow}
                         ></ListRoom>
                     </TabPane>
                     <TabPane tab="Dịch vụ" key="2" className="grid grid-cols-2 gap-12 text-base">

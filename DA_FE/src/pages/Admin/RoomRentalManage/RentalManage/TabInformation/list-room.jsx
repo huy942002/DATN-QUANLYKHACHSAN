@@ -1,30 +1,38 @@
 import { PlusOutlined } from '@ant-design/icons';
 import { Divider, Modal, message } from 'antd';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import RoomDetail from './room-detail';
-import ContentModalAddRoom from './content-modal-add-room';
+// import ContentModalAddRoom from './content-modal-add-room';
 import DetailInvoice from '~/models/DetailInvoice/DetailInvoice';
+// import ModalDetailInvoice from './modal-detail-invoice';
+// import ModalRoomDetail from './modal-room-detail';
+import dayjs from 'dayjs';
+import axios from 'axios';
 import ModalDetailInvoice from './modal-detail-invoice';
 import ModalRoomDetail from './modal-room-detail';
-import dayjs from 'dayjs';
+import ContentModalAddRoom from './content-modal-add-room';
 
-function ListRoom({ detailInvoices, setDetailInvoices, serviceDetails, setServiceDetails, bill }) {
+function ListRoom({ detailInvoices, setDetailInvoices, serviceDetails, setServiceDetails, bill, rentalTypeList, dateNow, dateTomorrow }) {
 
     //Data
     const [messageApi, contextHolder] = message.useMessage();
     const key = "messageApi";
     const [confirmLoading, setConfirmLoading] = useState(false);
     const [openModalRoom, setOpenModalRoom] = useState(false);
-    const [roomChoose, setRoomChoose] = useState([]);
-    const roomPlanDefault = useSelector((state) => state.roomPlan.roomPlan);
-    const rentalTypes = useSelector((state) => state.rentalType.rentalTypes);
     const [openModalDetailInvoice, setOpenModalDetailInvoice] = useState(false);
     const [openModalRoomDetail, setOpenModalRoomDetail] = useState(false);
+
+    const [roomChoose, setRoomChoose] = useState([]);
+    const [roomPlanDefault, setRoomPlanDefault] = useState();
+    // const rentalTypes = useSelector((state) => state.rentalType.rentalTypes);
     const [detailModalDetailInvoice, setDetailModalDetailInvoice] = useState();
     //End Data
 
     //Created
+    useEffect(() => {
+        getRoomPlan();
+    }, [])
     //End Created
 
     //Gen Data
@@ -36,6 +44,12 @@ function ListRoom({ detailInvoices, setDetailInvoices, serviceDetails, setServic
     //End Gen Data
 
     //Function
+    const getRoomPlan = async () => {
+        await axios.get('http://localhost:8080/api/room-rental-manage/get-room-plan')
+                .then(res => {
+                    setRoomPlanDefault(res.data);
+                }).catch(err => {});
+    }
     const addRoom = () => {
         const array = [];
         roomChoose.forEach((element) => {
@@ -45,9 +59,9 @@ function ListRoom({ detailInvoices, setDetailInvoices, serviceDetails, setServic
             newDetailInvoice.bills = bill;
             newDetailInvoice.facilitiesDetailsList = genDetail(element).facilitiesDetailsList;
             newDetailInvoice.serviceAvailableList = genDetail(element).serviceAvailableList;
-            newDetailInvoice.rentalTypes = rentalTypes[0];
-            newDetailInvoice.hireDate = dayjs(new Date).format('YYYY-MM-DD') + " 12:00";
-            newDetailInvoice.checkOutDay = '2022-11-22 12:00';
+            newDetailInvoice.rentalTypes = rentalTypeList[0];
+            newDetailInvoice.hireDate = dayjs(dateNow).format('YYYY-MM-DD') + " 12:00";
+            newDetailInvoice.checkOutDay = dayjs(dateTomorrow).format('YYYY-MM-DD') + " 12:00";
             newDetailInvoice.key = element.id;
             array.push(newDetailInvoice);
         });
@@ -154,10 +168,11 @@ function ListRoom({ detailInvoices, setDetailInvoices, serviceDetails, setServic
                 okText="Lưu"
                 cancelText="Hủy"
             >
-                <ModalDetailInvoice 
+                <ModalDetailInvoice
                     detailModalDetailInvoice={detailModalDetailInvoice}
                     setDetailModalDetailInvoice={setDetailModalDetailInvoice}
                     setDetailInvoices={setDetailInvoices}
+                    rentalTypeList={rentalTypeList}
                 ></ModalDetailInvoice>
             </Modal>
             <Modal
@@ -169,7 +184,7 @@ function ListRoom({ detailInvoices, setDetailInvoices, serviceDetails, setServic
                 onCancel={cancelModalRoomDetail}
                 okText="Xong"
             >
-                <ModalRoomDetail 
+                <ModalRoomDetail
                     detailModalDetailInvoice={detailModalDetailInvoice}
                     detailInvoices={detailInvoices}
                     serviceDetails={serviceDetails}
@@ -187,6 +202,8 @@ function ListRoom({ detailInvoices, setDetailInvoices, serviceDetails, setServic
                             showModalDetailInvoice={showModalDetailInvoice}
                             setDetailModalDetailInvoice={setDetailModalDetailInvoice}
                             showModalRoomDetail={showModalRoomDetail}
+                            rentalTypeList={rentalTypeList}
+                            dateNow={dateNow}
                         ></RoomDetail>
                     );
                 })}

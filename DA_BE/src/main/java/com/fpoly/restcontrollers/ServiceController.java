@@ -3,11 +3,18 @@
  */
 package com.fpoly.restcontrollers;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import com.fpoly.dto.ServiceByTypeDTO;
+import com.fpoly.repositories.irepo.IServiceTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,8 +38,9 @@ import com.fpoly.repositories.irepo.IServiceService;
 @RequestMapping("/api/service")
 public class ServiceController {
 
-	@Autowired
-	IServiceService repository;
+	@Autowired IServiceService repository;
+
+	@Autowired IServiceTypeService repoIServiceTypeService;
 
 	// getAll
 	@GetMapping
@@ -74,4 +82,18 @@ public class ServiceController {
 		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
 	}
 
+	@GetMapping("/all-by-type")
+	@Transactional
+	public ResponseEntity<?> getAllServiceByServiceType(){
+		List<Servicess> servicessList = (List<Servicess>) repository.findAll();
+		Map<Integer, List<Servicess>> listServiceByServiceType = servicessList.stream().collect(Collectors.groupingBy(s -> s.getServiceType().getId()));
+		List<ServiceByTypeDTO> serviceByTypeDTOList = new ArrayList<>();
+		for (Integer idServiceType : listServiceByServiceType.keySet()) {
+			ServiceByTypeDTO serviceByTypeDTO = new ServiceByTypeDTO();
+			serviceByTypeDTO.setServiceType(repoIServiceTypeService.findById(idServiceType).get().getName());
+			serviceByTypeDTO.setListService(listServiceByServiceType.get(idServiceType));
+			serviceByTypeDTOList.add(serviceByTypeDTO);
+		}
+		return new ResponseEntity<>(serviceByTypeDTOList, HttpStatus.OK);
+	}
 }

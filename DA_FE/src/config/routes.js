@@ -20,5 +20,6 @@ const routes = {
     signup: '/signup',
     notfound: '/*',
     roomPlan: "/admin/room-plan",
+    rentalManage: '/admin/rental-manage/:type/:idRoomChoose',
 };
 export default routes;

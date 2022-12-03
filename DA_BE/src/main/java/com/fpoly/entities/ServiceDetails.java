@@ -10,16 +10,19 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import com.fpoly.dto.ServiceDetailsDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@SuperBuilder
 public class ServiceDetails implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -45,5 +48,15 @@ public class ServiceDetails implements Serializable {
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "ID_SERVICE", nullable = false)
 	private Servicess servicess;
+
+	public static ServiceDetails toEntity(ServiceDetailsDTO serviceDetailsDTO){
+		return ServiceDetails.builder()
+				.id(serviceDetailsDTO.getId())
+				.quantity(serviceDetailsDTO.getQuantity())
+				.totalCash(serviceDetailsDTO.getTotalCash())
+				.status(serviceDetailsDTO.getStatus())
+				.detailsInvoice(DetailsInvoice.toEntity(serviceDetailsDTO.getDetailsInvoice()))
+				.servicess(serviceDetailsDTO.getServicess()).build();
+	}
 
 }

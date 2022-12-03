@@ -1,56 +1,70 @@
 import { Divider, Select, Input, Card } from 'antd';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { SearchOutlined } from '@ant-design/icons';
 import ServiceDetail from '~/models/ServiceDetail/ServiceDetail';
+import axios from 'axios';
 
 function Services({ detailInvoices, serviceDetails, setServiceDetails }) {
 
     //Data
+    const [servicesByServiceType, setServicesByServiceType] = useState();
+    const [serviceType, setServiceType] = useState();
+    const [queryServiceType, setQueryServiceType] = useState("ALL");
+    const [query, setQuery] = useState("");
     //End Data
 
     //Created
+    useEffect(() => {
+        getAllServiceByType();
+        getAllServiceType();
+    }, [])
     //End Created
 
     //Gen Data
+    const genOptionsKindOfRoom = () => {
+        const array = [{ value: "ALL", label: "ALL" }];
+        if(serviceType) {
+            serviceType.forEach((element) => {
+                array.push({ value: element.name, label: element.name });
+            });
+        }
+        return array;
+    };
+    const filterService = () => {
+        let filter = [];
+        if(servicesByServiceType) {
+            filter = servicesByServiceType;
+            if (queryServiceType !== 'ALL') {
+                filter = servicesByServiceType.filter((element) => element.serviceType === queryServiceType);
+            }
+            filter = filter.map((element) => ({
+                ...element,
+                listService: element.listService.filter((element2) => {
+                    return element2.name
+                        .toLowerCase()
+                        .replace(/\s+/g, '')
+                        .includes(query.toLowerCase().replace(/\s+/g, ''));
+                }),
+            }));
+        }
+        return filter;
+    };
     //End Gen Data
 
     //Function
-    //End Function
-
-    //Util
-    const formatCurrency = (value) => {
-        return value.toLocaleString('it-IT', {style : 'currency', currency : 'VND'});
-    };
-    //End Util
-
-    const servicesByServiceType = useSelector((state) => state.serviceByServiceType.servicesByServiceType);
-    const serviceType = useSelector((state) => state.serviceType.serviceTypes);
-    const genOptionsKindOfRoom = () => {
-        const array = [{ value: 'ALL', label: 'ALL' }];
-        serviceType.forEach((element) => {
-            array.push({ value: element.name, label: element.name });
-        });
-        return array;
-    };
-    const [queryServiceType, setQueryServiceType] = useState('ALL');
-    const [query, setQuery] = useState('');
-    const filterService = () => {
-        let filter = servicesByServiceType;
-        if (queryServiceType !== 'ALL') {
-            filter = servicesByServiceType.filter((element) => element.serviceType === queryServiceType);
-        }
-        filter = filter.map((element) => ({
-            ...element,
-            listService: element.listService.filter((element2) => {
-                return element2.name
-                    .toLowerCase()
-                    .replace(/\s+/g, '')
-                    .includes(query.toLowerCase().replace(/\s+/g, ''));
-            }),
-        }));
-        return filter;
-    };
+    const getAllServiceByType = async () => {
+        await axios.get("http://localhost:8080/api/service/all-by-type")
+                .then(res => {
+                    setServicesByServiceType(res.data);
+                }).catch(err => {});
+    }
+    const getAllServiceType = async () => {
+        await axios.get("http://localhost:8080/api/service-type")
+                .then(res => {
+                    setServiceType(res.data);
+                }).catch(err => {});
+    }
     const addService = (service) => {
         let array = serviceDetails;
         for (let i = 0; i < detailInvoices.length; i++) {
@@ -96,6 +110,13 @@ function Services({ detailInvoices, serviceDetails, setServiceDetails }) {
         }
         setServiceDetails(array);
     };
+    //End Function
+
+    //Util
+    const formatCurrency = (value) => {
+        return value.toLocaleString("it-IT", {style : "currency", currency : "VND"});
+    };
+    //End Util
 
     return (
         <div className="">
@@ -144,29 +165,6 @@ function Services({ detailInvoices, serviceDetails, setServiceDetails }) {
                                                         <div>{element2.name}</div>
                                                         <div>{formatCurrency(element2.prices)}</div>
                                                     </div>
-                                                    // <Card title={element2.name} className="p-0">
-                                                    //     {element2.prices}
-                                                    // </Card>
-                                                    // <Card.Grid
-                                                    //     onClick={() => {
-                                                    //         addService(element2);
-                                                    //     }}
-                                                    //     className="cursor-pointer select-none"
-                                                    //     key={index}
-                                                    //     style={{ width: '50%' }}
-                                                    // >
-                                                    //     <div>{element2.name}</div>
-                                                    //     <div>({element2.prices} VNĐ)</div>
-                                                    // </Card.Grid>
-                                                    // <div
-                                                    //     onClick={() => {
-                                                    //         addService(element2);
-                                                    //     }}
-                                                    //     className="cursor-pointer my-3 hover:bg-default-2 select-none"
-                                                    //     key={index}
-                                                    // >
-                                                    //     {element2.name} - {element2.prices}VNĐ
-                                                    // </div>
                                                 );
                                             })}
                                         </div>

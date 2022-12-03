@@ -2,6 +2,7 @@ package com.fpoly.entities;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -16,16 +17,19 @@ import javax.persistence.OneToMany;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import com.fpoly.dto.DetailsInvoiceDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@SuperBuilder
 public class DetailsInvoice implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -73,5 +77,42 @@ public class DetailsInvoice implements Serializable {
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "ID_ROOMS", nullable = false)
 	private Rooms rooms;
+
+	public static DetailsInvoice toEntity(DetailsInvoiceDTO detailsInvoiceDTO) {
+		if (detailsInvoiceDTO == null) {
+			return null;
+		}
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+		return DetailsInvoice.builder()
+				.id(detailsInvoiceDTO.getId())
+				.hireDate(LocalDateTime.parse(detailsInvoiceDTO.getHireDate(), formatter))
+				.checkOutDay(LocalDateTime.parse(detailsInvoiceDTO.getCheckOutDay(), formatter))
+				.numberOfHoursToRent(detailsInvoiceDTO.getNumberOfHoursToRent())
+				.numberOfDaysOfRent(detailsInvoiceDTO.getNumberOfDaysOfRent())
+				.numberOfPeople(detailsInvoiceDTO.getNumberOfPeople())
+				.totalCash(detailsInvoiceDTO.getTotalCash())
+				.status(detailsInvoiceDTO.getStatus())
+				.bills(Bills.toEntity(detailsInvoiceDTO.getBills()))
+				.rooms(detailsInvoiceDTO.getRooms())
+				.rentalTypes(detailsInvoiceDTO.getRentalTypes()).build();
+
+	}
+
+	public DetailsInvoiceDTO toDomain() {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+		DetailsInvoiceDTO detailsInvoiceDTO = DetailsInvoiceDTO.builder()
+				.id(this.id)
+				.hireDate(formatter.format(this.hireDate))
+				.checkOutDay(formatter.format(this.checkOutDay))
+				.numberOfDaysOfRent(this.numberOfDaysOfRent)
+				.numberOfPeople(this.numberOfPeople)
+				.numberOfHoursToRent(this.numberOfHoursToRent)
+				.totalCash(this.totalCash)
+				.status(this.status)
+				.bills(this.bills.toDomain())
+				.rooms(this.rooms)
+				.rentalTypes(this.rentalTypes).build();
+		return detailsInvoiceDTO;
+	}
 
 }

@@ -9,11 +9,9 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 const { RangePicker } = DatePicker;
 
-function CheckInInformation({ bill, setBill, detailInvoices, serviceDetails, type, open, setOpen }) {
+function CheckInInformation({ bill, setBill, detailInvoices, serviceDetails, type, open, setOpen, dateNow, rentalTypeList }) {
 
     //Data
-    const rentalTypes = useSelector((state) => state.rentalType.rentalTypes);
-    const dateNow = new Date();
     const columnDetailInVoice = [
         { title: 'Phòng', dataIndex: 'room', key: '1',
             render: (room, element) => <div onClick={() => changeChooseDetailInvoice(element.roomId)} className='font-semibold cursor-pointer hover:text-design-greenLight'>{room} <FontAwesomeIcon icon={faCircleExclamation}></FontAwesomeIcon></div>
@@ -58,7 +56,6 @@ function CheckInInformation({ bill, setBill, detailInvoices, serviceDetails, typ
     const [messageApi, contextHolder] = message.useMessage();
     const key = 'messageApi';
     const [confirmLoading, setConfirmLoading] = useState(false);
-    const navigate = new useNavigate();
     //End Data
 
     //Created
@@ -67,9 +64,11 @@ function CheckInInformation({ bill, setBill, detailInvoices, serviceDetails, typ
     //Gen Data
     const genRentalType = () => {
         const array = [];
-        rentalTypes.forEach((element) => {
-            array.push({ value: element.id, label: element.name });
-        });
+        if(rentalTypeList) {
+            rentalTypeList.forEach((element) => {
+                array.push({ value: element.id, label: element.name });
+            });
+        }
         return array;
     };
     const genDataTable = () => {
@@ -96,11 +95,13 @@ function CheckInInformation({ bill, setBill, detailInvoices, serviceDetails, typ
     }
     const genAllMoneyServiceByRoom = (idRoom) => {
         let allMoneyServiceByRoom = 0;
-        serviceDetails.forEach(element => {
-            if(element.detailsInvoice.rooms.id === idRoom) {
-                allMoneyServiceByRoom += Number(element.quantity * element.servicess.prices)
-            }
-        })
+        if(serviceDetails) {
+            serviceDetails.forEach(element => {
+                if(element.detailsInvoice.rooms.id === idRoom) {
+                    allMoneyServiceByRoom += Number(element.quantity * element.servicess.prices)
+                }
+            })
+        }
         return allMoneyServiceByRoom;
     }
     const genAllMoneyService = () => {
@@ -205,9 +206,10 @@ function CheckInInformation({ bill, setBill, detailInvoices, serviceDetails, typ
         })
         console.log(detailInvoiceList);
         console.log(serviceDetailList);
-        const response = await axios.post('http://localhost:8080/api/system-management/pay', {
+        const response = await axios.post('http://localhost:8080/api/room-rental-manage/pay', {
                 detailInvoices: detailInvoiceList,
                 serviceDetails: serviceDetailList,
+                bill: bill,
             }).then(res => {
                 if(res) {
                     setTimeout(() => {
@@ -441,7 +443,7 @@ function CheckInInformation({ bill, setBill, detailInvoices, serviceDetails, typ
                     <div>Loại hình thuê:</div>
                     <Select
                         className="w-full mt-[2px]"
-                        defaultValue={genRentalType()[0].value}
+                        value={rentalTypeList ? genRentalType()[0].value : ""}
                         options={genRentalType()}
                     />
                 </div>

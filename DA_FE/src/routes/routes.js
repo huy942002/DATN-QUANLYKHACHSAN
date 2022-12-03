@@ -22,6 +22,7 @@ import RoomManage from '~/pages/Admin/RoomManage';
 import CreateRoomManage from '~/pages/Admin/CreateRoomManage';
 import CreateOptionRoomManage from '~/pages/Admin/CreateOptionRoomManage';
 import RoomPlan from '~/pages/Admin/RoomRentalManage/RoomPlan/room-plan';
+import RentalManage from '~/pages/Admin/RoomRentalManage/RentalManage/rental-manage';
 
 // Routes public
 
@@ -46,7 +47,8 @@ const publicRoutes = [
     { path: config.routes.searchRoom, component: SearchRoom, layout: null },
     { path: config.routes.signup, component: Signup, layout: null },
     { path: config.routes.notfound, component: Notfound, layout: null },
-    { path: config.routes.roomPlan, component: RoomPlan }
+    { path: config.routes.roomPlan, component: RoomPlan },
+    { path: config.routes.rentalManage, component: RentalManage }
 ];
 
 const privateRoutes = [];

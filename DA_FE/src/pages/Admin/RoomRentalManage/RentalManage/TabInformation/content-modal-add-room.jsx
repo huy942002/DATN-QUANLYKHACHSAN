@@ -3,37 +3,43 @@ import RoomPlan from './Modal-Room-Plan/room-plan';
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import RoomChoose from './Modal-Room-Choose/room-choose';
+import axios from 'axios';
 
 function ContentModalAddRoom({ detailInvoices, roomChoose, setRoomChoose }) {
 
     //Data
+    const [roomPlan, setRoomPlan] = useState();
     //End Data
 
     //Created
+    useEffect(() => {
+        getRoomPlan();
+    }, []);
     //End Created
 
     //Gen Data
     //End Gen Data
 
     //Function
+    const getRoomPlan = async () => {
+        await axios.get('http://localhost:8080/api/room-rental-manage/get-room-plan')
+                .then(res => {
+                    if (detailInvoices) {
+                        detailInvoices.map((element) => {
+                            setRoomPlan(
+                                res.data.map((element2) => ({
+                                    ...element2,
+                                    listRoom: element2.listRoom.filter((element3) => element3.rooms.id !== element.rooms.id),
+                                })),
+                            );
+                        });
+                    }
+                }).catch(err => {});
+    }
     //End Function
 
     //Util
     //End Util
-    
-    const [roomPlan, setRoomPlan] = useState(useSelector((state) => state.roomPlan.roomPlan));
-    useEffect(() => {
-        if (detailInvoices) {
-            detailInvoices.map((element) => {
-                setRoomPlan(
-                    roomPlan.map((element2) => ({
-                        ...element2,
-                        listRoom: element2.listRoom.filter((element3) => element3.rooms.id !== element.rooms.id),
-                    })),
-                );
-            });
-        }
-    }, []);
 
     return (
         <div className="grid grid-cols-2 gap-6 ">

@@ -9,30 +9,12 @@ import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 const { RangePicker } = DatePicker;
 
-function RoomDetail({ detailInvoice, detailInvoiceList, setDetailInvoices, showModalDetailInvoice, setDetailModalDetailInvoice, showModalRoomDetail }) {
+function RoomDetail({ detailInvoice, detailInvoiceList, setDetailInvoices, showModalDetailInvoice, setDetailModalDetailInvoice, showModalRoomDetail, rentalTypeList, dateNow }) {
     
     //Data
-    const dateNow = new Date();
-    const rentalTypes = useSelector((state) => state.rentalType.rentalTypes);
     //End Data
 
     //Created
-    useEffect(() => {
-        setDetailInvoices(
-            detailInvoiceList.map((element) => {
-                if (element.rooms.id === detailInvoice.rooms.id && !element.rentalTypes && !element.hireDate && !element.checkOutDay) {
-                    return {
-                        ...element,
-                        rentalTypes: rentalTypes[0],
-                        hireDate: '2022-11-21 12:00',
-                        checkOutDay: '2022-11-22 12:00',
-                    };
-                } else {
-                    return element;
-                }
-            }),
-        );
-    }, []);
     //End Created
 
     //Gen Data
@@ -121,99 +103,7 @@ function RoomDetail({ detailInvoice, detailInvoiceList, setDetailInvoices, showM
                         </span>
                     </div>
                 </div>
-                {/* <Meta
-                    avatar={<Avatar src="https://joeschmoe.io/api/v1/random" />}
-                    title={detailInvoice.rooms.name}
-                    description={detailInvoice.rooms.kindOfRoom.name}
-                /> */}
             </Card>
-            {/* <Divider orientation="left">
-                <div className="text-base font-semibold">{detailInvoice.rooms.name}</div>
-            </Divider>
-            <div className="grid grid-cols-2 gap-4 items-center">
-                <div className="flex items-center">
-                    <div>Loại phòng:</div>
-                    <div className="ml-2 font-semibold">{detailInvoice.rooms.kindOfRoom.name}</div>
-                </div>
-                <div></div>
-                <div className="flex items-center">
-                    <div>Giá theo ngày:</div>
-                    <div className="ml-2 font-semibold">{detailInvoice.rooms.kindOfRoom.priceByDay} VNĐ</div>
-                </div>
-                <div className="flex items-center">
-                    <div>Giá theo giờ:</div>
-                    <div className="ml-2 font-semibold">{detailInvoice.rooms.kindOfRoom.hourlyPrice} VNĐ</div>
-                </div>
-                <div className="">
-                    <div>Số người: </div>
-                    <div className="w-full">
-                        <InputNumber
-                            onChange={(e) => {
-                                changeNumberOfPeople(e.target.value);
-                            }}
-                            defaultValue={detailInvoice.numberOfPeople}
-                            className="w-full"
-                            placeholder="Số người..."
-                        ></InputNumber>
-                    </div>
-                </div>
-                <div>
-                    <div>Loại hình thuê:</div>
-                    <div className="w-full">
-                        <Select
-                            onChange={(e) => {
-                                changeRentalType(e);
-                            }}
-                            className="w-full mt-[2px]"
-                            value={
-                                detailInvoice.rentalTypes
-                                    ? genRentalType().find((element) => element.value === detailInvoice.rentalTypes.id)
-                                          .value
-                                    : genRentalType()[0].value
-                            }
-                            options={genRentalType()}
-                        />
-                    </div>
-                </div>
-                <div className="col-span-2">
-                    <div className="">Ngày & Giờ Check in/out: </div>
-                    <div className="w-full">
-                        <RangePicker
-                            className="w-full"
-                            showTime={{
-                                format: 'HH:mm',
-                            }}
-                            format="DD-MM-YYYY HH:mm"
-                            onChange={(date, dateString) => {
-                                changeTime(date, dateString);
-                            }}
-                            value={
-                                detailInvoice.hireDate && detailInvoice.checkOutDay
-                                    ? [dayjs(detailInvoice.hireDate), dayjs(detailInvoice.checkOutDay)]
-                                    : ''
-                            }
-                        />
-                    </div>
-                </div>
-                <div className="flex content-start h-full">
-                    <div>Trang thiết bị:&nbsp;</div>
-                    <div>
-                        {detailInvoice.facilitiesDetailsList.map((element) => {
-                            return <div> - {element.facilities.name}</div>;
-                        })}
-                    </div>
-                </div>
-                <div className="flex content-start h-full">
-                    <div>Mini Bar:&nbsp;</div>
-                    <div>
-                        {detailInvoice.serviceAvailableList.map((element) => {
-                            return <div> - {element.servicess.name}</div>;
-                        })}
-                    </div>
-                </div>
-                <div className="col-span-2">Số ngày thuê: {genDayRental(detailInvoice.hireDate)}</div>
-                <div className="col-span-2">Số giờ thuê: {genHourRental(detailInvoice.hireDate)}</div>
-            </div> */}
         </div>
     );
 }

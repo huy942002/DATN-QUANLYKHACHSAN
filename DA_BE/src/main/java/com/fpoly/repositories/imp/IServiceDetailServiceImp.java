@@ -3,8 +3,10 @@
  */
 package com.fpoly.repositories.imp;
 
+import java.util.List;
 import java.util.Optional;
 
+import com.fpoly.entities.DetailsInvoice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,6 +43,11 @@ public class IServiceDetailServiceImp implements IServiceDetailService {
 	@Override
 	public void remove(Integer id) {
 		svdetailRepo.deleteById(id);
+	}
+
+	@Override
+	public List<ServiceDetails> listByRoomAndStatus(DetailsInvoice detailsInvoice, Integer status) {
+		return svdetailRepo.listByRoomAndStatus(detailsInvoice, status);
 	}
 
 }

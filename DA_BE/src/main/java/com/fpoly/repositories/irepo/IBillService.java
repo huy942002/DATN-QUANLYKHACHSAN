@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 import com.fpoly.entities.Bills;
 
+import java.util.List;
+
 
 /**
  *
@@ -15,5 +17,5 @@ import com.fpoly.entities.Bills;
  */
 @Service
 public interface IBillService extends IGeneralService<Bills>{
-
+    List<Bills> getAllBillByStatus (Integer status);
 }

@@ -27,6 +27,18 @@ const RoomPlan = () => {
     //Created
     useEffect(() => {
         window.scrollTo(0, 0);
+        const getRoomPlan = async () => {
+            await axios.get('http://localhost:8080/api/room-rental-manage/get-room-plan')
+                    .then(res => {
+                        setRoomPlan(res.data);
+                    }).catch(err => {});
+        }
+        const getAllKindOfRoom = async () => {
+            await axios.get('http://localhost:8080/api/kind-of-room')
+                    .then(res => {
+                        setKindOfRoomList(res.data);
+                    }).catch(err => {});
+        }
         getRoomPlan();
         getAllKindOfRoom();
     }, []);
@@ -117,18 +129,6 @@ const RoomPlan = () => {
     //End Gen Data
 
     //Function
-    const getRoomPlan = async () => {
-        await axios.get('http://localhost:8080/api/room-rental-manage/get-room-plan')
-                .then(res => {
-                    setRoomPlan(res.data);
-                }).catch(err => {});
-    }
-    const getAllKindOfRoom = async () => {
-        await axios.get('http://localhost:8080/api/kind-of-room')
-                .then(res => {
-                    setKindOfRoomList(res.data);
-                }).catch(err => {});
-    }
     const getAllNationality = async () => {
         await axios.get('http://localhost:8080/api/kind-of-room')
                 .then(res => {
@@ -254,7 +254,7 @@ const RoomPlan = () => {
                 </div>
             </div>
             {filterRoomPlan() && filterRoomPlan().map((element, index) => {
-                return <Floor key={index} theRoomsOfTheFloor={element}></Floor>;
+                return <Floor key={index} theRoomsOfTheFloor={element} roomPlan={roomPlan} setRoomPlan={setRoomPlan}></Floor>;
             })}
         </div>
     );

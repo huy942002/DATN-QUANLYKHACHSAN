@@ -1,21 +1,33 @@
 import { faBed } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Card } from 'antd';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 function RoomChoose({ room, roomPlan, setRoomPlan, roomChoose, setRoomChoose }) {
 
     //Data
-    const roomPlanDefault = useSelector((state) => state.roomPlan.roomPlan);
+    // const roomPlanDefault = useSelector((state) => state.roomPlan.roomPlan);
+    const [roomPlanDefault, setRoomPlanDefault] = useState();
     //End Data
 
     //Created
+    useEffect(() => {
+        getRoomPlan();
+    }, [])
     //End Created
 
     //Gen Data
     //End Gen Data
 
     //Function
+    const getRoomPlan = async () => {
+        await axios.get('http://localhost:8080/api/room-rental-manage/get-room-plan')
+                .then(res => {
+                    setRoomPlanDefault(res.data);
+                }).catch(err => {});
+    }
     const removeRoom = (room) => {
         let floor = roomPlanDefault.find((element) => element.numberOfFloors === room.numberOfFloors.numberOfFloors);
         let detailedRoom = floor.listRoom.find((element) => element.rooms.id === room.id);
@@ -50,36 +62,6 @@ function RoomChoose({ room, roomPlan, setRoomPlan, roomChoose, setRoomChoose }) 
     //End Util
 
     return (
-        // <div
-        //     className={`h-[150px] rounded-[2px] cursor-default grid grid-cols-3 grid-rows-2 items-center text-base text-white
-        //         ${room.status === 1 ? 'bg-status-1' : ''}
-        //         ${room.status === 2 ? 'bg-status-2' : ''}
-        //         ${room.status === 3 ? 'bg-status-3' : ''}`}
-        //     onClick={() => {
-        //         removeRoom(room);
-        //     }}
-        // >
-        //     <div className="w-full h-full p-4">
-        //         <div
-        //             className={`rounded-[2px] h-full w-full flex items-center justify-center font-semibold
-        //                 ${room.status === 1 ? 'bg-status-1.5' : ''}
-        //                 ${room.status === 2 ? 'bg-status-2.5' : ''}
-        //                 ${room.status === 3 ? 'bg-status-3.5' : ''}`}
-        //         >
-        //             {room.name}
-        //         </div>
-        //     </div>
-        //     <div className="w-full h-full p-4 pl-0 col-span-2">
-        //         <div
-        //             className={`rounded-[2px] h-full w-full flex items-center justify-center font-semibold
-        //                 ${room.status === 1 ? 'bg-status-1.5' : ''}
-        //                 ${room.status === 2 ? 'bg-status-2.5' : ''}
-        //                 ${room.status === 3 ? 'bg-status-3.5' : ''}`}
-        //         >
-        //             {room.kindOfRoom.name}
-        //         </div>
-        //     </div>
-        // </div>
         <Card onClick={() => removeRoom(room)} className="hover:border-design-greenLight cursor-pointer">
             <div className='flex items-center'>
                 <div className='bg-design-greenLight rounded-full p-2 text-white h-10 w-10 flex justify-center items-center'>

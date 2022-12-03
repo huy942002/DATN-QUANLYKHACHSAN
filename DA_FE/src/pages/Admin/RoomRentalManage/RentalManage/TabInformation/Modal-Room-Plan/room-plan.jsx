@@ -1,96 +1,93 @@
-import { CheckOutlined, FontColorsOutlined, ReloadOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons';
-import { Avatar, Badge, Input, Select } from 'antd';
+import { ReloadOutlined, SearchOutlined } from '@ant-design/icons';
+import { Input, Select } from 'antd';
+import axios from 'axios';
 import { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { getAllKindOfRoom } from '~/app/reducers/KindOfRoom/kind-of-room-api';
-import { getAllRoomPlan } from '~/app/reducers/RoomPlan/room-plan-api';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBroom } from '@fortawesome/free-solid-svg-icons';
 import HotelFloor from './hotel-floor';
-import { getAllNationality } from '~/app/reducers/Nationality/nationality-api';
-import { getAllRentalType } from '~/app/reducers/RentalType/rental-type-api';
-import { getAllServiceByServiceType } from '~/app/reducers/ServiceByServiceType/service-by-service-type-api';
-import { getAllServiceType } from '~/app/reducers/ServiceType/service-type-api';
 
 const RoomPlan = ({ roomPlan, setRoomPlan, roomChoose, setRoomChoose }) => {
 
     //Data
+    const [queryFloor, setQueryFloor] = useState("ALL");
+    const [queryKindOfRoom, setQueryKindOfRoom] = useState("ALL");
+    const [queryName, setQueryName] = useState('');
+    const [kindOfRoomList, setKindOfRoomList] = useState();
     //End Data
 
     //Created
+    useEffect(() => {
+        getAllKindOfRoom();
+    }, []);
     //End Created
 
     //Gen Data
-    //End Gen Data
-
-    //Function
-    //End Function
-
-    //Util
-    //End Util
-
-    const dispatch = new useDispatch();
-    useEffect(() => {
-        getAllRoomPlan(dispatch);
-        getAllKindOfRoom(dispatch);
-        getAllNationality(dispatch);
-        getAllRentalType(dispatch);
-        getAllServiceByServiceType(dispatch);
-        getAllServiceType(dispatch);
-    }, []);
-
-    const kindOfRooms = useSelector((state) => state.kindOfRoom.kindOfRooms);
+    const filterRoomPlan = () => {
+        let filter = [];
+        if(roomPlan) {
+            filter = roomPlan;
+            if (queryFloor !== 'ALL') {
+                filter = roomPlan.filter((element) => element.numberOfFloors === queryFloor);
+            }
+            filter = filter.map((element) => {
+                return {
+                    ...element,
+                    listRoom: element.listRoom.filter((element2) => element2.rooms.status === 1),
+                };
+            });
+            if (queryKindOfRoom !== 'ALL') {
+                filter = filter.map((element) => {
+                    return {
+                        ...element,
+                        listRoom: element.listRoom.filter((element2) => element2.rooms.kindOfRoom.id === queryKindOfRoom),
+                    };
+                });
+            }
+            if (queryName !== '') {
+                filter = filter.map((element) => {
+                    return {
+                        ...element,
+                        listRoom: element.listRoom.filter((element2) =>
+                            element2.rooms.name
+                                .toLowerCase()
+                                .replace(/\s+/g, '')
+                                .includes(queryName.toLowerCase().replace(/\s+/g, '')),
+                        ),
+                    };
+                });
+            }
+        }
+        return filter;
+    };
     const genOptionsFloor = () => {
         const array = [{ value: 'ALL', label: 'ALL' }];
-        roomPlan.forEach((element) => {
-            array.push({ value: element.numberOfFloors, label: 'Tầng ' + element.numberOfFloors });
-        });
+        if(roomPlan) {
+            roomPlan.forEach((element) => {
+                array.push({ value: element.numberOfFloors, label: 'Tầng ' + element.numberOfFloors });
+            });
+        }
         return array;
     };
     const genOptionsKindOfRoom = () => {
         const array = [{ value: 'ALL', label: 'ALL' }];
-        kindOfRooms.forEach((element) => {
-            array.push({ value: element.id, label: element.name });
-        });
+        if(kindOfRoomList) {
+            kindOfRoomList.forEach((element) => {
+                array.push({ value: element.id, label: element.name });
+            });
+        }
         return array;
     };
-    const [queryFloor, setQueryFloor] = useState(genOptionsFloor()[0].value);
-    const [queryKindOfRoom, setQueryKindOfRoom] = useState(genOptionsKindOfRoom()[0].value);
-    const [queryName, setQueryName] = useState('');
-    const filterRoomPlan = () => {
-        let filter = roomPlan;
-        if (queryFloor !== 'ALL') {
-            filter = roomPlan.filter((element) => element.numberOfFloors === queryFloor);
-        }
-        filter = filter.map((element) => {
-            return {
-                ...element,
-                listRoom: element.listRoom.filter((element2) => element2.rooms.status === 1),
-            };
-        });
-        if (queryKindOfRoom !== 'ALL') {
-            filter = filter.map((element) => {
-                return {
-                    ...element,
-                    listRoom: element.listRoom.filter((element2) => element2.rooms.kindOfRoom.id === queryKindOfRoom),
-                };
-            });
-        }
-        if (queryName !== '') {
-            filter = filter.map((element) => {
-                return {
-                    ...element,
-                    listRoom: element.listRoom.filter((element2) =>
-                        element2.rooms.name
-                            .toLowerCase()
-                            .replace(/\s+/g, '')
-                            .includes(queryName.toLowerCase().replace(/\s+/g, '')),
-                    ),
-                };
-            });
-        }
-        return filter;
-    };
+    //End Gen Data
+
+    //Function
+    const getAllKindOfRoom = async () => {
+        await axios.get('http://localhost:8080/api/kind-of-room')
+                .then(res => {
+                    setKindOfRoomList(res.data);
+                }).catch(err => {});
+    }
+    //End Function
+
+    //Util
+    //End Util
 
     return (
         <div className="w-full">

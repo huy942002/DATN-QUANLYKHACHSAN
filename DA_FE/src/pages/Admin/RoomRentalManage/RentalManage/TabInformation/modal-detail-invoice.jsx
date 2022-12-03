@@ -2,10 +2,9 @@ import { DatePicker, InputNumber, message, Select } from "antd";
 import dayjs from "dayjs";
 import { useSelector } from "react-redux";
 
-function ModalDetailInvoice({ detailModalDetailInvoice, setDetailModalDetailInvoice, setDetailInvoices }) {
+function ModalDetailInvoice({ detailModalDetailInvoice, setDetailModalDetailInvoice, setDetailInvoices, rentalTypeList }) {
 
     //Data
-    const rentalTypes = useSelector((state) => state.rentalType.rentalTypes);
     //End Data
 
     //Created
@@ -14,15 +13,17 @@ function ModalDetailInvoice({ detailModalDetailInvoice, setDetailModalDetailInvo
     //Gen Data
     const genRentalType = () => {
         const array = [];
-        rentalTypes.forEach((element) => {
-            array.push({ value: element.id, label: element.name });
-        });
+        if(rentalTypeList) {
+            rentalTypeList.forEach((element) => {
+                array.push({ value: element.id, label: element.name });
+            });
+        }
         return array;
     };
     //End Gen Data
 
     //Function
-    const changeRentalType = (value) => setDetailModalDetailInvoice({...detailModalDetailInvoice, rentalTypes: rentalTypes.find((element) => element.id === value)});
+    const changeRentalType = (value) => setDetailModalDetailInvoice({...detailModalDetailInvoice, rentalTypes: rentalTypeList.find((element) => element.id === value)});
     
     const changeNumberOfPeople = (value) => {
         if(value === 0 || value < 0) {
@@ -54,9 +55,9 @@ function ModalDetailInvoice({ detailModalDetailInvoice, setDetailModalDetailInvo
                     onChange={(e) => changeRentalType(e)}
                     className="ml-3 w-28"
                     value={
-                        detailModalDetailInvoice.rentalTypes
-                        ? genRentalType().find((element) => element.value === detailModalDetailInvoice.rentalTypes.id).value
-                        : genRentalType()[0].value
+                        detailModalDetailInvoice.rentalTypes ? genRentalType().find((element) => element.value === detailModalDetailInvoice.rentalTypes.id).value
+                        : rentalTypeList ? genRentalType()[0].value
+                        : ""
                     }
                     options={genRentalType()}
                 />
