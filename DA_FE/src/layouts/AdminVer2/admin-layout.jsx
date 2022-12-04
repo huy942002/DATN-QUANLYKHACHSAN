@@ -12,7 +12,17 @@ import { useNavigate } from 'react-router-dom';
 
 import './admin-layout.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowsRotate, faBarsProgress, faHotel, faListCheck, faRightBracket, faBed, faBell, faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
+import {
+    faArrowsRotate,
+    faBarsProgress,
+    faHotel,
+    faListCheck,
+    faRightBracket,
+    faBed,
+    faBell,
+    faRightFromBracket,
+    faShield,
+} from '@fortawesome/free-solid-svg-icons';
 import { Modal, Button } from 'flowbite-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllHandOver } from '~/app/reducers/handOver';
@@ -34,7 +44,6 @@ const ConfirmSchema = Yup.object().shape({
 });
 
 const AdminLayout = ({ children }) => {
-
     const [collapsed, setCollapsed] = useState(false);
     const navigate = new useNavigate();
 
@@ -75,7 +84,7 @@ const AdminLayout = ({ children }) => {
                             key: '1',
                             icon: <FontAwesomeIcon icon={faHotel}></FontAwesomeIcon>,
                             label: 'Sơ đồ phòng',
-                            onClick: () => navigate("/admin/room-plan"),
+                            onClick: () => navigate('/admin/room-plan'),
                         },
                         {
                             key: '2',
@@ -98,19 +107,19 @@ const AdminLayout = ({ children }) => {
                                     key: '5',
                                     // icon: <UploadOutlined />,
                                     label: 'Quản lý nhân viên',
-                                    onClick: () => navigate("/admin/personnel-manage"),
+                                    onClick: () => navigate('/admin/personnel-manage'),
                                 },
                                 {
                                     key: '6',
                                     // icon: <UploadOutlined />,
                                     label: 'Quản lý khách hàng',
-                                    onClick: () => navigate("/admin/customer-manage"),
+                                    onClick: () => navigate('/admin/customer-manage'),
                                 },
                                 {
                                     key: '7',
                                     // icon: <UploadOutlined />,
                                     label: 'Quản lý dịch vụ',
-                                    onClick: () => navigate("/admin/service-manage"),
+                                    onClick: () => navigate('/admin/service-manage'),
                                 },
                                 {
                                     key: '8',
@@ -118,34 +127,34 @@ const AdminLayout = ({ children }) => {
                                     label: 'Hóa đơn',
                                     // onClick: () => setCollapsed(!collapsed),
                                 },
-                            ]
+                            ],
                         },
                         {
-                            key: "9",
+                            key: '9',
                             icon: <FontAwesomeIcon icon={faArrowsRotate}></FontAwesomeIcon>,
-                            label: "Giao ca",
+                            label: 'Giao ca',
                             children: [
                                 {
                                     key: '10',
                                     // icon: <UploadOutlined />,
                                     label: 'Giao ca',
-                                    onClick: () => navigate("/admin/hand-over"),
+                                    onClick: () => navigate('/admin/hand-over'),
                                 },
                                 {
                                     key: '11',
                                     // icon: <UploadOutlined />,
                                     label: 'Lịch sử giao ca',
-                                    onClick: () => navigate("/admin/hand-over-manage"),
+                                    onClick: () => navigate('/admin/hand-over-manage'),
                                 },
                                 {
                                     key: '12',
                                     // icon: <UploadOutlined />,
                                     label: 'Lịch sử',
-                                    onClick: () => navigate("/admin/history"),
+                                    onClick: () => navigate('/admin/history'),
                                 },
-                            ]
+                            ],
                         },
-                        
+
                         {
                             key: '13',
                             icon: <FontAwesomeIcon icon={faListCheck} />,
@@ -154,6 +163,12 @@ const AdminLayout = ({ children }) => {
                         },
                         {
                             key: '14',
+                            icon: <FontAwesomeIcon icon={faShield} />,
+                            label: 'Phân quyền',
+                            onClick: () => navigate('/admin/authorization'),
+                        },
+                        {
+                            key: '15',
                             icon: <FontAwesomeIcon icon={faRightFromBracket} />,
                             label: 'Đăng xuất',
                             // onClick: () => setCollapsed(!collapsed),
@@ -241,7 +256,11 @@ const AdminLayout = ({ children }) => {
                                                     name="note"
                                                     className={`
                                                         bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
-                                                        ${errors.note && touched.note ? 'border-2 border-rose-600' : ''} `}
+                                                        ${
+                                                            errors.note && touched.note
+                                                                ? 'border-2 border-rose-600'
+                                                                : ''
+                                                        } `}
                                                 />
                                                 {errors.note && touched.note ? (
                                                     <div className="text-sm text-red-600 mt-2">{errors.note}</div>

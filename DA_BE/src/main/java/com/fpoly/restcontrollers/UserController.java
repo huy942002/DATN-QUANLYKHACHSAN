@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,7 +44,9 @@ public class UserController {
 	// add new
 	@PostMapping
 	public ResponseEntity<Users> createNewPost(@RequestBody Users user) {
-		return new ResponseEntity<>(repository.save(user), HttpStatus.OK);
+		Users u = user;
+		u.setPassword(BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()));;
+		return new ResponseEntity<>(repository.save(u), HttpStatus.OK);
 	}
 
 	// getById

@@ -9,8 +9,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { toast } from 'react-toastify';
 
-import bcrypt from 'bcryptjs';
-
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { add, getAllNationality, getAllPersonnel, getPersonnelById, update } from '~/app/reducers/personnel';
@@ -119,13 +117,12 @@ function PersonnelManage() {
     }
 
     function handleAdd(data) {
-        const hashedPass = bcrypt.hashSync(data.users.password, 10);
         dispatch(
             add({
                 ...data,
                 status: 1,
                 gender: data.gender === '' ? 'Nam' : data.gender,
-                users: { ...data.users, status: 1, password: bcrypt.hashSync(data.users.password, 10), roles: [] },
+                users: { ...data.users, status: 1, roles: [] },
                 nationality: nationalities.filter(
                     (nat) =>
                         nat.id === (data.nationality === undefined ? nationalities[0].id : Number(data.nationality)),
@@ -248,12 +245,7 @@ function PersonnelManage() {
                                 .map((x) => (
                                     <tr className="bg-white dark:bg-gray-800" key={x.id}>
                                         <td className="py-4 px-6">
-                                            <img
-                                                src="https://i.pravatar.cc/100"
-                                                alt={x.fullname}
-                                                className="rounded-sm"
-                                                width={50}
-                                            />
+                                            <img src={x.img} alt={x.fullname} className="rounded-sm" width={50} />
                                         </td>
                                         <td className="py-4 px-6">{x.users.username}</td>
                                         <td className="py-4 px-6">{x.email}</td>

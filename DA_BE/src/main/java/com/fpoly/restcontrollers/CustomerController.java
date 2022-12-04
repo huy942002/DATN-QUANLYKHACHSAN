@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,7 +44,9 @@ public class CustomerController {
 	// add new
 	@PostMapping
 	public ResponseEntity<Customer> createNewCustomer(@RequestBody Customer customer) {
-		return new ResponseEntity<>(repository.save(customer), HttpStatus.OK);
+		Customer c = customer;
+		c.getUsers().setPassword(BCrypt.hashpw(customer.getUsers().getPassword(), BCrypt.gensalt()));;
+		return new ResponseEntity<>(repository.save(c), HttpStatus.OK);
 	}
 
 	// getById

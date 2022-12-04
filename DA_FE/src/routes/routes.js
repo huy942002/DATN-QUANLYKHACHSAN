@@ -19,6 +19,7 @@ import Notfound from '~/pages/Notfound';
 import SearchRoom from '~/pages/Customer/SearchRoom';
 import RoomDetail from '~/pages/Customer/RoomDetail';
 import RoomManage from '~/pages/Admin/RoomManage';
+import Authorization from '~/pages/Admin/Authorization';
 import CreateRoomManage from '~/pages/Admin/CreateRoomManage';
 import CreateOptionRoomManage from '~/pages/Admin/CreateOptionRoomManage';
 import RoomPlan from '~/pages/Admin/RoomRentalManage/RoomPlan/room-plan';
@@ -43,12 +44,13 @@ const publicRoutes = [
     { path: config.routes.handOverManage, component: HandOverManage },
     { path: config.routes.nationality, component: Nationality },
     { path: config.routes.rentalTypeManage, component: RentalTypes },
+    { path: config.routes.authorization, component: Authorization },
     { path: config.routes.room, component: RoomDetail, layout: null },
     { path: config.routes.searchRoom, component: SearchRoom, layout: null },
     { path: config.routes.signup, component: Signup, layout: null },
     { path: config.routes.notfound, component: Notfound, layout: null },
     { path: config.routes.roomPlan, component: RoomPlan },
-    { path: config.routes.rentalManage, component: RentalManage }
+    { path: config.routes.rentalManage, component: RentalManage },
 ];
 
 const privateRoutes = [];

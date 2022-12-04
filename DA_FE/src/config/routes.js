@@ -16,10 +16,11 @@ const routes = {
     createRoomManage: '/admin/create-room',
     createOptionRoomManage: '/admin/create-option-room',
     rentalTypeManage: '/admin/rental-type-manage',
+    authorization: '/admin/authorization',
     login: '/login',
     signup: '/signup',
     notfound: '/*',
-    roomPlan: "/admin/room-plan",
+    roomPlan: '/admin/room-plan',
     rentalManage: '/admin/rental-manage/:type/:idRoomChoose',
 };
 export default routes;

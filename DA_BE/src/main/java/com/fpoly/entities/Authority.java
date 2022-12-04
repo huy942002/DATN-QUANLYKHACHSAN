@@ -2,6 +2,7 @@ package com.fpoly.entities;
 
 import java.io.Serializable;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -32,11 +33,11 @@ public class Authority implements Serializable {
 	@Column(name = "STATUS", nullable = false, precision = 10)
 	private int status;
 
-	@ManyToOne(optional = false)
+	@ManyToOne(optional = false, cascade = CascadeType.MERGE)
 	@JoinColumn(name = "ID_ROLES", nullable = false)
 	private Roles roles;
 
-	@ManyToOne(optional = false)
+	@ManyToOne(optional = false, cascade = CascadeType.MERGE)
 	@JoinColumn(name = "ID_USER", nullable = false)
 	private Users users;
 

@@ -11,7 +11,7 @@ import { toast } from 'react-toastify';
 
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { add, getAllNationality, getAllCustomer, getCustomerById, update } from '~/app/reducers/customer';
+import { add, getAllCustomer, getAllNationality, getCustomerById, update } from '~/app/reducers/customer';
 
 import { Button, Modal } from 'flowbite-react';
 
@@ -213,12 +213,7 @@ function CustomerManage() {
                                 .map((x) => (
                                     <tr className="bg-white dark:bg-gray-800" key={x.id}>
                                         <td className="py-4 px-6">
-                                            <img
-                                                src="https://i.pravatar.cc/100"
-                                                alt={x.fullname}
-                                                className="rounded-sm"
-                                                width={50}
-                                            />
+                                            <img src={x.img} alt={x.fullname} className="rounded-sm" width={50} />
                                         </td>
                                         <td className="py-4 px-6">{x.users.username}</td>
                                         <td className="py-4 px-6">{x.email}</td>
@@ -519,6 +514,7 @@ function CustomerManage() {
                                                     Username
                                                 </label>
                                                 <Field
+                                                    disabled
                                                     name="users.username"
                                                     className={`
                                                     bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
@@ -531,30 +527,6 @@ function CustomerManage() {
                                                 {errors.users?.username && touched.users?.username ? (
                                                     <div className="text-sm text-red-600 mt-2">
                                                         {errors.users?.username}
-                                                    </div>
-                                                ) : null}
-                                            </div>
-                                            <div>
-                                                <label
-                                                    htmlFor="password"
-                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                                >
-                                                    Password
-                                                </label>
-                                                <Field
-                                                    type="password"
-                                                    name="users.password"
-                                                    className={`
-                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
-                                                    ${
-                                                        errors.users?.password && touched.users?.password
-                                                            ? 'border-2 border-rose-600'
-                                                            : ''
-                                                    } `}
-                                                />
-                                                {errors.users?.password && touched.users?.password ? (
-                                                    <div className="text-sm text-red-600 mt-2">
-                                                        {errors.users?.password}
                                                     </div>
                                                 ) : null}
                                             </div>
