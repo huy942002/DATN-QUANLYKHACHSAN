@@ -181,6 +181,17 @@ function CheckInInformation({ bill, setBill, detailInvoices, serviceDetails, typ
                 (element) => element.detailsInvoice.rooms.id === roomId && element.quantity !== 0,
             );
     };
+    const genTotalPayable = () => {
+        let totalPayable = 0;
+        if(bill) {
+            if(bill.deposits >= genAllMoney()) {
+                totalPayable = 0;
+            } else {
+                totalPayable = genAllMoney() - bill.deposits;
+            }
+        }
+        return totalPayable;
+    }
     //End Gen Data
 
     //Function
@@ -301,6 +312,9 @@ function CheckInInformation({ bill, setBill, detailInvoices, serviceDetails, typ
                             Tổng tiền
                         </div>
                         <div className='my-6'>
+                            Khách đặt cọc
+                        </div>
+                        <div className='my-6'>
                             Giảm giá
                         </div>
                         <div className='my-6'>
@@ -318,12 +332,13 @@ function CheckInInformation({ bill, setBill, detailInvoices, serviceDetails, typ
                         <div className='my-6'>{formatCurrency(genSurcharge())}</div>
                         <div className='my-6'>{formatCurrency(genAllMoneyService())}</div>
                         <div className='my-6'>{formatCurrency(genAllMoney())}</div>
+                        <div className='my-6'>{bill && formatCurrency(bill.deposits)}</div>
                         <div className='my-6'>0%</div>
-                        <div className='my-6'>{formatCurrency(genAllMoney())}</div>
+                        <div className='my-6'>{formatCurrency(genTotalPayable())}</div>
                         <div className='my-6'>
                             <InputNumber
                                 onChange={(e) => {
-                                    setBill({ ...bill, customerPay: e, customerReturnMoney: e >= genAllMoney() ? e - genAllMoney() : 0 });
+                                    setBill({ ...bill, customerPay: e, customerReturnMoney: e >= genTotalPayable() ? e - genTotalPayable() : 0 });
                                 }}
                                 className="mt-[2px] w-full"
                                 value={bill.customerPay || 0}
