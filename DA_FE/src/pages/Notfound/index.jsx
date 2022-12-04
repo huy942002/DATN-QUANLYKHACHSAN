@@ -1,8 +1,7 @@
-import { Button, Result } from "antd";
-import { useNavigate } from "react-router-dom";
+import { Button, Result } from 'antd';
+import { useNavigate } from 'react-router-dom';
 
 function Home() {
-
     const navigate = new useNavigate();
 
     return (
@@ -13,7 +12,7 @@ function Home() {
             extra={
                 <Button
                     onClick={() => {
-                        navigate('/admin');
+                        navigate('/');
                     }}
                     type="primary"
                 >

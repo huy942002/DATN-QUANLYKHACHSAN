@@ -28,10 +28,12 @@ public class TokenAuthService {
 	private SecurityUserDetailsService userDetails;
 
 	public static final String AUTH_HEADER_NAME = "token";
+	public static final String AUTH_USERNAME = "username";
 
 	public void addJwtTokenToHeader(HttpServletResponse response, UserAuthentication authentication) {
 		final UserDetails user = authentication.getDetails();
 		response.addHeader(AUTH_HEADER_NAME, jwtToken.generateToken(user));
+		response.addHeader(AUTH_USERNAME, user.getUsername());
 	}
 
 	public Authentication generateAuthenticationFromRequest(HttpServletRequest request) {

@@ -1,12 +1,13 @@
 import { Fragment } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { React } from 'react';
-import DefaultLayout from './layouts/Admin/DefaultLayout/DefaultLayout';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import AdminLayout from './layouts/AdminVer2/admin-layout';
+
+import authoService from '~/services/authoServices';
 
 import '~/global/global.css';
 
-import { publicRoutes } from '~/routes/routes';
+import { privateRoutes, publicRoutes } from '~/routes/routes';
+import LoginAdmin from './pages/Admin/LoginAdmin';
 
 function App() {
     return (
@@ -14,6 +15,10 @@ function App() {
             <div>
                 <Routes>
                     {publicRoutes.map((route, index) => {
+                        const Page = route.component;
+                        return <Route key={index} path={route.path} element={<Page />} />;
+                    })}
+                    {privateRoutes.map((route, index) => {
                         const Page = route.component;
                         let Layout = AdminLayout;
 
@@ -27,9 +32,13 @@ function App() {
                                 key={index}
                                 path={route.path}
                                 element={
-                                    <Layout>
-                                        <Page />
-                                    </Layout>
+                                    authoService.username ? (
+                                        <Layout>
+                                            <Page />
+                                        </Layout>
+                                    ) : (
+                                        <LoginAdmin />
+                                    )
                                 }
                             />
                         );

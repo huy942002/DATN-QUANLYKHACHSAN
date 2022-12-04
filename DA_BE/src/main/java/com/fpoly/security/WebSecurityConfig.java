@@ -79,8 +79,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             cors.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:8000"));
             cors.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
             cors.setAllowCredentials(true);
-            cors.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", TokenAuthService.AUTH_HEADER_NAME, "x-file-name"));
-            cors.setExposedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", TokenAuthService.AUTH_HEADER_NAME, "x-file-name"));
+            cors.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", TokenAuthService.AUTH_HEADER_NAME,TokenAuthService.AUTH_USERNAME, "x-file-name"));
+            cors.setExposedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", TokenAuthService.AUTH_HEADER_NAME,TokenAuthService.AUTH_USERNAME, "x-file-name"));
             return cors;
         });
 

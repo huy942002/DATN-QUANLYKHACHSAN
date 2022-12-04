@@ -8,9 +8,7 @@ import axios from 'axios';
 
 import { faLock, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useState } from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 const objLogin = {
@@ -32,8 +30,9 @@ function LoginAdmin() {
         await axios
             .post(url, data)
             .then((res) => {
-                navigate('/admin');
+                navigate('/admin/room-plan');
                 window.localStorage.setItem('token', res.headers.token);
+                window.localStorage.setItem('username', res.headers.username);
                 window.location.reload();
             })
             .catch((error) => {
@@ -44,7 +43,7 @@ function LoginAdmin() {
 
     return (
         <div className="grid grid-cols-3 gap-4 place-content-center p-8 bg-admin-login-hotel bg-cover h-screen">
-            <div className="col-start-2 bg-slate-50 p-8 rounded">
+            <div className="col-start-2 bg-gray-300 p-8 rounded">
                 <div className="flex justify-center items-center">
                     <img src={logo} alt="logo" />
                 </div>

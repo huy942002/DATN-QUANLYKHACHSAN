@@ -171,7 +171,11 @@ const AdminLayout = ({ children }) => {
                             key: '15',
                             icon: <FontAwesomeIcon icon={faRightFromBracket} />,
                             label: 'Đăng xuất',
-                            // onClick: () => setCollapsed(!collapsed),
+                            onClick: () => {
+                                window.localStorage.removeItem('token');
+                                window.localStorage.removeItem('username');
+                                window.location.reload();
+                            },
                         },
                     ]}
                 ></Menu>
