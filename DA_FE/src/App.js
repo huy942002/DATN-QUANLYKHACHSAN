@@ -1,7 +1,7 @@
 import { Fragment } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { React } from 'react';
-// import DefaultLayout from './layouts/Admin/DefaultLayout/DefaultLayout';
+import DefaultLayout from './layouts/Admin/DefaultLayout/DefaultLayout';
 import AdminLayout from './layouts/AdminVer2/admin-layout';
 
 import '~/global/global.css';
