@@ -76,6 +76,30 @@ function Room({ room, roomPlan, setRoomPlan }) {
             return room.detailsInvoice.checkOutDay.toString().split(" ")[1];
         }
     }
+    const genAllMoneyDetail = () => {
+        let allMoney = 0;
+        if(room.detailsInvoice && dayRental && hourRental){
+
+            let allMoneyRoom = room.detailsInvoice.rentalTypes.name === "Theo ngày" ? room.rooms.kindOfRoom.priceByDay * dayRental : room.rooms.kindOfRoom.hourlyPrice * hourRental;
+            
+            let surcharge = 0;
+            let d1 = dateNow.getTime();
+            let d2 = new Date(room.detailsInvoice.checkOutDay).getTime();
+            if(room.detailsInvoice.rentalTypes.name === "Theo ngày") {
+                if(d1 > d2) {
+                    surcharge = allMoneyRoom * 10 / 100;
+                }
+            }
+
+            let allMoneyService = 0;
+            room.serviceDetailsList.forEach(element => {
+                allMoneyService += element.quantity * element.servicess.prices;
+            })
+
+            allMoney = allMoneyRoom + surcharge + allMoneyService;
+        }
+        return allMoney;
+    }
     //End Gen Data
 
     //Function
@@ -136,6 +160,9 @@ function Room({ room, roomPlan, setRoomPlan }) {
     //End Function
 
     //Util
+    const formatCurrency = (value) => {
+        return value.toLocaleString('it-IT', {style : 'currency', currency : 'VND'});
+    };
     //End Util
 
     return (
@@ -153,7 +180,7 @@ function Room({ room, roomPlan, setRoomPlan }) {
                 <p>Bạn chắc chắn phòng đã được dọn rồi chứ?</p>
             </Modal>
             <div
-                className={`h-[200px] rounded-lg cursor-default grid grid-cols-3 grid-rows-4 items-center text-base text-white
+                className={`h-[230px] rounded-lg cursor-default grid grid-cols-3 grid-rows-5 items-center text-base text-white
                 ${room.rooms.status === 1 ? 'bg-status-1' : ''}
                 ${room.rooms.status === 2 ? 'bg-status-2' : ''}
                 ${room.rooms.status === 3 ? 'bg-status-3' : ''}`}
@@ -163,51 +190,84 @@ function Room({ room, roomPlan, setRoomPlan }) {
                     toggleMenu(true);
                 }}
             >
-                <div className='col-span-3 h-full grid grid-cols-3'>
-                    <div className='w-full h-full flex justify-center items-center text-white'>
-                        <div>
-                            <div className='text-xl font-semibold w-full flex justify-center items-center'>{room.rooms.name}</div>
-                            <div className='w-full flex justify-center items-center'>{room.rooms.kindOfRoom.roomTypeName}</div>
-                        </div>
-                    </div>
-                    <div className='w-full h-full flex justify-center items-center text-white'>
-                        
-                    </div>
-                    <div className='w-full h-full flex justify-center items-center text-white'>
-                        <div>
-                            <div className='w-full flex justify-center items-center text-xl h-[28px]'>
-                                <FontAwesomeIcon icon={faBed}></FontAwesomeIcon>
+                {room.rooms && room.rooms.status === 2 ? (
+                    <>
+                        <div className='col-span-3 h-full grid grid-cols-3 font-semibold'>
+                            <div className='w-full h-full flex justify-center items-center text-white'>
+                                <div>
+                                    <div className='text-xl font-semibold w-full flex justify-center items-center'>{room.rooms.name}</div>
+                                    <div className='w-full flex justify-center items-center'>{room.rooms.kindOfRoom.name}</div>
+                                </div>
                             </div>
-                            <div className='w-full flex justify-center items-center'>Đã có khách</div>
+                            <div className='w-full h-full flex justify-center items-center text-white'>
+                                
+                            </div>
+                            <div className='w-full h-full flex justify-center items-center text-white'>
+                                <div>
+                                    <div className='w-full flex justify-center items-center text-xl h-[28px]'>
+                                        <FontAwesomeIcon icon={faBed}></FontAwesomeIcon>
+                                    </div>
+                                    <div className='w-full flex justify-center items-center'>
+                                        {room.rooms && room.rooms.status === 1 ? "Phòng trống" : room.rooms.status === 2 ? "Đã có khách" : "Dọn dẹp"}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-                <div className='col-span-3 h-full flex justify-center items-center row-span-2'>
-                    <div className='flex justify-center items-center mr-3'>
-                        {/* {room.detailsInvoice && room.detailsInvoice.hireDate} */}
-                        <div className='mr-2'>
-                            <div className='border-b-[1px] font-semibold flex items-center justify-center'>{getDayHireDate() ? getDayHireDate().split("-")[2] : ""}</div>
-                            <div className='border-t-[1px] font-semibold flex items-center justify-center'>{getDayHireDate() ? getDayHireDate().split("-")[1] : ""}</div>
+                        <div className='col-span-3 h-full flex justify-center items-center font-semibold text-xl'>
+                            {room.detailsInvoice && room.detailsInvoice.bills.customer.fullname}
                         </div>
-                        <div className='text-2xl'>{getTimeHireDate()}</div>
-                    </div>
-                    <div className='bg-white h-[70px] w-[70px] rounded-full flex justify-center items-center text-black font-semibold'>
-                        {room.detailsInvoice && room.detailsInvoice.rentalTypes.id === 1 && (<span>{dayRental} (D)</span>) }
-                        {room.detailsInvoice && room.detailsInvoice.rentalTypes.id === 2 && (<span>{hourRental} (H)</span>)}
-                    </div>
-                    <div className='flex justify-center items-center ml-3'>
-                        {/* {room.detailsInvoice && room.detailsInvoice.hireDate} */}
-                        <div className='mr-2'>
-                            <div className='border-b-[1px] font-semibold flex items-center justify-center'>{getDayCheckOutDay() ? getDayCheckOutDay().split("-")[2] : ""}</div>
-                            <div className='border-t-[1px] font-semibold flex items-center justify-center'>{getDayCheckOutDay() ? getDayCheckOutDay().split("-")[1] : ""}</div>
+                        <div className='col-span-3 h-full flex justify-center items-center row-span-2'>
+                            <div className='flex justify-center items-center mr-3'>
+                                {/* {room.detailsInvoice && room.detailsInvoice.hireDate} */}
+                                <div className='mr-2'>
+                                    <div className='border-b-[1px] font-semibold flex items-center justify-center'>{getDayHireDate() ? getDayHireDate().split("-")[2] : ""}</div>
+                                    <div className='border-t-[1px] font-semibold flex items-center justify-center'>{getDayHireDate() ? getDayHireDate().split("-")[1] : ""}</div>
+                                </div>
+                                <div className='text-2xl'>{getTimeHireDate()}</div>
+                            </div>
+                            <div className='bg-white h-[70px] w-[70px] rounded-full flex justify-center items-center text-black font-semibold'>
+                                {room.detailsInvoice && room.detailsInvoice.rentalTypes.id === 1 && (<span>{dayRental} (D)</span>) }
+                                {room.detailsInvoice && room.detailsInvoice.rentalTypes.id === 2 && (<span>{hourRental} (H)</span>)}
+                            </div>
+                            <div className='flex justify-center items-center ml-3'>
+                                {/* {room.detailsInvoice && room.detailsInvoice.hireDate} */}
+                                <div className='mr-2'>
+                                    <div className='border-b-[1px] font-semibold flex items-center justify-center'>{getDayCheckOutDay() ? getDayCheckOutDay().split("-")[2] : ""}</div>
+                                    <div className='border-t-[1px] font-semibold flex items-center justify-center'>{getDayCheckOutDay() ? getDayCheckOutDay().split("-")[1] : ""}</div>
+                                </div>
+                                <div className='text-2xl'>{getTimeCheckOutDay()}</div>
+                            </div>
                         </div>
-                        <div className='text-2xl'>{getTimeCheckOutDay()}</div>
-                    </div>
-                </div>
-                <div className='col-span-3 h-full flex justify-center items-center text-xl font-semibold'>
-                    <FontAwesomeIcon icon={faDollar}></FontAwesomeIcon>
-                </div>
-                
+                        <div className='col-span-3 h-full flex justify-center items-center text-xl font-semibold'>
+                            <FontAwesomeIcon icon={faDollar} className="mr-2"></FontAwesomeIcon> {formatCurrency(genAllMoneyDetail())}
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <div className='col-span-3 row-span-5 grid grid-cols-2 gap-10 font-semibold'>
+                            <div className='w-full h-full flex justify-end items-center text-white'>
+                                <div>
+                                    <div className='text-xl font-semibold w-full flex justify-center items-center'>{room.rooms.name}</div>
+                                    <div className='w-full flex justify-center items-center'>{room.rooms.kindOfRoom.name}</div>
+                                </div>
+                            </div>
+                            <div className='w-full h-full flex justify-start items-center text-white'>
+                                <div>
+                                    <div className='w-full flex justify-center items-center text-xl h-[28px]'>
+                                        <FontAwesomeIcon icon={faBed}></FontAwesomeIcon>
+                                    </div>
+                                    <div className='w-full flex justify-center items-center'>
+                                        {room.rooms && room.rooms.status === 1 ? "Phòng trống" : room.rooms.status === 2 ? "Đã có khách" : "Đang dọn dẹp"}
+                                    </div>
+                                </div>
+                            </div>
+                            <div className='col-span-2 w-full h-full flex justify-center items-center text-white font-semibold text-xl'>
+                                {room.rooms && room.rooms.status === 1 ? "Sẵn sàng đón khách" : "Đang được dọn dẹp"}
+                            </div>
+                        </div>
+                    </>
+                )}
+
                 {/** Menu list */}
                 <div className="rounded-[2px]">
                     <ControlledMenu

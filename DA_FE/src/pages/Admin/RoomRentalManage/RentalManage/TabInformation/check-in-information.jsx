@@ -1,5 +1,5 @@
-import { DollarCircleOutlined } from '@ant-design/icons';
-import { Divider, DatePicker, Select, Input, Table, Descriptions, Badge, Modal, Drawer, Button, Radio, Space, message } from 'antd';
+import { DollarCircleOutlined, AuditOutlined } from '@ant-design/icons';
+import { Divider, DatePicker, Select, Input, Table, Descriptions, Badge, Modal, Drawer, Button, Radio, Space, message, InputNumber } from 'antd';
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleExclamation, faMoneyCheckDollar } from '@fortawesome/free-solid-svg-icons';
@@ -53,9 +53,12 @@ function CheckInInformation({ bill, setBill, detailInvoices, serviceDetails, typ
     ];
     const [chooseDetailInvoice, setChooseDetailInvoice] = useState();
     const [showModalDetailInvoice, setShowModalDetailInvoice] = useState(false);
+    const navigate = new useNavigate();
     const [messageApi, contextHolder] = message.useMessage();
     const key = 'messageApi';
     const [confirmLoading, setConfirmLoading] = useState(false);
+    const [radioValue, setRadioValue] = useState("tienmat");
+    const [disableCustomerPay, setDisableCustomerPay] = useState(radioValue === "tienmat" ? false : true);
     //End Data
 
     //Created
@@ -206,6 +209,7 @@ function CheckInInformation({ bill, setBill, detailInvoices, serviceDetails, typ
         })
         console.log(detailInvoiceList);
         console.log(serviceDetailList);
+        setConfirmLoading(true);
         const response = await axios.post('http://localhost:8080/api/room-rental-manage/pay', {
                 detailInvoices: detailInvoiceList,
                 serviceDetails: serviceDetailList,
@@ -220,8 +224,8 @@ function CheckInInformation({ bill, setBill, detailInvoices, serviceDetails, typ
                             content: 'Cập nhật thành công!',
                             duration: 2,
                         });
+                        navigate('/admin/room-plan');
                     }, 1000);
-                    // navigate('/admin');
                 }
             }).catch(err => {
                 setTimeout(() => {
@@ -236,6 +240,17 @@ function CheckInInformation({ bill, setBill, detailInvoices, serviceDetails, typ
             }).finally(() => {
                 
             });
+    }
+    const changePaymentType = (value) => {
+        setRadioValue(value);
+        if(value === "tienmat") {
+            setDisableCustomerPay(false);
+            setBill({ ...bill, customerPay: 0, customerReturnMoney: 0 });
+        }
+        if(value === "the" || value === "chuyenkhoan") {
+            setDisableCustomerPay(true);
+            setBill({ ...bill, customerPay: genAllMoney(), customerReturnMoney: 0 });
+        }
     }
     //End Function
 
@@ -252,6 +267,8 @@ function CheckInInformation({ bill, setBill, detailInvoices, serviceDetails, typ
         return arrayDate[2] + '-' + arrayDate[1] + '-' + arrayDate[0] + ' ' + arrayDateTime[1];
     };
     //End Util
+
+    console.log(bill);
 
     return <>
         {contextHolder}
@@ -292,6 +309,9 @@ function CheckInInformation({ bill, setBill, detailInvoices, serviceDetails, typ
                         <div className='my-6'>
                             Khách thanh toán
                         </div>
+                        <div className='my-6'>
+                            Trả lại khách
+                        </div>
                     </div>
                     <div className='text-right font-semibold'>
                         <div>{formatCurrency(genAllMoneyRoom())}</div>
@@ -301,12 +321,21 @@ function CheckInInformation({ bill, setBill, detailInvoices, serviceDetails, typ
                         <div className='my-6'>0%</div>
                         <div className='my-6'>{formatCurrency(genAllMoney())}</div>
                         <div className='my-6'>
-                            <Input></Input>
+                            <InputNumber
+                                onChange={(e) => {
+                                    setBill({ ...bill, customerPay: e, customerReturnMoney: e >= genAllMoney() ? e - genAllMoney() : 0 });
+                                }}
+                                className="mt-[2px] w-full"
+                                value={bill.customerPay || 0}
+                                disabled={disableCustomerPay}
+                                addonAfter="VND"
+                            />
                         </div>
+                        <div className='my-6'>{formatCurrency(bill.customerReturnMoney)}</div>
                     </div>
                 </div>
                 <div className='my-6'>
-                    <Radio.Group defaultValue="tienmat">
+                    <Radio.Group value={radioValue} onChange={(e) => changePaymentType(e.target.value)}>
                         <Radio value="tienmat">
                             Tiền mặt
                         </Radio>
@@ -419,60 +448,18 @@ function CheckInInformation({ bill, setBill, detailInvoices, serviceDetails, typ
                 </>
             )}
         </Modal>
-
-        {type === "check-in" && (
-            <div className="">
+        <div>
             <Divider orientation="left">
-                <div className="text-base font-semibold">Thông tin thuê phòng</div>
+                <div className="text-base font-semibold">Hóa đơn</div>
             </Divider>
-            <div className="grid grid-cols-2 gap-6 items-center">
-                <div className="col-span-2">
-                    <div>Ngày & Giờ Check in/out</div>
-                    <RangePicker
-                        className="mt-[2px] w-full"
-                        showTime={{
-                            format: 'HH:mm',
-                        }}
-                        format="DD-MM-YYYY HH:mm"
-                        onChange={(date, dateString) => {
-                            changeTime(date, dateString);
-                        }}
-                    />
-                </div>
-                <div>
-                    <div>Loại hình thuê:</div>
-                    <Select
-                        className="w-full mt-[2px]"
-                        value={rentalTypeList ? genRentalType()[0].value : ""}
-                        options={genRentalType()}
-                    />
-                </div>
-                <div>
-                    <div>Đặt cọc:</div>
-                    <Input
-                        onChange={(e) => {
-                            setBill({ ...bill, deposits: e.target.value });
-                        }}
-                        className="mt-[2px]"
-                        placeholder="Deposits..."
-                        prefix={<DollarCircleOutlined />}
-                    />
-                </div>
-            </div>
-        </div>
-        )}
-        {type === "details" && (
-            <div>
-                <Divider orientation="left">
-                    <div className="text-base font-semibold">Hóa đơn</div>
-                </Divider>
-                <Table
-                    size="middle"
-                    bordered
-                    pagination={false}
-                    columns={columnDetailInVoice}
-                    dataSource={genDataTable()}
-                    footer={() => 
+            <Table
+                size="middle"
+                bordered
+                pagination={false}
+                columns={columnDetailInVoice}
+                dataSource={type === "check-in" ? "" : genDataTable()}
+                locale={{emptyText: "Khách hàng chưa thuê phòng nào!"}}
+                footer={type === "details" ? () => (
                         <div className='text-base font-semibold grid grid-cols-2'>
                             <div className='text-left font-normal'>
                                 <div>Tổng tiền phòng</div>
@@ -487,10 +474,11 @@ function CheckInInformation({ bill, setBill, detailInvoices, serviceDetails, typ
                                 <div className='mt-3'>{formatCurrency(genAllMoney())}</div>
                             </div>
                         </div>
-                    }
-                />
-            </div>
-        )}
+                    )
+                    : false
+                }
+            />
+        </div>
     </>
 }
 

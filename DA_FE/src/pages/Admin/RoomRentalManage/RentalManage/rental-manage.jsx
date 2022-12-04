@@ -141,7 +141,10 @@ const RentalManage = () => {
         setServiceDetails(response.data.serviceDetailsList);
         // //Set Customer
         setCustomer(response.data.bills.customer);
-        setBill(response.data.bills);
+        const billData = response.data.bills;
+        billData.customerPay = 0;
+        billData.customerReturnMoney = 0;
+        setBill(billData);
     };
 
     const getRoomByRoomPlan = (idRoom) => {
@@ -263,6 +266,7 @@ const RentalManage = () => {
                                 customer={customer}
                                 setCustomer={setCustomer}
                                 type={type}
+                                bill={bill}
                                 setBill={setBill}
                                 nationalityList={nationalityList}
                                 billActiveList={billActiveList}
@@ -309,9 +313,11 @@ const RentalManage = () => {
                     </TabPane>
                 </Tabs>
                 <div className="mt-6 flex justify-end">
-                    <Button onClick={() => setOpen(true)} className="mr-3">
-                       Thanh toán
-                    </Button>
+                    {type === "details" && (
+                        <Button onClick={() => setOpen(true)} className="mr-3">
+                            Thanh toán
+                        </Button>
+                    )}
                     <Button onClick={() => triggerAction()} loading={confirmLoading}>
                         {type === "check-in" && <span>Check in</span>}
                         {type === "details" && <span>Lưu</span>}

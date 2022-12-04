@@ -1,9 +1,6 @@
 package com.fpoly.dto;
 
-import com.fpoly.entities.DetailsInvoice;
-import com.fpoly.entities.FacilitiesDetails;
-import com.fpoly.entities.Rooms;
-import com.fpoly.entities.ServiceAvailable;
+import com.fpoly.entities.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,4 +17,5 @@ public class RoomDetailDTO {
     private DetailsInvoice detailsInvoice;
     private List<FacilitiesDetails> facilitiesDetailsList;
     private List<ServiceAvailable> serviceAvailableList;
+    private List<ServiceDetails> serviceDetailsList;
 }

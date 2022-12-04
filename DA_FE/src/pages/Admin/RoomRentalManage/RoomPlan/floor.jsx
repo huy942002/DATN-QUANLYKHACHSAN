@@ -23,7 +23,7 @@ function Floor({ theRoomsOfTheFloor, roomPlan, setRoomPlan }) {
                 Tầng {theRoomsOfTheFloor.numberOfFloors}
             </div>
             {theRoomsOfTheFloor.listRoom.length > 0 && (
-                <div className="grid grid-cols-4 gap-2 mb-4">
+                <div className="grid grid-cols-3 gap-2 mb-4">
                     {theRoomsOfTheFloor.listRoom.map((element, index) => {
                         return <Room key={index} room={element} roomPlan={roomPlan} setRoomPlan={setRoomPlan}></Room>;
                     })}

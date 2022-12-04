@@ -1,4 +1,4 @@
-import { Button, DatePicker, Divider, Input, message, Modal, Select } from 'antd';
+import { Button, DatePicker, Divider, Input, InputNumber, message, Modal, Select } from 'antd';
 import { AuditOutlined, GoogleOutlined, HomeOutlined, PhoneOutlined, UserOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import dayjs from 'dayjs';
@@ -14,7 +14,7 @@ const customerType = [
     { value: 'New', label: 'Mới' },
     { value: 'Using', label: 'Đang sử dụng' },
 ];
-function CustomerInformation({ customer, setCustomer, type, setBill, nationalityList, billActiveList }) {
+function CustomerInformation({ customer, setCustomer, type, bill, setBill, nationalityList, billActiveList }) {
 
     //Data
     const [customerTypeSelected, setCustomerTypeSelected] = useState('New');
@@ -118,7 +118,7 @@ function CustomerInformation({ customer, setCustomer, type, setBill, nationality
             <div className="">
                 <Divider orientation="left">
                     <div className="flex justify-center items-center">
-                        <div className="text-base font-semibold mr-3">Thông tin</div>
+                        <div className="text-base font-semibold mr-3">Thông tin khách hàng</div>
                         {type !== "details" && (
                             <Select
                                 className="w-36"
@@ -256,6 +256,53 @@ function CustomerInformation({ customer, setCustomer, type, setBill, nationality
                             prefix={<HomeOutlined />}
                             value={customer.address || ''}
                             disabled={customerTypeSelected === 'Using' || type === "details"}
+                        />
+                    </div>
+                </div>
+                <Divider orientation="left" style={{paddingTop: 12}}>
+                    <div className="flex justify-center items-center">
+                        <div className="text-base font-semibold mr-3">Thông tin khác</div>
+                    </div>
+                </Divider>
+                <div className="grid grid-cols-2 gap-6 items-center">
+                    <div>
+                        <div>Số người lớn:</div>
+                        <InputNumber
+                            onChange={(e) => {
+                                setBill({ ...bill, numberOfAdults: e });
+                            }}
+                            className="mt-[2px] w-full"
+                            placeholder="Number Of Adults..."
+                            prefix={<UserOutlined />}
+                            value={bill.numberOfAdults || 0}
+                            disabled={customerTypeSelected === 'Using' || type === "details"}
+                        />
+                    </div>
+                    <div>
+                        <div>Số trẻ em:</div>
+                        <InputNumber
+                            onChange={(e) => {
+                                setBill({ ...bill, numberOfKids: e });
+                            }}
+                            className="mt-[2px] w-full"
+                            placeholder="Number Of Kids..."
+                            prefix={<UserOutlined />}
+                            value={bill.numberOfKids || 0}
+                            disabled={customerTypeSelected === 'Using' || type === "details"}
+                        />
+                    </div>
+                    <div>
+                        <div>Đặt cọc:</div>
+                        <InputNumber
+                            onChange={(e) => {
+                                setBill({ ...bill, deposits: e });
+                            }}
+                            className="mt-[2px] w-full"
+                            placeholder="Deposits..."
+                            prefix={<AuditOutlined />}
+                            value={bill.deposits || 0}
+                            disabled={customerTypeSelected === 'Using' || type === "details"}
+                            addonAfter="VND"
                         />
                     </div>
                 </div>

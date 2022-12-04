@@ -47,6 +47,7 @@ public class RoomRentalManageController {
             DetailsInvoice detailsInvoice = iDetailInvoiceService.findByRoomsAndStatus(r, 1);
             if (detailsInvoice != null) {
                 romDetailDTO.setDetailsInvoice(detailsInvoice);
+                romDetailDTO.setServiceDetailsList(iServiceDetailService.listByRoomAndStatus(detailsInvoice, 1));
             } else {
                 romDetailDTO.setDetailsInvoice(null);
             }

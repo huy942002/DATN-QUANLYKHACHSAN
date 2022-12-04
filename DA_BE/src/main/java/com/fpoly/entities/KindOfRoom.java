@@ -32,7 +32,7 @@ public class KindOfRoom implements Serializable {
 	private int id;
 
 	@Column(name = "ROOM_TYPE_NAME", nullable = false, length = 50)
-	private String roomTypeName;
+	private String name;
 
 	@Column(name = "NOTE", length = 255)
 	private String note;
