@@ -1,13 +1,62 @@
 import { Link } from 'react-router-dom';
 import config from '~/config';
 
-import { faBed, faCalendarDays, faChevronRight, faPerson } from '@fortawesome/free-solid-svg-icons';
+import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+
+import { faBed, faCalendarDays, faChevronRight, faMoon } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { seachRoomBooking } from '~/app/reducers/booking'
+import { getAllKindOfRoom } from '~/app/reducers/kindOfRoom';
+import { getRoomById } from '~/app/reducers/room';
+import { getByRoomId} from '~/app/reducers/facilityDetail';
 
 import Header from '~/layouts/Customer/Header';
 import Footer from '~/layouts/Customer/Footer';
 
+
+const date = new Date();
+const futureDate = date.getDate() +5;
+date.setDate(futureDate);
+const defaultValue = date.toLocaleDateString('en-CA');
 function SearchRoom() {
+    const dispatch = useDispatch();
+    const KindOfRoom = useSelector((state) => state.kindOfRoom.kindOfRoom);
+    const roomSeach = useSelector((state) => state.booking.roomSeach);
+    const [valuedateCheckout, setvaluedateCheckout] = useState('');
+    const [valuedateCheckin, setvaluedateCheckin] = useState(defaultValue);
+    const [valueSLday, setvalueSLday] = useState('');
+    const [valueid, setvalueid] = useState('');
+
+    function getdateCheckout(day) {
+        console.log(valuedateCheckin);
+        const datecheckout = new Date(valuedateCheckin);
+        const futuredatecheckout = datecheckout.getDate() + parseInt(day);
+        datecheckout.setDate(futuredatecheckout);
+        const valuedateCheckout = datecheckout.toLocaleDateString('en-CA');
+        setvaluedateCheckout(valuedateCheckout);
+    }
+
+    function CheckSeach() {
+
+        if (valueid.length === 0) {
+            dispatch(seachRoomBooking({ v1: valuedateCheckin,v2: valuedateCheckout, v3:KindOfRoom[0].id}));
+        } else {
+            const url = "booking/" + valuedateCheckin + "/" + valuedateCheckout + "/" + valueid;
+            console.log(url);
+            dispatch(seachRoomBooking({ v1: valuedateCheckin,v2: valuedateCheckout, v3:valueid, v4:valueSLday}));
+        }
+    }
+
+    function getRoom(id){
+        dispatch(getRoomById(id));
+        dispatch(getByRoomId(id));
+    }
+
+    useEffect(() => {
+        dispatch(getAllKindOfRoom());
+
+    }, []);
     return (
         <div>
             <Header />
@@ -32,7 +81,7 @@ function SearchRoom() {
                 <div className="p-6 shadow-md h-fit">
                     <h5 className="font-bold">Tìm kiếm phòng</h5>
                     <div className="mt-4">
-                        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">
                             Ngày nhận phòng
                         </label>
                         <div className="relative">
@@ -42,11 +91,33 @@ function SearchRoom() {
                             <input
                                 type="date"
                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                value={valuedateCheckin}
+                                onChange={(e) => {
+                                    setvaluedateCheckin(e.target.value);
+                                    setvalueSLday(e.target.value);
+                                }}
                             />
                         </div>
                     </div>
                     <div className="mt-4">
-                        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                            Số ngày thuê
+                        </label>
+                        <div className="relative">
+                            <div className="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
+                                <FontAwesomeIcon icon={faMoon} />
+                            </div>
+                            <input
+                                type="number"
+                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                onChange={(e) => {
+                                    getdateCheckout(e.target.value)
+                                }}
+                            />
+                        </div>
+                    </div>
+                    <div className="mt-4">
+                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">
                             Ngày trả phòng
                         </label>
                         <div className="relative">
@@ -56,207 +127,78 @@ function SearchRoom() {
                             <input
                                 type="date"
                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                defaultValue={valuedateCheckout}
                             />
                         </div>
                     </div>
                     <div className="mt-4">
-                        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-                            Số phòng
+                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                            Loại Phòng
                         </label>
                         <div className="relative">
                             <div className="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
                                 <FontAwesomeIcon icon={faBed} />
                             </div>
-                            <input
-                                type="number"
+                            <select
+                                name="KindOfRoom"
+                                id="KindOfRoom"
                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            />
-                        </div>
-                    </div>
-                    <div className="mt-4">
-                        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-                            Số người
-                        </label>
-                        <div className="relative">
-                            <div className="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
-                                <FontAwesomeIcon icon={faPerson} />
-                            </div>
-                            <input
-                                type="number"
-                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            />
+                                onChange={(e) => {
+                                    setvalueid(KindOfRoom[e.target.options[e.target.selectedIndex].id].id);
+
+                                }}
+                            >
+                                {KindOfRoom.map((x, index) => (
+                                    <option key={x.id} value={x.name} id={index}>
+                                        {x.name}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
                     </div>
                     <div className="mt-4">
                         <button
+                            onClick={() => {
+                            CheckSeach();
+                            // handleAdd(roomAdd, data2, NBFAdd);
+                            }}
                             type="button"
                             className="py-2 px-3 w-full text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                         >
                             <span className="mx-2">
-                                <Link to={config.routes.searchRoom}>Tìm kiếm</Link>
+                                Tìm kiếm
                             </span>
                         </button>
                     </div>
                 </div>
                 <div className="col-start-2 col-end-4">
-                    <h5 className="font-bold">Tìm thấy 50 phòng phù hợp</h5>
-                    <div className="grid grid-cols-3 gap-3 mt-8">
-                        <Link to={config.routes.room}>
+                    <h5 className="font-bold">Tìm thấy {roomSeach.length} phòng phù hợp</h5>
+                    {roomSeach.map((x) =>(
+                        <div key={x.id} className="grid grid-cols-3 gap-3 mt-8">
+                        <Link to={config.routes.room}
+                        onClick={() => {
+                            getRoom(x.id);
+                            
+                            }}
+                        >
                             <img
                                 className="object-cover w-full rounded-lg"
-                                src="https://data.vietnambooking.com/business/hotel/bg/hotel_type/can_ho_dich_vu.jpg"
+                                src={x.img}
                                 alt=""
                             />
                         </Link>
                         <div className="col-start-2 col-end-4 flex flex-col justify-between pl-2 leading-normal">
                             <h5 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
-                                Moon West Lake Hotel & Residence
+                            {x.kindOfRoom.name}
                             </h5>
-                            <span className="text-blue-500">Giá phòng : 5,000,000đ</span>
+                            <span className="text-blue-500">Giá phòng : {x.kindOfRoom.prices_by_day}</span>
                             <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
                                 Lối trang trí kiểu cổ điển của Pháp và kiến trúc Châu Âu là nét đặc trưng của Beryl
                                 Palace Hotel and Spa, một chỗ nghỉ boutique nằm trên Phố Cổ Hàng Bông nhộn nhịp.
                             </p>
                         </div>
                     </div>
-                    <div className="grid grid-cols-3 gap-3 mt-8">
-                        <Link to={config.routes.room}>
-                            <img
-                                className="object-cover w-full rounded-lg"
-                                src="https://data.vietnambooking.com/business/hotel/bg/hotel_type/can_ho_dich_vu.jpg"
-                                alt=""
-                            />
-                        </Link>
-                        <div className="col-start-2 col-end-4 flex flex-col justify-between pl-2 leading-normal">
-                            <h5 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
-                                Hanoi Center Silk Boutique Hotel & Travel
-                            </h5>
-                            <span className="text-blue-500">Giá phòng : 5,000,000đ</span>
-                            <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
-                                Lối trang trí kiểu cổ điển của Pháp và kiến trúc Châu Âu là nét đặc trưng của Beryl
-                                Palace Hotel and Spa, một chỗ nghỉ boutique nằm trên Phố Cổ Hàng Bông nhộn nhịp.
-                            </p>
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-3 gap-3 mt-8">
-                        <Link to={config.routes.room}>
-                            <img
-                                className="object-cover w-full rounded-lg"
-                                src="https://data.vietnambooking.com/business/hotel/bg/hotel_type/can_ho_dich_vu.jpg"
-                                alt=""
-                            />
-                        </Link>
-                        <div className="col-start-2 col-end-4 flex flex-col justify-between pl-2 leading-normal">
-                            <h5 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
-                                Beryl Palace Hotel and Spa
-                            </h5>
-                            <span className="text-blue-500">Giá phòng : 5,000,000đ</span>
-                            <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
-                                Lối trang trí kiểu cổ điển của Pháp và kiến trúc Châu Âu là nét đặc trưng của Beryl
-                                Palace Hotel and Spa, một chỗ nghỉ boutique nằm trên Phố Cổ Hàng Bông nhộn nhịp.
-                            </p>
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-3 gap-3 mt-8">
-                        <Link to={config.routes.room}>
-                            <img
-                                className="object-cover w-full rounded-lg"
-                                src="https://data.vietnambooking.com/business/hotel/bg/hotel_type/can_ho_dich_vu.jpg"
-                                alt=""
-                            />
-                        </Link>
-                        <div className="col-start-2 col-end-4 flex flex-col justify-between pl-2 leading-normal">
-                            <h5 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
-                                Hanoi Center Silk Hotel & Travel
-                            </h5>
-                            <span className="text-blue-500">Giá phòng : 5,000,000đ</span>
-                            <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
-                                Lối trang trí kiểu cổ điển của Pháp và kiến trúc Châu Âu là nét đặc trưng của Beryl
-                                Palace Hotel and Spa, một chỗ nghỉ boutique nằm trên Phố Cổ Hàng Bông nhộn nhịp.
-                            </p>
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-3 gap-3 mt-8">
-                        <Link to={config.routes.room}>
-                            <img
-                                className="object-cover w-full rounded-lg"
-                                src="https://data.vietnambooking.com/business/hotel/bg/hotel_type/can_ho_dich_vu.jpg"
-                                alt=""
-                            />
-                        </Link>
-                        <div className="col-start-2 col-end-4 flex flex-col justify-between pl-2 leading-normal">
-                            <h5 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
-                                Golden Sun Villa Hotel
-                            </h5>
-                            <span className="text-blue-500">Giá phòng : 5,000,000đ</span>
-                            <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
-                                Lối trang trí kiểu cổ điển của Pháp và kiến trúc Châu Âu là nét đặc trưng của Beryl
-                                Palace Hotel and Spa, một chỗ nghỉ boutique nằm trên Phố Cổ Hàng Bông nhộn nhịp.
-                            </p>
-                        </div>
-                    </div>
-                    <div className="text-center mt-20">
-                        <nav aria-label="Page navigation example">
-                            <ul className="inline-flex -space-x-px">
-                                <li>
-                                    <Link
-                                        to={config.routes.home}
-                                        className="py-2 px-3 ml-0 leading-tight text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                                    >
-                                        Previous
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link
-                                        to={config.routes.home}
-                                        className="py-2 px-3 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                                    >
-                                        1
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link
-                                        to={config.routes.home}
-                                        className="py-2 px-3 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                                    >
-                                        2
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link
-                                        to={config.routes.home}
-                                        className="py-2 px-3 text-blue-600 bg-blue-50 border border-gray-300 hover:bg-blue-100 hover:text-blue-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white"
-                                    >
-                                        3
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link
-                                        to={config.routes.home}
-                                        className="py-2 px-3 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                                    >
-                                        4
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link
-                                        to={config.routes.home}
-                                        className="py-2 px-3 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                                    >
-                                        5
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link
-                                        to={config.routes.home}
-                                        className="py-2 px-3 leading-tight text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                                    >
-                                        Next
-                                    </Link>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
+                    ))}
                 </div>
             </div>
 

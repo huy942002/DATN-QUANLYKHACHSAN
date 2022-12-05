@@ -12,6 +12,10 @@ export const getByIdNumberOfFloors = createAsyncThunk('numberOfFloors/getByIdNum
     return http.httpGet(`number-of-floor/${id}`);
 });
 
+export const getByIdNumberOfFloorslast = createAsyncThunk('numberOfFloors/getByIdNumberOfFloorslast', () => {
+    return http.httpGet(`number-of-floor/last`);
+});
+
 export const AddNBF = createAsyncThunk('numberOfFloors/AddNBF', (data) => {
     return http.httpPost('number-of-floor', data);
 });
@@ -87,6 +91,21 @@ const slice = createSlice({
         });
         builder.addCase(AddNBF.rejected, (state, action) => {
             state.loading = false;
+            state.error = action.error.message;
+        });
+
+
+        builder.addCase(getByIdNumberOfFloorslast.pending, (state) => {
+            state.loading = true;
+        });
+        builder.addCase(getByIdNumberOfFloorslast.fulfilled, (state, action) => {
+            state.loading = false;
+            state.NumberOfFloor = action.payload;
+            state.error = '';
+        });
+        builder.addCase(getByIdNumberOfFloorslast.rejected, (state, action) => {
+            state.loading = false;
+            state.NumberOfFloor = {};
             state.error = action.error.message;
         });
     },

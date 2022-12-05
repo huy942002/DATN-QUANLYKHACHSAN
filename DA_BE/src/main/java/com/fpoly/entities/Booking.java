@@ -30,6 +30,18 @@ public class Booking implements Serializable {
 	@Column(name = "ID", unique = true, nullable = false, precision = 10)
 	private int id;
 
+	@Column(name = "CUSTOMER_NAME", nullable = false, length = 255)
+	private String name;
+
+	@Column(name = "EMAIL", length = 255)
+	private String email;
+
+	@Column(name = "CITIZEN_ID_CODE", length = 12)
+	private String citizenIdCode;
+
+	@Column(name = "PHONE_NUMBER", length = 12)
+	private String phoneNumber;
+
 	@Column(name = "DATE_OF_HIRE", nullable = false)
 	private LocalDate dateOfHire;
 

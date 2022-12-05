@@ -59,4 +59,14 @@ const handleResponse = (response) => {
     }
 };
 
-export default { httpGet, httpPost, httpPut, httpDelete };
+const httpPosts = async (endpoint) => {
+    return await http
+        .post(`${config.baseUrl}${endpoint}`)
+        .then((res) => handleResponse(res))
+        .catch((error) => {
+            console.error(error);
+            throw Error(error);
+        });
+};
+
+export default { httpGet, httpPost, httpPut, httpDelete, httpPosts };

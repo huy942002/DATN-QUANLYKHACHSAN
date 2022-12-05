@@ -3,12 +3,16 @@
  */
 package com.fpoly.repositories.repo;
 
+import com.fpoly.entities.Customer;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.fpoly.entities.Bills;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  *
@@ -17,5 +21,7 @@ import java.util.List;
  */
 @Repository
 public interface BillRepository extends JpaRepository<Bills, Integer>{
+    @Query("select entity from Bills entity Where customer = :customer")
+    public List<Bills> getBillByCustomer(@Param("customer") Optional<Customer> customer);
     List<Bills> findByStatus (Integer status);
 }
