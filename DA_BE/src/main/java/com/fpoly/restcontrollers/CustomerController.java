@@ -5,6 +5,7 @@ package com.fpoly.restcontrollers;
 
 import java.util.Optional;
 
+import com.fpoly.repositories.repo.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +36,9 @@ public class CustomerController {
 	@Autowired
 	ICustomerService repository;
 
+	@Autowired
+	CustomerRepository repository2;
+
 	// getAll
 	@GetMapping
 	public ResponseEntity<Iterable<Customer>> getAllCustomer() {
@@ -47,6 +51,15 @@ public class CustomerController {
 		Customer c = customer;
 		c.getUsers().setPassword(BCrypt.hashpw(customer.getUsers().getPassword(), BCrypt.gensalt()));;
 		return new ResponseEntity<>(repository.save(c), HttpStatus.OK);
+	}
+
+	@GetMapping("/nameUser/{username}")
+	public ResponseEntity<Customer> getCustomerBynameUser(@PathVariable String username) {
+		Optional<Customer> c = repository2.getCutomer(username);
+		System.out.println("/////////////////");
+		System.out.println(c.get().getFullname()+"///////");
+		return c.map(customer -> new ResponseEntity<>(customer, HttpStatus.OK))
+				.orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
 	}
 
 	// getById

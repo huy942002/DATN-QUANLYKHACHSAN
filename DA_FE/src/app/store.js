@@ -17,6 +17,9 @@ import room from './reducers/room';
 import authority from './reducers/authority';
 import resetHandOver from './reducers/resetHandOver';
 import customer from './reducers/customer';
+import serviceAvailable from './reducers/serviceAvailable'
+import booking from './reducers/booking'
+
 
 const reducer = combineReducers({
     // here we will be adding reducers
@@ -35,6 +38,8 @@ const reducer = combineReducers({
     handOverBill: handOverBill,
     resetHandOver: resetHandOver,
     customer: customer,
+    serviceAvailable: serviceAvailable,
+    booking: booking,
 });
 const store = configureStore({
     reducer,

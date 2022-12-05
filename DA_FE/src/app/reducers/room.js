@@ -20,14 +20,6 @@ export const addRoomOption = createAsyncThunk('room/addRoomOption', (data) => {
     return http.httpPost(`room/Option/${data.sl}`, data.roomAdd);
 });
 
-export const adds = createAsyncThunk('ServiceAvailable/createServiceAvailable', (data) => {
-    return http.httpPosts(`service-available/${data.id}/${data.sl}`);
-});
-
-export const addsvOption = createAsyncThunk('ServiceAvailable/addsvOption', (data) => {
-    return http.httpPosts(`service-available/Option/${data.id}/${data.sl}`);
-});
-
 export const getRoomById = createAsyncThunk('room/getRoomById', (id) => {
     return http.httpGet(`room/${id}`);
 });
@@ -36,9 +28,6 @@ export const deleteById = createAsyncThunk('room/deleteById', (data) => {
     return http.httpDelete('room', data);
 });
 
-export const getByRoomIdSv = createAsyncThunk('service-available/getByRoomId', (id) => {
-    return http.httpGet(`service-available/room/${id}`);
-});
 
 // Slice
 const slice = createSlice({
@@ -46,7 +35,6 @@ const slice = createSlice({
     initialState: {
         rooms: [],
         room: {},
-        ServiceAvailables: [],
         error: '',
         loading: false,
     },
@@ -63,21 +51,6 @@ const slice = createSlice({
         builder.addCase(getAllRoom.rejected, (state, action) => {
             state.loading = false;
             state.rooms = [];
-            state.error = action.error.message;
-        });
-
-        //getByRoomIdSv
-        builder.addCase(getByRoomIdSv.pending, (state) => {
-            state.loading = true;
-        });
-        builder.addCase(getByRoomIdSv.fulfilled, (state, action) => {
-            state.loading = false;
-            state.ServiceAvailables = action.payload;
-            state.error = '';
-        });
-        builder.addCase(getByRoomIdSv.rejected, (state, action) => {
-            state.loading = false;
-            state.ServiceAvailables = [];
             state.error = action.error.message;
         });
 
@@ -135,18 +108,6 @@ const slice = createSlice({
             state.rooms.push(action.payload);
         });
         builder.addCase(addRoom.rejected, (state, action) => {
-            state.loading = false;
-            state.error = action.error.message;
-        });
-
-        builder.addCase(addsvOption.pending, (state) => {
-            state.loading = true;
-        });
-        builder.addCase(addsvOption.fulfilled, (state, action) => {
-            state.loading = false;
-            state.rooms.push(action.payload.roomAdd);
-        });
-        builder.addCase(addsvOption.rejected, (state, action) => {
             state.loading = false;
             state.error = action.error.message;
         });

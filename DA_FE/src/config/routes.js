@@ -20,5 +20,6 @@ const routes = {
     notfound: '/*',
     roomPlan: '/admin/room-plan',
     rentalManage: '/admin/rental-manage/:type/:idRoomChoose',
+    booking: '/booking',
 };
 export default routes;

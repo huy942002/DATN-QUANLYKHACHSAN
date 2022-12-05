@@ -18,9 +18,8 @@ export const addByIdOption = createAsyncThunk('facility-detail/getByRoomIdOption
     return http.httpPosts(`facility-detail/option/${id}`);
 });
 
-export const fddeleteById = createAsyncThunk('facility-detail/fddeleteById', (data) => {
-    console.log(data.id);
-    return http.httpDelete(`facility-detail`, data);
+export const fddeleteById = createAsyncThunk('facility-detail/fddeleteById', (id) => {
+    return http.httpDelete(`facility-detail`, id);
 });
 
 const slice = createSlice({

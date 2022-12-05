@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package com.fpoly.restcontrollers;
 
@@ -7,9 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.fpoly.dto.RoomManageDTO;
+import com.fpoly.entities.*;
+import com.fpoly.repositories.repo.FacilityDetailRepository;
+import com.fpoly.repositories.repo.ServiceAvailableRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,8 +25,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fpoly.entities.NumberOfFloors;
-import com.fpoly.entities.Rooms;
 import com.fpoly.repositories.irepo.INumberOfFloorService;
 import com.fpoly.repositories.irepo.IRoomService;
 import com.fpoly.repositories.repo.NumberOfFloorRepository;
@@ -44,10 +47,13 @@ public class RoomController {
 	RoomRepository roomRepo;
 
 	@Autowired
-	INumberOfFloorService numberFloorrepository;
+	NumberOfFloorRepository numberOfFloorrepository;
 
 	@Autowired
-	NumberOfFloorRepository numberOfFloorrepository;
+	FacilityDetailRepository facilityDetailRepository;
+
+	@Autowired
+	ServiceAvailableRepository serviceAvailableRepository;
 
 	// getAll
 	@GetMapping
@@ -62,30 +68,58 @@ public class RoomController {
 	}
 
 	@PostMapping("/Option/{SLRoom}")
-	public ResponseEntity<List<Rooms>> createOptionRoom(@RequestBody Rooms room, @PathVariable Integer SLRoom) {
+	@Transactional
+	public ResponseEntity<?> createOptionRoom(@RequestBody RoomManageDTO room, @PathVariable Integer SLRoom) {
 		List<NumberOfFloors> n = numberOfFloorrepository.findAll();
-
-		NumberOfFloors nbf = new NumberOfFloors();
-		nbf.setNumberOfFloors(n.get(n.size() - 1).getNumberOfFloors() + 1);
-		nbf.setStatus(1);
-
-		numberFloorrepository.save(nbf);
-		n = numberOfFloorrepository.findAll();
-		ArrayList<Rooms> listRoom = new ArrayList<>();
+		System.out.println(room.getRooms().getName()+"///////");
+		List<Rooms> listRoom = new ArrayList<>();
 		for (int i = 1; i < SLRoom + 1; i++) {
 			Rooms r = new Rooms();
-			r.setKindOfRoom(room.getKindOfRoom());
-			r.setNote(room.getNote());
+			r.setKindOfRoom(room.getRooms().getKindOfRoom());
+			r.setNote(room.getRooms().getNote());
 //				r.setImg(room.getImg());
 // 				r.setImg1(room.getImg1());
 // 				r.setImg2(room.getImg2());
 // 				r.setImg3(room.getImg3());
 			r.setStatus(1);
-			r.setName(room.getName() + n.get(n.size() - 1).getNumberOfFloors() + "0" + i);
+			r.setName(room.getRooms().getName() + n.get(n.size() - 1).getNumberOfFloors() + "0" + i);
 			r.setNumberOfFloors(n.get(n.size() - 1));
 			listRoom.add(r);
 		}
-		return new ResponseEntity<>(roomRepo.saveAll((Iterable<Rooms>) listRoom), HttpStatus.OK);
+		roomRepo.saveAll(listRoom);
+
+		List<Rooms> listRoomnew = roomRepo.findAll();
+		List<FacilitiesDetails> facilitiesDetailsList = new ArrayList<>();
+		for (int i = 1; i < SLRoom + 2; i++) {
+			for (FacilitiesDetails facilitiesDetailsDTO : room.getFacilitiesDetailsList()){
+				System.out.println(listRoomnew.get(listRoomnew.size()-i).getId()+"???????????????????????????");
+				facilitiesDetailsDTO.setRooms(listRoomnew.get(listRoomnew.size()-i));
+				facilitiesDetailsList.add(facilitiesDetailsDTO);
+			}
+
+		}
+		for (FacilitiesDetails ff :
+				facilitiesDetailsList) {
+			System.out.println(ff);
+		}
+		facilityDetailRepository.saveAll(facilitiesDetailsList);
+		List<ServiceAvailable> serviceAvailableList = new ArrayList<>();
+		for (int i = 1; i < SLRoom + 2; i++) {
+
+			for (ServiceAvailable serviceAvailableDTO : room.getServiceAvailableList()){
+//				serviceAvailableDTO.setId();
+				System.out.println(listRoomnew.get(listRoomnew.size()-i).getId()+"???????????????????????????");
+				serviceAvailableDTO.setRooms(listRoomnew.get(listRoomnew.size()-i));
+				serviceAvailableList.add(serviceAvailableDTO);
+			}
+
+		}
+		for (ServiceAvailable ss :
+				serviceAvailableList) {
+			System.out.println(ss);
+		}
+		serviceAvailableRepository.saveAll(serviceAvailableList);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	// getById

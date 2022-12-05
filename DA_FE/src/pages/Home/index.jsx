@@ -1,14 +1,62 @@
 import { Link } from 'react-router-dom';
 import config from '~/config';
 
-import { faBed, faCalendarDays, faPerson } from '@fortawesome/free-solid-svg-icons';
+import { faBed, faCalendarDays, faMoon } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
+import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { getAllRoom } from '~/app/reducers/room';
+import { getAllKindOfRoom } from '~/app/reducers/kindOfRoom';
+import { seachRoomBooking } from '~/app/reducers/booking';
+// import { setvaluecheckInday, setvaluevalueDay, setvalueCheckOutday } from '~/app/reducers/seach';
 
 import { Carousel } from 'flowbite-react';
 import Footer from '~/layouts/Customer/Footer';
 import Header from '~/layouts/Customer/Header';
 
+const date = new Date();
+const futureDate = date.getDate() + 5;
+date.setDate(futureDate);
+const defaultValue = date.toLocaleDateString('en-CA');
 function Home() {
+
+    const rooms = useSelector((state) => state.room.rooms);
+    const KindOfRoom = useSelector((state) => state.kindOfRoom.kindOfRoom);
+    const dispatch = useDispatch();
+    const [valueSearch, setValueSearch] = useState('1');
+    const [valuedateCheckout, setvaluedateCheckout] = useState('');
+    const [valuedateCheckin, setvaluedateCheckin] = useState(defaultValue);
+    const [valueSLday, setvalueSLday] = useState('');
+    const [valueid, setvalueid] = useState('');
+
+    function getdateCheckout(day) {
+        setvalueSLday(day);
+        console.log(valuedateCheckin);
+        const datecheckout = new Date(valuedateCheckin);
+        const futuredatecheckout = datecheckout.getDate() + parseInt(day);
+        datecheckout.setDate(futuredatecheckout);
+        const valuedateCheckout = datecheckout.toLocaleDateString('en-CA');
+        setvaluedateCheckout(valuedateCheckout);
+    }
+
+    function CheckSeach() {
+
+        if (valueid.length === 0) {
+            dispatch(seachRoomBooking({ v1: valuedateCheckin,v2: valuedateCheckout, v3:KindOfRoom[0].id}));
+        } else {
+            const url = "booking/" + valuedateCheckin + "/" + valuedateCheckout + "/" + valueid;
+            console.log(url);
+            dispatch(seachRoomBooking({ v1: valuedateCheckin,v2: valuedateCheckout, v3:valueid, v4:valueSLday}));
+        }
+    }
+
+    useEffect(() => {
+        dispatch(getAllRoom());
+        dispatch(getAllKindOfRoom());
+
+    }, []);
+
     return (
         <div>
             {/* Header */}
@@ -50,6 +98,28 @@ function Home() {
                             <input
                                 type="date"
                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                value={valuedateCheckin}
+                                onChange={(e) => {
+                                    setvaluedateCheckin(e.target.value);
+                                    setvalueSLday(e.target.value);
+                                }}
+                            />
+                        </div>
+                    </div>
+                    <div>
+                        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                            Số ngày thuê
+                        </label>
+                        <div className="relative">
+                            <div className="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
+                                <FontAwesomeIcon icon={faMoon} />
+                            </div>
+                            <input
+                                type="number"
+                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                onChange={(e) => {
+                                    getdateCheckout(e.target.value)
+                                }}
                             />
                         </div>
                     </div>
@@ -64,40 +134,43 @@ function Home() {
                             <input
                                 type="date"
                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                defaultValue={valuedateCheckout}
                             />
                         </div>
                     </div>
                     <div>
                         <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-                            Số phòng
+                            Loại Phòng
                         </label>
                         <div className="relative">
                             <div className="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
                                 <FontAwesomeIcon icon={faBed} />
                             </div>
-                            <input
-                                type="number"
+                            <select
+                                name="KindOfRoom"
+                                id="KindOfRoom"
                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            />
-                        </div>
-                    </div>
-                    <div>
-                        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-                            Số người
-                        </label>
-                        <div className="relative">
-                            <div className="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
-                                <FontAwesomeIcon icon={faPerson} />
-                            </div>
-                            <input
-                                type="number"
-                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            />
+                                onChange={(e) => {
+                                    setvalueid(KindOfRoom[e.target.options[e.target.selectedIndex].id].id);
+                                    setTimeout(() => setValueSearch(KindOfRoom[e.target.options[e.target.selectedIndex].id].id), 1000);
+
+                                }}
+                            >
+                                {KindOfRoom.map((x, index) => (
+                                    <option key={x.id} value={x.name} id={index}>
+                                        {x.name}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
                     </div>
                     <div className="col-start-4">
                         <button
                             type="button"
+                            onClick={() => {
+                                CheckSeach();
+                                // handleAdd(roomAdd, data2, NBFAdd);
+                            }}
                             className="py-2 px-3 w-full text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                         >
                             <span className="mx-2">
@@ -114,83 +187,31 @@ function Home() {
                     <h1 className="text-xl font-bold">Đa dạng loại phòng lựa chọn</h1>
                     <h1 className="text-blue-500 font-bold float-right">Xem thêm</h1>
                 </div>
+
                 <div className="grid grid-cols-4 gap-4 mt-8">
-                    <div className="max-w-sm bg-white rounded-lg border border-gray-200 shadow-md dark:bg-gray-800 dark:border-gray-700">
-                        <Link to={config.routes.home}>
-                            <img
-                                className="rounded-t-lg"
-                                src="https://data.vietnambooking.com/business/hotel/bg/hotel_type/can_ho_dich_vu.jpg"
-                                alt=""
-                            />
-                        </Link>
-                        <div className="p-5">
-                            <Link to={config.routes.home}>
-                                <h5 className="mb-2 text-lg font-bold tracking-tight text-gray-900 dark:text-white">
-                                    Phòng gia đình
-                                </h5>
-                            </Link>
-                            <p className="font-normal text-gray-700 dark:text-gray-400">
-                                Here are the biggest enterprise technology acquisitions in reverse ...
-                            </p>
-                        </div>
-                    </div>
-                    <div className="max-w-sm bg-white rounded-lg border border-gray-200 shadow-md dark:bg-gray-800 dark:border-gray-700">
-                        <Link to={config.routes.home}>
-                            <img
-                                className="rounded-t-lg"
-                                src="https://data.vietnambooking.com/business/hotel/bg/hotel_type/can_ho_dich_vu.jpg"
-                                alt=""
-                            />
-                        </Link>
-                        <div className="p-5">
-                            <Link to={config.routes.home}>
-                                <h5 className="mb-2 text-lg font-bold tracking-tight text-gray-900 dark:text-white">
-                                    Phòng gia đình
-                                </h5>
-                            </Link>
-                            <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
-                                Here are the biggest enterprise technology acquisitions in reverse ...
-                            </p>
-                        </div>
-                    </div>
-                    <div className="max-w-sm bg-white rounded-lg border border-gray-200 shadow-md dark:bg-gray-800 dark:border-gray-700">
-                        <Link to={config.routes.home}>
-                            <img
-                                className="rounded-t-lg"
-                                src="https://data.vietnambooking.com/business/hotel/bg/hotel_type/can_ho_dich_vu.jpg"
-                                alt=""
-                            />
-                        </Link>
-                        <div className="p-5">
-                            <Link to={config.routes.home}>
-                                <h5 className="mb-2 text-lg font-bold tracking-tight text-gray-900 dark:text-white">
-                                    Phòng gia đình
-                                </h5>
-                            </Link>
-                            <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
-                                Here are the biggest enterprise technology acquisitions in reverse ...
-                            </p>
-                        </div>
-                    </div>
-                    <div className="max-w-sm bg-white rounded-lg border border-gray-200 shadow-md dark:bg-gray-800 dark:border-gray-700">
-                        <Link to={config.routes.home}>
-                            <img
-                                className="rounded-t-lg"
-                                src="https://data.vietnambooking.com/business/hotel/bg/hotel_type/can_ho_dich_vu.jpg"
-                                alt=""
-                            />
-                        </Link>
-                        <div className="p-5">
-                            <Link to={config.routes.home}>
-                                <h5 className="mb-2 text-lg font-bold tracking-tight text-gray-900 dark:text-white">
-                                    Phòng gia đình
-                                </h5>
-                            </Link>
-                            <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
-                                Here are the biggest enterprise technology acquisitions in reverse ...
-                            </p>
-                        </div>
-                    </div>
+                    {rooms
+                        .filter((x) => (x.kindOfRoom.id + "").toLowerCase().includes(valueSearch))
+                        .map((x) => (
+                            <div key={x.id} className="max-w-sm bg-white rounded-lg border border-gray-200 shadow-md dark:bg-gray-800 dark:border-gray-700">
+                                <Link to={config.routes.home}>
+                                    <img
+                                        className="rounded-t-lg"
+                                        src={x.img}
+                                        alt=""
+                                    />
+                                </Link>
+                                <div className="p-5">
+                                    <Link to={config.routes.home}>
+                                        <h5 className="mb-2 text-lg font-bold tracking-tight text-gray-900 dark:text-white">
+                                            {x.kindOfRoom.name}
+                                        </h5>
+                                    </Link>
+                                    <p className="font-normal text-gray-700 dark:text-gray-400">
+                                        Here are the biggest enterprise technology acquisitions in reverse ...
+                                    </p>
+                                </div>
+                            </div>
+                        ))}
                 </div>
             </div>
 

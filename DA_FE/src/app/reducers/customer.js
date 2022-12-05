@@ -16,6 +16,10 @@ export const getCustomerById = createAsyncThunk('customer/getCustomerById', (id)
     return http.httpGet(`customer/${id}`);
 });
 
+export const getCustomerByNameUser = createAsyncThunk('customer/getCustomerByNameUser', (name) => {
+    return http.httpGet(`customer/nameUser/${name}`);
+});
+
 export const update = createAsyncThunk('customer/update', (data) => {
     return http.httpPut(`customer/${data.id}`, data);
 });
@@ -108,6 +112,21 @@ const slice = createSlice({
         });
         builder.addCase(add.rejected, (state, action) => {
             state.loading = false;
+            state.error = action.error.message;
+        });
+
+
+        builder.addCase(getCustomerByNameUser.pending, (state) => {
+            state.loading = true;
+        });
+        builder.addCase(getCustomerByNameUser.fulfilled, (state, action) => {
+            state.loading = false;
+            state.customer = action.payload;
+            state.error = '';
+        });
+        builder.addCase(getCustomerByNameUser.rejected, (state, action) => {
+            state.loading = false;
+            state.customer = {};
             state.error = action.error.message;
         });
     },
