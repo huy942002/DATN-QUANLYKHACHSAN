@@ -12,6 +12,7 @@ const slice = createSlice({
     name: 'handOverBill',
     initialState: {
         bills: [],
+        handOvers: [],
         error: '',
         totalCash: 0,
         totalCard: 0,
@@ -30,8 +31,11 @@ const slice = createSlice({
             const now = new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000)
                 .toISOString()
                 .replace('T', ' ')
-                .slice(0, 17);
-            const dateOfLogin = '2022-10-13 00:00';
+                .slice(0, 19);
+            const userLogin = state.handOvers
+                .filter((x) => x.status === 0)
+                .reduce((prev, current) => (prev.dateTimeStart > current.dateTimeStart ? prev : current), {});
+            const dateOfLogin = '2022-10-13 00:00'; // dateTimeStart từ hand-over của user login
             state.loading = false;
             state.bills = action.payload.filter((x) => x.status === 1);
             state.bills

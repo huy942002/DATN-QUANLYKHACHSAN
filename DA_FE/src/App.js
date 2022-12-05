@@ -2,7 +2,7 @@ import { Fragment } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import AdminLayout from './layouts/AdminVer2/admin-layout';
 
-import authoService from '~/services/authoServices';
+import authoService from '~/services/authorServices';
 
 import '~/global/global.css';
 

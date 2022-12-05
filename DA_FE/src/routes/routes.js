@@ -5,7 +5,6 @@ import Home from '~/pages/Home';
 import Login from '~/pages/Login';
 import LoginAdmin from '~/pages/Admin/LoginAdmin';
 import HistoryAdmin from '~/pages/Admin/HistoryAdmin';
-import RoomDetailAdmin from '~/pages/Admin/RoomDetailAdmin';
 import PersonnelManage from '~/pages/Admin/PersonnelManage';
 import ServiceManage from '~/pages/Admin/ServiceManage';
 import HandOver from '~/pages/Admin/HandOver';
@@ -40,7 +39,6 @@ const privateRoutes = [
     { path: config.routes.roomPlan, component: RoomPlan },
     { path: config.routes.rentalManage, component: RentalManage },
     { path: config.routes.historyAdmin, component: HistoryAdmin },
-    { path: config.routes.roomAdmin, component: RoomDetailAdmin },
     { path: config.routes.personnelManage, component: PersonnelManage },
     { path: config.routes.serviceManage, component: ServiceManage },
     { path: config.routes.handOver, component: HandOver },

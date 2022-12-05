@@ -2,7 +2,6 @@ const routes = {
     home: '/',
     loginAdmin: '/admin/login',
     historyAdmin: '/admin/history',
-    roomAdmin: '/admin/room-check/:information',
     personnelManage: '/admin/personnel-manage',
     serviceManage: '/admin/service-manage',
     handOver: '/admin/hand-over',

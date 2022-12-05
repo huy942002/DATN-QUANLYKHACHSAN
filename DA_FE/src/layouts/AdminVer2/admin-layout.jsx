@@ -31,6 +31,8 @@ import { toast } from 'react-toastify';
 import { Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 
+import authorServices from '~/services/authorServices';
+
 const { Header, Sider, Content } = Layout;
 
 const objConfirm = {
@@ -55,8 +57,11 @@ const AdminLayout = ({ children }) => {
     const index = handOvers.findIndex((x) => x === userLogin);
     const dispatch = useDispatch();
 
+    const [currentUser, setCurrentUser] = useState();
+
     useEffect(() => {
         dispatch(getAllHandOver());
+        authorServices.currentUser().then((res) => setCurrentUser(res));
         // eslint-disable-next-line
     }, []);
 
@@ -188,6 +193,7 @@ const AdminLayout = ({ children }) => {
                         textAlign: 'right',
                     }}
                 >
+                    <span className="font-bold">Xin chào {currentUser?.fullname} !</span>
                     {collapsed && (
                         <MenuUnfoldOutlined
                             className="trigger text-lg m-3"
