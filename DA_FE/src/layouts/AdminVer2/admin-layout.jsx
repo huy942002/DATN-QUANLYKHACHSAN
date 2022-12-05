@@ -106,7 +106,7 @@ const AdminLayout = ({ children }) => {
                                     key: '4',
                                     // icon: <UploadOutlined />,
                                     label: 'Quản lý phòng',
-                                    // onClick: () => setCollapsed(!collapsed),
+                                    onClick: () => navigate('/admin/room-manage'),
                                 },
                                 {
                                     key: '5',

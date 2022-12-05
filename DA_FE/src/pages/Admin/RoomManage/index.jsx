@@ -388,7 +388,7 @@ function RoomManage() {
                                             {x.kindOfRoom.hourlyPrice}
                                         </td>
                                         <td className="py-4 px-6 ">
-                                        <td className="py-4 px-6">{x.status === 1 ? 'Hoạt động' : 'Không tồn tại'}</td>
+                                             <p className="py-4 px-6">{x.status === 1 ? 'Hoạt động' : 'Không tồn tại'}</p>
                                         </td>
                                         <td className="py-4 px-6 ">
                                             <button
@@ -443,7 +443,7 @@ function RoomManage() {
                     {/* Modal update */}
                     <Modal show={visibleUpdate} size="4xl" position="top-center" popup={true} onClose={() => setVisibleUpdate(false)}>
                         <Modal.Header >
-                            <h1 className="mb-2 mr-3 text-gray-900 dark:text-gray-300 font-bold">Update Room</h1>
+                            <p className="mb-2 mr-3 text-gray-900 dark:text-gray-300 font-bold">Update Room</p>
                         </Modal.Header>
                         <Modal.Body>
                             <form>

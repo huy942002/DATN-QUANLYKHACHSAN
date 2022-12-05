@@ -255,6 +255,10 @@ CREATE TABLE BOOKING
 ID INT IDENTITY(1,1) NOT NULL,
 ID_BILL INT NOT NULL,
 ID_KIND_OF_ROOM INT NOT NULL,
+CUSTOMER_NAME NVARCHAR(255) NULL,
+EMAIL NVARCHAR(255) NULL,
+CITIZEN_ID_CODE NVARCHAR(12) NULL,
+PHONE_NUMBER NVARCHAR(12) NULL,
 DATE_OF_HIRE DATE NOT NULL,
 CHECK_OUT_DAY DATE NOT NULL,
 TIME_IN NVARCHAR(15) NULL,
@@ -332,6 +336,7 @@ INSERT INTO ROLES (NAME, STATUS) VALUES (N'Nhân viên', 1)
 INSERT INTO ROLES (NAME, STATUS) VALUES (N'Khách hàng', 1)
 ---
 INSERT INTO AUTHORITY (ID_ROLES, ID_USER, STATUS) VALUES (1, 1, 1)
+INSERT INTO AUTHORITY (ID_ROLES, ID_USER, STATUS) VALUES (2, 1, 1)
 INSERT INTO AUTHORITY (ID_ROLES, ID_USER, STATUS) VALUES (1, 2, 1)
 INSERT INTO AUTHORITY (ID_ROLES, ID_USER, STATUS) VALUES (1, 3, 1)
 INSERT INTO AUTHORITY (ID_ROLES, ID_USER, STATUS) VALUES (1, 4, 1)
@@ -345,11 +350,11 @@ INSERT INTO NATIONALITY (NAME, STATUS) VALUES (N'Nhật Bản', 0)
 ---
 INSERT INTO CUSTOMER (ID_USER, FULLNAME, EMAIL, CITIZEN_ID_CODE, GENDER,
 						DATE_OF_BIRTH, PHONE_NUMBER, ADDRESS, IMG, ID_NATIONALITY, STATUS)
-		VALUES (5, N'Hồ Văn Lân', 'lanhv@gmail.com', '987654321', N'Nam', 
+		VALUES (5, N'Hồ Văn Lân', 'lanhv@gmail.com', '987654321', N'Nam',
 		'2/3/1999', '0345789999', N'Đà Nẵng', 'lanhv.jpg', 1, 1)
 INSERT INTO CUSTOMER (ID_USER, FULLNAME, EMAIL, CITIZEN_ID_CODE, GENDER,
 						DATE_OF_BIRTH, PHONE_NUMBER, ADDRESS, IMG, ID_NATIONALITY, STATUS)
-		VALUES (6, N'Nguyễn Văn Tèo', 'teonv@gmail.com', '987654321', N'Nam', 
+		VALUES (6, N'Nguyễn Văn Tèo', 'teonv@gmail.com', '987654321', N'Nam',
 		'2/3/1998', '0345789999', N'Đà Nẵng', 'teo.jpg', 1, 1)
 ---
 INSERT INTO PERSONNEL (ID_USER, FULLNAME, EMAIL, GENDER, CITIZEN_ID_CODE,
@@ -378,9 +383,9 @@ INSERT INTO PERSONNEL (ID_USER, FULLNAME, EMAIL, GENDER, CITIZEN_ID_CODE,
 		'9/9/2002', '0354321987', N'Hà Nội', 1, 'fpoly.jpg', 1)
 ---
 INSERT INTO HAND_OVER(ID_PERSONNEL,RECEIVER,DATE_TIME_START,DATE_TIME_END,TOTAL_MONEY,MONEY_FIRST,TOTAL_MONEY_CARD,TOTAL_CASH,SURCHARGE,MONEY_REAL,MONEY_HAND_OVER, NOTE, STATUS)
-VALUES(6,N'','2022-10-31T09:35:53','2022-10-31T09:35:53',0,500000,0,500000,0,0,0,N'Đã nhận ca từ quản lý lúc 2022-10-31T09:35:53',0) 
+VALUES(6,N'','2022-10-31T09:35:53','2022-10-31T09:35:53',0,500000,0,500000,0,0,0,N'Đã nhận ca từ quản lý lúc 2022-10-31T09:35:53',0)
 ---
-INSERT INTO RESET_HAND_OVER(ID_PERSONNEL,RECEIVER,DATE_TIME_START,DATE_TIME_END,TOTAL_MONEY,HAND_MONEY,NOTE,STATUS) 
+INSERT INTO RESET_HAND_OVER(ID_PERSONNEL,RECEIVER,DATE_TIME_START,DATE_TIME_END,TOTAL_MONEY,HAND_MONEY,NOTE,STATUS)
 VALUES(6,N'huynh','2022-10-31T09:35:53','2022-10-31T12:35:53',3000000,2000000,N'Còn dư 1 triệu',1)
 ---
 INSERT INTO PAYMENT_TYPE (NAME, STATUS) VALUES (N'Chuyển khoản', 1)
@@ -398,23 +403,23 @@ INSERT INTO BILLS (ID_CUSTOMER, ID_PERSONNEL,ID_PAYMENT_TYPE,ID_ROOM_REFUND_COND
 ---
 INSERT INTO RENTAL_TYPES (NAME, STATUS) VALUES (N'Theo ngày', 1)
 INSERT INTO RENTAL_TYPES (NAME, STATUS) VALUES (N'Theo giờ', 1)
---- 
+---
 INSERT INTO SERVICE_TYPE (NAME, NOTE, STATUS) VALUES (N'Giặt là', N'Dịch vụ giặt là trả đồ sau 6h.', 1)
 INSERT INTO SERVICE_TYPE (NAME, NOTE, STATUS) VALUES (N'Dọn phòng', N'Dịch vụ dọn phòng ngay.', 1)
 INSERT INTO SERVICE_TYPE (NAME, NOTE, STATUS) VALUES (N'Đồ uống', N'Các loại đồ uống', 1)
 INSERT INTO SERVICE_TYPE (NAME, NOTE, STATUS) VALUES (N'Đồ ăn', N'Các loại đồ ăn', 1)
 ---
-INSERT INTO SERVICESS (NAME, ID_SERVICE_TYPE, PRICES, NOTE, STATUS) 
+INSERT INTO SERVICESS (NAME, ID_SERVICE_TYPE, PRICES, NOTE, STATUS)
 			VALUES (N'Giặt bikini', 1, '60000', N'60.000 dong/ kg', 1 )
-INSERT INTO SERVICESS (NAME, ID_SERVICE_TYPE, PRICES, NOTE, STATUS) 
+INSERT INTO SERVICESS (NAME, ID_SERVICE_TYPE, PRICES, NOTE, STATUS)
 			VALUES (N'Cafe sữa đá', 3, '49000', N'49.000 dong/ cup ', 1 )
-INSERT INTO SERVICESS (NAME, ID_SERVICE_TYPE, PRICES, NOTE, STATUS) 
+INSERT INTO SERVICESS (NAME, ID_SERVICE_TYPE, PRICES, NOTE, STATUS)
 			VALUES (N'Pizza', 1, '89000', N'89.000 đồng/ cake', 1 )
-INSERT INTO SERVICESS (NAME, ID_SERVICE_TYPE, PRICES, NOTE, STATUS) 
+INSERT INTO SERVICESS (NAME, ID_SERVICE_TYPE, PRICES, NOTE, STATUS)
 			VALUES (N'Nước lọc', 3, '10000', N'10.000 dong/ bot', 1 )
-INSERT INTO SERVICESS (NAME, ID_SERVICE_TYPE, PRICES, NOTE, STATUS) 
+INSERT INTO SERVICESS (NAME, ID_SERVICE_TYPE, PRICES, NOTE, STATUS)
 			VALUES (N'Cafe gói', 3, '9000', N'9.000 dong/ pack ', 1 )
-INSERT INTO SERVICESS (NAME, ID_SERVICE_TYPE, PRICES, NOTE, STATUS) 
+INSERT INTO SERVICESS (NAME, ID_SERVICE_TYPE, PRICES, NOTE, STATUS)
 			VALUES (N'Redbull', 3, '15000', N'15.000 đồng/ lon', 1 )
 ---
 INSERT INTO KIND_OF_ROOM(ROOM_TYPE_NAME, NOTE, PRICE_BY_DAY,HOURLY_PRICE, STATUS) VALUES (N'Phòng đơn', N'Single room', 0,0, 1)
@@ -423,7 +428,7 @@ INSERT INTO KIND_OF_ROOM(ROOM_TYPE_NAME, NOTE, PRICE_BY_DAY,HOURLY_PRICE, STATUS
 INSERT INTO KIND_OF_ROOM(ROOM_TYPE_NAME, NOTE, PRICE_BY_DAY,HOURLY_PRICE, STATUS) VALUES (N'Phòng VIP 1', N'King room' , 0,0, 1)
 INSERT INTO KIND_OF_ROOM(ROOM_TYPE_NAME, NOTE, PRICE_BY_DAY,HOURLY_PRICE, STATUS) VALUES (N'Phòng VIP 2', N'Queen room', 0,0, 1)
 ---
-INSERT INTO BOOKING(ID_BILL, ID_KIND_OF_ROOM, DATE_OF_HIRE, CHECK_OUT_DAY, TIME_IN, TIME_OUT, STATUS) 
+INSERT INTO BOOKING(ID_BILL, ID_KIND_OF_ROOM, DATE_OF_HIRE, CHECK_OUT_DAY, TIME_IN, TIME_OUT, STATUS)
 VALUES (1,1,'10/13/2022','10/14/2022','19:30','20h30',1)
 ---
 INSERT INTO NUMBER_OF_FLOORS (NUMBER_OF_FLOORS, STATUS) VALUES (2, 1)
@@ -436,58 +441,53 @@ INSERT INTO NUMBER_OF_FLOORS (NUMBER_OF_FLOORS, STATUS) VALUES (8, 1)
 INSERT INTO NUMBER_OF_FLOORS (NUMBER_OF_FLOORS, STATUS) VALUES (9, 1)
 ---
 INSERT INTO ROOMS (NAME, ID_NUMBER_OF_FLOORS, ID_KIND_OF_ROOM, NOTE, IMG, IMG1, IMG2, IMG3,STATUS)
-			VALUES ('P201', 1, 2, N'Phòng 2 người', 
-'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg', 
+			VALUES ('P201', 1, 2, N'Phòng 2 người',
+'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg',
 'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg',
 'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg',
 'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg', 1)
 INSERT INTO ROOMS (NAME, ID_NUMBER_OF_FLOORS, ID_KIND_OF_ROOM, NOTE, IMG, IMG1, IMG2, IMG3,STATUS)
 			VALUES ('P202', 1, 1, N'Phòng 1 người',
-'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg', 
+'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg',
 'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg',
 'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg',
 'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg',1)
 INSERT INTO ROOMS (NAME, ID_NUMBER_OF_FLOORS, ID_KIND_OF_ROOM, NOTE, IMG, IMG1, IMG2, IMG3, STATUS)
 			VALUES ('P203', 1, 2, N'Phòng 2 người',
-'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg', 
+'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg',
 'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg',
 'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg',
 'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg',1)
 INSERT INTO ROOMS (NAME, ID_NUMBER_OF_FLOORS, ID_KIND_OF_ROOM, NOTE, IMG, IMG1, IMG2, IMG3, STATUS)
 			VALUES ('P204', 1, 1, N'Phòng 1 người',
-'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg', 
+'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg',
 'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg',
 'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg',
 'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg',1)
 INSERT INTO ROOMS (NAME, ID_NUMBER_OF_FLOORS, ID_KIND_OF_ROOM, NOTE, IMG, IMG1, IMG2, IMG3, STATUS)
 			VALUES ('P205', 1, 2, N'Phòng 2 người',
-'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg', 
+'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg',
 'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg',
 'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg',
 'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg',1)
 INSERT INTO ROOMS (NAME, ID_NUMBER_OF_FLOORS, ID_KIND_OF_ROOM, NOTE, IMG, IMG1, IMG2, IMG3, STATUS)
 			VALUES ('P206', 1, 1, N'Phòng 1 người',
-'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg', 
+'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg',
 'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg',
 'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg',
 'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg',1)
 INSERT INTO ROOMS (NAME, ID_NUMBER_OF_FLOORS, ID_KIND_OF_ROOM, NOTE, IMG, IMG1, IMG2, IMG3, STATUS)
 			VALUES ('P207', 1, 2, N'Phòng 2 người',
-'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg', 
+'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg',
 'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg',
 'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg',
 'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg',1)
 INSERT INTO ROOMS (NAME, ID_NUMBER_OF_FLOORS, ID_KIND_OF_ROOM, NOTE, IMG, IMG1, IMG2, IMG3, STATUS)
 			VALUES ('P208', 1, 1, N'Phòng 1 người',
-'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg', 
+'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg',
 'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg',
 'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg',
 'https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg',1)
----
-INSERT INTO DETAILS_INVOICE(ID_BILL, ID_ROOMS, ID_RENTAL_TYPES, HIRE_DATE, CHECK_OUT_DAY, NUMBER_OF_DAYS_OF_RENT,
-NUMBER_OF_HOURS_TO_RENT, NUMBER_OF_PEOPLE, TOTAL_CASH, STATUS) VALUES (1,1,1,'10/13/2022','10/14/2022',2,36,4, 10000000, 1)
-INSERT INTO DETAILS_INVOICE(ID_BILL, ID_ROOMS, ID_RENTAL_TYPES, HIRE_DATE, CHECK_OUT_DAY, NUMBER_OF_DAYS_OF_RENT,
-NUMBER_OF_HOURS_TO_RENT, NUMBER_OF_PEOPLE, TOTAL_CASH, STATUS) VALUES (1,1,1,'10/14/2022','10/15/2022',2,35,4, 10000000, 1)
 ---
 INSERT INTO FACILITIES (NAME, STATUS) VALUES (N'Tivi', 1)
 INSERT INTO FACILITIES (NAME, STATUS) VALUES (N'Máy sấy tóc', 1)
@@ -536,9 +536,4 @@ INSERT INTO SERVICE_AVAILABLE (ID_SERVICE, ID_ROOMS, PRICES, QUANTITY, STATUS)
 	VALUES (5, 3, '9000', 2, 1)
 INSERT INTO SERVICE_AVAILABLE (ID_SERVICE, ID_ROOMS, PRICES, QUANTITY, STATUS)
 	VALUES (6, 3, '15000', 1, 1)
----
-INSERT INTO SERVICE_DETAILS(ID_SERVICE, ID_DETAILS_INVOICE, QUANTITY, TOTAL_CASH, STATUS) VALUES (1, 1, 10, 2000000, 1)
-INSERT INTO SERVICE_DETAILS(ID_SERVICE, ID_DETAILS_INVOICE, QUANTITY, TOTAL_CASH, STATUS) VALUES (2, 2, 5, 1000000, 1)
----
-
 
