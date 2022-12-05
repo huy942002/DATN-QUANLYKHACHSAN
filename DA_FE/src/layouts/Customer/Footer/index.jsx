@@ -17,19 +17,19 @@ function Footer() {
                 <div>
                     <h5>Về chúng tôi</h5>
                     <div className="grid grid-flow-row mt-5">
-                        <Link to={config.routes.home} className="text-slate-300">
+                        <Link to={config.routes.roomPlan} className="text-slate-300">
                             Giới thiệu
                         </Link>
-                        <Link to={config.routes.home} className="text-slate-300">
+                        <Link to={config.routes.roomPlan} className="text-slate-300">
                             Liên hệ
                         </Link>
-                        <Link to={config.routes.home} className="text-slate-300">
+                        <Link to={config.routes.roomPlan} className="text-slate-300">
                             Chính sách bảo mật
                         </Link>
-                        <Link to={config.routes.home} className="text-slate-300">
+                        <Link to={config.routes.roomPlan} className="text-slate-300">
                             Điều khoản sử dụng
                         </Link>
-                        <Link to={config.routes.home} className="text-slate-300">
+                        <Link to={config.routes.roomPlan} className="text-slate-300">
                             Đơn vị hợp tác
                         </Link>
                     </div>
@@ -37,13 +37,13 @@ function Footer() {
                 <div>
                     <h5>Sản phẩm</h5>
                     <div className="grid grid-flow-row mt-5">
-                        <Link to={config.routes.home} className="text-slate-300">
+                        <Link to={config.routes.roomPlan} className="text-slate-300">
                             Đặt phòng khách sạn
                         </Link>
-                        <Link to={config.routes.home} className="text-slate-300">
+                        <Link to={config.routes.roomPlan} className="text-slate-300">
                             Tư vấn đặt phòng
                         </Link>
-                        <Link to={config.routes.home} className="text-slate-300">
+                        <Link to={config.routes.roomPlan} className="text-slate-300">
                             Chăm sóc khách hàng
                         </Link>
                     </div>
@@ -51,15 +51,15 @@ function Footer() {
                 <div>
                     <h5>Kết nối</h5>
                     <div className="grid grid-cols-3 gap-2 text-center mt-5">
-                        <Link to={config.routes.home} className="p-1 bg-blue-400 text-white rounded-md border-2">
+                        <Link to={config.routes.roomPlan} className="p-1 bg-blue-400 text-white rounded-md border-2">
                             <span className="mr-2 text-sm">Facebook</span>
                             <FontAwesomeIcon icon={faFacebookF} />
                         </Link>
-                        <Link to={config.routes.home} className="p-1 bg-amber-400 text-white rounded-md border-2">
+                        <Link to={config.routes.roomPlan} className="p-1 bg-amber-400 text-white rounded-md border-2">
                             <span className="mr-2 text-sm">Instagram</span>
                             <FontAwesomeIcon icon={faInstagram} />
                         </Link>
-                        <Link to={config.routes.home} className="p-1 bg-red-500 text-white rounded-md border-2">
+                        <Link to={config.routes.roomPlan} className="p-1 bg-red-500 text-white rounded-md border-2">
                             <span className="mr-2 text-sm">Email</span>
                             <FontAwesomeIcon icon={faEnvelope} />
                         </Link>

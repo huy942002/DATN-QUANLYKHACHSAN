@@ -170,7 +170,7 @@ function Authorization() {
                 <ol className="inline-flex items-center space-x-1 md:space-x-3">
                     <li className="inline-flex items-center">
                         <Link
-                            to={config.routes.homeAdmin}
+                            to={config.routes.roomPlan}
                             className="ml-1 text-sm font-medium text-gray-700 hover:text-gray-900 md:ml-2 dark:text-gray-400 dark:hover:text-white"
                         >
                             Home

@@ -198,7 +198,7 @@ function RoomManage() {
                 <ol className="inline-flex items-center space-x-1 md:space-x-3">
                     <li className="inline-flex items-center">
                         <Link
-                            to={config.routes.homeAdmin}
+                            to={config.routes.roomPlan}
                             className="ml-1 text-sm font-medium text-gray-700 hover:text-gray-900 md:ml-2 dark:text-gray-400 dark:hover:text-white"
                         >
                             Home
@@ -221,7 +221,7 @@ function RoomManage() {
                                 className="inline-block text-4xl p-4  rounded-t-lg border-b-2 text-blue-600 hover:text-blue-600 dark:text-blue-500 dark:hover:text-blue-500 border-blue-600 dark:border-blue-500"
                                 id="profile-tab"
                             >
-                                <Link to={config.routes.homeAdmin}>Danh sách phòng</Link>
+                                <Link to={config.routes.roomPlan}>Danh sách phòng</Link>
                             </button>
                         </li>
                         <li className="mr-8 ml-12" role="presentation">
@@ -229,7 +229,7 @@ function RoomManage() {
                                 className="inline-block text-4xl p-4 rounded-t-lg border-b-2 border-transparent hover:text-blue-600 hover:border-blue-600 dark:hover:text-blue-600 dark:border-transparent text-gray-400 dark:text-blue-600 border-blue-600 dark:border-blue-600"
                                 id="dashboard-tab"
                             >
-                                <Link to={config.routes.homeAdmin}>Tầng</Link>
+                                <Link to={config.routes.roomPlan}>Tầng</Link>
                             </button>
                         </li>
                         <li className="mr-2  ml-12" role="presentation">
@@ -237,7 +237,7 @@ function RoomManage() {
                                 className="inline-block text-4xl p-4 rounded-t-lg border-b-2 border-transparent hover:text-blue-600 hover:border-blue-600 dark:hover:text-blue-600 dark:border-transparent text-gray-400 dark:text-blue-600 border-grablue-600 dark:border-blue-600"
                                 id="settings-tab"
                             >
-                                <Link to={config.routes.homeAdmin}>Loại phòng</Link>
+                                <Link to={config.routes.roomPlan}>Loại phòng</Link>
                             </button>
                         </li>
                     </ul>
