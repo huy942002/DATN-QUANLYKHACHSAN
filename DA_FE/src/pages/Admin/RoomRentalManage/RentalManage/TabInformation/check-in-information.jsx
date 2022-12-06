@@ -218,13 +218,17 @@ function CheckInInformation({ bill, setBill, detailInvoices, serviceDetails, typ
         serviceDetailList.forEach(element => {
             element.status = 2;
         })
-        console.log(detailInvoiceList);
-        console.log(serviceDetailList);
+        // console.log(detailInvoiceList);
+        // console.log(serviceDetailList);
+        let billRequest = bill;
+        billRequest.totalCash = genTotalPayable();
+        billRequest.dateOfPayment = dayjs(dateNow).format('YYYY-MM-DD HH:mm');
+        // console.log(billRequest);
         setConfirmLoading(true);
         const response = await axios.post('http://localhost:8080/api/room-rental-manage/pay', {
                 detailInvoices: detailInvoiceList,
                 serviceDetails: serviceDetailList,
-                bill: bill,
+                bill: billRequest,
             }).then(res => {
                 if(res) {
                     setTimeout(() => {
