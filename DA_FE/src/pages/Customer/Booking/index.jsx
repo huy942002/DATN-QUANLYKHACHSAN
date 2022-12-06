@@ -9,7 +9,7 @@ import { toast } from 'react-toastify';
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllKindOfRoom } from '~/app/reducers/kindOfRoom';
-import { addboking } from '~/app/reducers/booking'
+// import { addboking } from '~/app/reducers/booking'
 // import { getcheckInday, getvalueDay, getCheckOutday } from '~/app/reducers/seach';
 
 import Footer from '~/layouts/Customer/Footer';
@@ -22,10 +22,21 @@ function Booking() {
     const valueDay = useSelector((state) => state.booking.valueDay2);
     const checkOutday = useSelector((state) => state.booking.CheckOutday2);
     const [booking, setbooking] = useState();
+    const [prices, setprices] = useState();
+    const [name, setname] = useState(cutomer.fullname);
+    const [mobinumber, setmobinumber] = useState(cutomer.phoneNumber);
+    const [emailaddress, setaddress] = useState(cutomer.email);
+    const [citizenIdCode, setcitizenIdCode] = useState(cutomer.citizenIdCode);
+
     const dispatch = useDispatch();
+    console.log(room.kindOfRoom.priceByDay);
+    console.log(valueDay);
+    const [price, setUrl] = useState((room.kindOfRoom.priceByDay) * valueDay);
 
     const FacilityDetail = useSelector((state) => state.facilityDetail.facilityDetail);
 
+    const url = "http://localhost:8080/booking-pay/" + checkInday + "/" + checkOutday + "/" + room.kindOfRoom.id + "/" + cutomer.id + "/" + name+ "/" + mobinumber+ "/" + emailaddress+ "/" + citizenIdCode+ "?amount=" + price + "&bankcode=&language=vi&txt_billing_mobile=Thanh+toan+don+hang&txt_billing_email=" + room.email + "&txt_billing_fullname=" +  room.name + "%20anh&txt_inv_addr1=ha%20noi&txt_bill_city=ha%20noi&txt_bill_country=viet%20nam&txt_bill_state=ha%20noi&txt_inv_mobile=0389355471&txt_inv_email=quanganhsaker@gmail.com&txt_inv_customer=Nguy%E1%BB%85n%20Van%20A&txt_inv_addr1=ha%20noi&city&txt_inv_company=fsoft&txt_inv_taxcode=10&cbo_inv_type=other&vnp_OrderType=other&vnp_OrderInfo=order%20info%20test";
+    console.log(url)
     useEffect(() => {
         dispatch(getAllKindOfRoom());
 
@@ -33,10 +44,7 @@ function Booking() {
 
 
     function handleAdd() {
-        dispatch(
-            addboking({v1:checkInday,v2:checkOutday,v3:room.kindOfRoom.id,v4:cutomer.id})
-        );
-        toast.success('Đặt phòng thành công!', { autoClose: 2000 });
+        window.open(url, 'mywindow','location=1,status=1,scrollbars=1, resizable=1, directories=1, toolbar=1, titlebar=1');
     }
     return (
         <div>
@@ -116,7 +124,7 @@ function Booking() {
                         ))}
 
                     </div>
-                    <h5 className="font-bold text-xl text-red-500 mt-6">Giá phòng : {room?.kindOfRoom?.prices_by_day || ''} \1 Đêm</h5>
+                    <h5 className="font-bold text-xl text-red-500 mt-6">Giá phòng : {room?.kindOfRoom?.priceByDay || ''} \1 Đêm</h5>
 
                 </div>
                 <div className="border-2 border-slate-200 rounded-md p-5">
@@ -126,9 +134,12 @@ function Booking() {
                             htmlFor=""
                             className="mb-2 mr-3 text-gray-900 dark:text-gray-300 font-bold"
                         >
-                            Contact's name  :
+                            Tên người nhận phòng  :
                         </label>
                         <input
+                        onChange={(e) => {
+                            setname(e.target.value)
+                        }}
                             type="text"
                             id="nameRoom"
                             name="nameRoom"
@@ -141,9 +152,12 @@ function Booking() {
                             htmlFor=""
                             className="mb-2 mr-3 text-gray-900 dark:text-gray-300 font-bold"
                         >
-                            Reachable mobile number  :
+                            Số điện thoại  :
                         </label>
                         <input
+                        onChange={(e) => {
+                            setmobinumber(e.target.value)
+                        }}
                             type="text"
                             id="SDT"
                             name="SDT"
@@ -156,13 +170,34 @@ function Booking() {
                             htmlFor=""
                             className="mb-2 mr-3 text-gray-900 dark:text-gray-300 font-bold"
                         >
-                            Contact's email address  :
+                            Địa chỉ Email  :
                         </label>
                         <input
+                        onChange={(e) => {
+                            setaddress(e.target.value)
+                        }}
                             type="text"
                             id="SDT"
                             name="SDT"
                             defaultValue={cutomer.email || ''}
+                            className="w-48 p-1 rounded"
+                        />
+                    </div>
+                    <div className='mt-4'>
+                        <label
+                            htmlFor=""
+                            className="mb-2 mr-3 text-gray-900 dark:text-gray-300 font-bold"
+                        >
+                            Số chứng minh thư :
+                        </label>
+                        <input
+                        onChange={(e) => {
+                           setcitizenIdCode(e.target.value)
+                        }}
+                            type="text"
+                            id="SDT"
+                            name="SDT"
+                            defaultValue={cutomer.citizenIdCode || ''}
                             className="w-48 p-1 rounded"
                         />
                     </div>
@@ -196,7 +231,7 @@ function Booking() {
                                     </li>
                                     <li>
                                         <FontAwesomeIcon icon={faCheck} color="green" className="mr-2" />
-                                        Check in: {checkInday} from 12h00 
+                                        Check in: {checkInday} from 12h00
                                     </li>
                                     <li>
                                         <FontAwesomeIcon icon={faCheck} color="green" className="mr-2" />
@@ -208,17 +243,11 @@ function Booking() {
                                     </li>
                                 </ul>
                                 <button
+                                onClick={()=>handleAdd()}
                                     type="button"
                                     className="py-2 px-3 float-right text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                                 >
-                                    <span className="mx-2 block">
-                                        <Link to={config.routes.searchRoom}
-                                        onClick={() => {
-                                            handleAdd();
-                                            
-                                            }}
-                                        >Xác Nhận Thông tin</Link>
-                                    </span>
+                                    Xác Nhận Thông tin
                                 </button>
                             </div>
                         </div>

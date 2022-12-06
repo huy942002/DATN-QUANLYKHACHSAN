@@ -7,45 +7,24 @@ idKingOfRoom =0
 ;
 export const seachRoomBooking = createAsyncThunk('booking/seachRoomBooking', (data) => {
     checkInday=data.v1;
-    valueDay=data.v4;
     CheckOutday=data.v2;
     idKingOfRoom=data.v3;
-    return http.httpGet(`booking/${data.v1}/${data.v2}/${data.v3}`);
+    valueDay=data.v4;
+    return http.httpGet(`booking/${data.v1}/${data.v2}/${data.v3}/${data.v4}`);
 });
 
 export const addboking = createAsyncThunk('booking/addboking', (data) => {
     return http.httpPosts(`booking/${data.v1}/${data.v2}/${data.v3}/${data.v4}`);
 });
 
-const objRoom = {
-    id: '',
-    name: '',
-    note: '',
-    img: '',
-    img1: '',
-    img2: '',
-    img3: '',
-    status: '',
-    kindOfRoom: {
-        id: '',
-        name: '',
-        note: '',
-        prices_by_day: '',
-        hourly_prices: '',
-        status: ''
-    },
-    numberOfFloors: {
-        id: '',
-        numberOfFloors: '',
-        status: ''
-    }
-
-};
+export const getAllBookingByStatus = createAsyncThunk('booking/getAllBookingByStatus', () => {
+    return http.httpGet('booking/status');
+});
 
 const slice = createSlice({
     name: 'booking',
     initialState: {
-        roomSeach:[objRoom],
+        roomSeach:[],
         booking:[],
         checkInday2: '',
         valueDay2: 0,
@@ -55,7 +34,23 @@ const slice = createSlice({
         loading: false,
     },
     extraReducers: (builder) => {
-        // getAllHandOver
+
+
+        builder.addCase(getAllBookingByStatus.pending, (state) => {
+            state.loading = true;
+        });
+        builder.addCase(getAllBookingByStatus.fulfilled, (state, action) => {
+            state.loading = false;
+            state.booking = action.payload.filter((x) => x.status === 1);
+            state.error = '';
+        });
+        builder.addCase(getAllBookingByStatus.rejected, (state, action) => {
+            state.loading = false;
+            state.booking = [];
+            state.error = action.error.message;
+        });
+
+
         builder.addCase(seachRoomBooking.pending, (state) => {
             state.loading = true;
         });

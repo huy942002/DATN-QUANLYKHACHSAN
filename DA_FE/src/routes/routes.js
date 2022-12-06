@@ -24,6 +24,7 @@ import CreateOptionRoomManage from '~/pages/Admin/CreateOptionRoomManage';
 import RoomPlan from '~/pages/Admin/RoomRentalManage/RoomPlan/room-plan';
 import RentalManage from '~/pages/Admin/RoomRentalManage/RentalManage/rental-manage';
 import Booking from '~/pages/Customer/Booking';
+import BookingManage from '~/pages/Admin/BookingManage'
 
 // Routes public
 
@@ -54,6 +55,7 @@ const privateRoutes = [
     { path: config.routes.nationality, component: Nationality },
     { path: config.routes.rentalTypeManage, component: RentalTypes },
     { path: config.routes.authorization, component: Authorization },
+    { path: config.routes.bookingmanage, component: BookingManage },
 ];
 
 export { publicRoutes, privateRoutes };

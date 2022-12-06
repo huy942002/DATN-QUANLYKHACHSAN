@@ -94,7 +94,8 @@ function RoomManage() {
     const [ServiceAvailable, setServiceAvailable] = useState([]);
     const [ServiceAvailableUpdate, setServiceAvailableUpdate] = useState();
     const [idcheck, setId] = useState(-1);
-    const [valueSearch, setValueSearch] = useState('');
+    const [valueSearch, setValueSearch] = useState('2');
+    const [valueSearch1, setValueSearch1] = useState('');
     const ServiceAva = useSelector((state) => state.serviceAvailable.ServiceAvailables);
 
     const dispatch = useDispatch();
@@ -147,6 +148,9 @@ function RoomManage() {
     }
 
     function getIdDelete(id) {
+        dispatch(getRoomById(id));
+        dispatch(getByRoomId(id));
+        dispatch(getByRoomIdSv(id));
         setId(id);
         setVisibleDelete(true);
     }
@@ -192,9 +196,9 @@ function RoomManage() {
 
     }
 
-    function handleDeleteById(data) {
-        // setroom(room);
-        dispatch(deleteById(data));
+    function handleDeleteById() {
+        dispatch(UpdateRoom({ ...Room, status: 0 }));
+        toast.success('Cập nhật thành công', { autoClose: 2000 });
         dispatch(getAllRoom());
         setVisibleDelete(false);
     }
@@ -264,6 +268,10 @@ function RoomManage() {
                             name="KindOfRoom"
                             id="KindOfRoom"
                             className="w-40 p-1 rounded"
+                            onChange={(e) => {
+                                setTimeout(() => setValueSearch1(KindOfRoom[e.target.options[e.target.selectedIndex].id].id), 1000);
+
+                            }}
 
                         >
                             {KindOfRoom.map((x, index) => (
@@ -297,9 +305,6 @@ function RoomManage() {
                                 <div className="flex justify-center gap-4">
                                     <Button
                                         color="gray"
-                                        onClick={() => {
-                                            handleDeleteById(room);
-                                        }}
                                     >
                                         <Link
                                             to={config.routes.createRoomManage}
@@ -360,6 +365,7 @@ function RoomManage() {
                         </thead>
                         <tbody>
                             {rooms
+                            .filter((x) => (x.kindOfRoom.id + "").toLowerCase().includes(valueSearch1))
                                 .filter((x) => (x.numberOfFloors.numberOfFloors + "").toLowerCase().includes(valueSearch))
                                 .map((x) => (
                                     <tr key={x.id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
@@ -428,7 +434,7 @@ function RoomManage() {
                                     <Button
                                         color="failure"
                                         onClick={() => {
-                                            handleDeleteById(room);
+                                            handleDeleteById();
                                         }}
                                     >
                                         Đồng ý
@@ -723,7 +729,7 @@ function RoomManage() {
                                             onClick={() => {
                                                 uploadImage(Room);
                                             }}
-                                            className="py-2 px-3 text-sm font-medium text-center text-white bg-lime-500 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                                            className="py-2 px-3 text-sm font-medium text-center text-white bg-blue-500 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                                         >
                                             <span className="mx-2">Update</span>
                                         </button>
