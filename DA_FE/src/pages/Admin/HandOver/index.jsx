@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Button, Modal } from 'flowbite-react';
 
 import { toast } from 'react-toastify';
+import authorServices from '~/services/authorServices';
 
 import { getAllPersonnel } from '~/app/reducers/personnel';
 import { useDispatch, useSelector } from 'react-redux';
@@ -50,6 +51,7 @@ function HandOver() {
     const [passwordReset, setPasswordReset] = useState('');
     const [handOver, setHandOver] = useState(objHandOver);
     const [resetHandOver, setResetHandOver] = useState(objResetHandOver);
+    const [currentUser, setCurrentUser] = useState();
     const personnels = useSelector((state) => state.personnel.personnels);
     const handOvers = useSelector((state) => state.handOver.handOvers);
     const { totalCash, totalCard, totalDeposits } = useSelector((state) => state.handOverBill);
@@ -66,6 +68,7 @@ function HandOver() {
         dispatch(getAllHandOver());
         dispatch(getAllHandOverBill());
         dispatch(getAllResetHandOver());
+        authorServices.currentUser().then((res) => setCurrentUser(res));
         setNow(new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 19));
         // eslint-disable-next-line
     }, []);
@@ -101,7 +104,7 @@ function HandOver() {
     function handleDispatch() {
         const receiverDefault = personnels.filter(
             (x) =>
-                x.users.username !== userLogin.personnel?.users.username &&
+                x.users.username !== currentUser.users.username &&
                 x.users.roles.some((i) => i.name.includes('Nhân viên')),
         )[0];
         dispatch(
@@ -136,7 +139,7 @@ function HandOver() {
                 surcharge: 0,
                 moneyReal: 0,
                 moneyHandOver: 0,
-                note: `Đã nhận ca từ nhân viên ${userLogin.personnel.users.username} lúc ${formatDate(now)}`,
+                note: `Đã nhận ca từ nhân viên ${currentUser.users.username} lúc ${formatDate(now)}`,
                 moneyFirst: 500000,
                 status: 0,
             }),
@@ -178,7 +181,7 @@ function HandOver() {
         // check password receiver
         const receiverDefault = personnels.filter(
             (x) =>
-                x.users.username !== userLogin.personnel?.users.username &&
+                x.users.username !== currentUser.users.username &&
                 x.users.roles.some((i) => i.name.includes('Quản lý')),
         )[0];
         if (resetHandOver.receiver === '') {
@@ -189,7 +192,7 @@ function HandOver() {
                         totalMoney: handOver.moneyFirst + totalDeposits,
                         dateTimeStart: userLogin.dateTimeStart,
                         dateTimeEnd: formatDate(now),
-                        personnel: userLogin.personnel,
+                        personnel: currentUser,
                     }),
                 );
                 toast.success('Reset ca thành công', { autoClose: 2000 });
@@ -205,7 +208,7 @@ function HandOver() {
                         totalMoney: handOver.moneyFirst + totalDeposits,
                         dateTimeStart: userLogin.dateTimeStart,
                         dateTimeEnd: formatDate(now),
-                        personnel: userLogin.personnel,
+                        personnel: currentUser,
                     }),
                 );
                 toast.success('Reset ca thành công', { autoClose: 2000 });

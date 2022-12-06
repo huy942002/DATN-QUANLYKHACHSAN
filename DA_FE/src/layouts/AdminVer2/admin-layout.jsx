@@ -26,7 +26,7 @@ import {
 import { Modal, Button } from 'flowbite-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllHandOver } from '~/app/reducers/handOver';
-import { update } from '~/app/reducers/serviceType';
+import { update as updateHandOver } from '~/app/reducers/handOver';
 import { toast } from 'react-toastify';
 import { Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
@@ -72,7 +72,14 @@ const AdminLayout = ({ children }) => {
     }
 
     function handleConfirm(data) {
-        dispatch(update({ ...userLogin, note: userLogin.note + '. ' + data.note, moneyReal: Number(data.moneyReal) }));
+        dispatch(
+            updateHandOver({
+                ...userLogin,
+                note: userLogin.note + '. ' + data.note,
+                moneyReal: Number(data.moneyReal),
+            }),
+        );
+        window.localStorage.setItem('isHandOver', false);
         toast.success('Nhận ca thành công', { autoClose: 2000 });
     }
 
