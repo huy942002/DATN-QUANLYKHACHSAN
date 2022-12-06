@@ -80,6 +80,7 @@ const AdminLayout = ({ children }) => {
             }),
         );
         window.localStorage.setItem('isHandOver', false);
+        window.location.reload();
         toast.success('Nhận ca thành công', { autoClose: 2000 });
     }
 
@@ -118,23 +119,29 @@ const AdminLayout = ({ children }) => {
                                 {
                                     key: '5',
                                     // icon: <UploadOutlined />,
+                                    label: 'Quản lý loại phòng',
+                                    onClick: () => navigate('/admin/kind-of-room'),
+                                },
+                                {
+                                    key: '6',
+                                    // icon: <UploadOutlined />,
                                     label: 'Quản lý nhân viên',
                                     onClick: () => navigate('/admin/personnel-manage'),
                                 },
                                 {
-                                    key: '6',
+                                    key: '7',
                                     // icon: <UploadOutlined />,
                                     label: 'Quản lý khách hàng',
                                     onClick: () => navigate('/admin/customer-manage'),
                                 },
                                 {
-                                    key: '7',
+                                    key: '8',
                                     // icon: <UploadOutlined />,
                                     label: 'Quản lý dịch vụ',
                                     onClick: () => navigate('/admin/service-manage'),
                                 },
                                 {
-                                    key: '8',
+                                    key: '9',
                                     // icon: <UploadOutlined />,
                                     label: 'Hóa đơn',
                                     // onClick: () => setCollapsed(!collapsed),
@@ -142,24 +149,24 @@ const AdminLayout = ({ children }) => {
                             ],
                         },
                         {
-                            key: '9',
+                            key: '10',
                             icon: <FontAwesomeIcon icon={faArrowsRotate}></FontAwesomeIcon>,
                             label: 'Giao ca',
                             children: [
                                 {
-                                    key: '10',
+                                    key: '11',
                                     // icon: <UploadOutlined />,
                                     label: 'Giao ca',
                                     onClick: () => navigate('/admin/hand-over'),
                                 },
                                 {
-                                    key: '11',
+                                    key: '12',
                                     // icon: <UploadOutlined />,
                                     label: 'Lịch sử giao ca',
                                     onClick: () => navigate('/admin/hand-over-manage'),
                                 },
                                 {
-                                    key: '12',
+                                    key: '13',
                                     // icon: <UploadOutlined />,
                                     label: 'Lịch sử',
                                     onClick: () => navigate('/admin/history'),
@@ -168,23 +175,24 @@ const AdminLayout = ({ children }) => {
                         },
 
                         {
-                            key: '13',
+                            key: '14',
                             icon: <FontAwesomeIcon icon={faListCheck} />,
                             label: 'Thống kê',
                             // onClick: () => setCollapsed(!collapsed),
                         },
                         {
-                            key: '14',
+                            key: '15',
                             icon: <FontAwesomeIcon icon={faShield} />,
                             label: 'Phân quyền',
                             onClick: () => navigate('/admin/authorization'),
                         },
                         {
-                            key: '15',
+                            key: '16',
                             icon: <FontAwesomeIcon icon={faRightFromBracket} />,
                             label: 'Đăng xuất',
                             onClick: () => {
                                 navigate('/admin/login');
+                                window.localStorage.setItem('isHandOver', false);
                             },
                         },
                     ]}

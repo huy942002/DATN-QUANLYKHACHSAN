@@ -29,18 +29,18 @@ const slice = createSlice({
             const now = new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000)
                 .toISOString()
                 .replace('T', ' ')
-                .slice(0, 19);
+                .slice(0, 16);
             const dateOfLogin = window.localStorage.getItem('dateTimeStart'); // dateTimeStart từ hand-over của user login
             state.loading = false;
-            state.bills = action.payload.filter((x) => x.status === 1);
+            state.bills = action.payload.filter((x) => x.status === 2);
             state.bills
-                .filter((x) => dateOfLogin <= x.dateOfPayment <= now)
+                .filter((x) => dateOfLogin <= x.dateOfPayment && x.dateOfPayment <= now)
                 .map((x) => (state.totalCash += x.totalCash));
             state.bills
-                .filter((x) => dateOfLogin <= x.dateOfPayment <= now)
+                .filter((x) => dateOfLogin <= x.dateOfPayment && x.dateOfPayment <= now)
                 .map((x) => (state.totalCard += x.totalCard));
             state.bills
-                .filter((x) => dateOfLogin <= x.hireDate && x.checkOutDay <= now)
+                .filter((x) => dateOfLogin <= x.hireDate && x.hireDate <= now)
                 .map((x) => (state.totalDeposits += x.deposits));
             state.error = '';
         });

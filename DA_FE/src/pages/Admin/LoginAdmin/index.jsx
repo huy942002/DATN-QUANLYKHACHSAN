@@ -38,7 +38,6 @@ function LoginAdmin() {
         dispatch(getAllHandOver());
         window.localStorage.removeItem('token');
         window.localStorage.removeItem('username');
-        window.localStorage.setItem('isHandOver', false);
         // eslint-disable-next-line
     }, []);
     const handleLogin = async (data) => {

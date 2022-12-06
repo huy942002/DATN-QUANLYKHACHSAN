@@ -19,6 +19,7 @@ const routes = {
     signup: '/signup',
     notfound: '/*',
     roomPlan: '/admin/room-plan',
+    kindOfRoom: '/admin/kind-of-room',
     rentalManage: '/admin/rental-manage/:type/:idRoomChoose',
     booking: '/booking',
 };

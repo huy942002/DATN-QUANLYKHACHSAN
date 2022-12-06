@@ -170,6 +170,7 @@ function HandOver() {
             } else {
                 refNote.current.style.borderColor = 'rgb(209 213 219)';
                 handleDispatch();
+                navigate('/admin/login');
                 window.localStorage.setItem('isHandOver', true);
                 toast.success('Giao ca thành công', { autoClose: 2000 });
             }

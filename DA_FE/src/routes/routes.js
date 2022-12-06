@@ -12,6 +12,7 @@ import RentalTypes from '~/pages/Admin/RentalTypeManage';
 import CustomerManage from '~/pages/Admin/CustomerManage';
 import HandOverManage from '~/pages/Admin/HandOverManage';
 import Nationality from '~/pages/Admin/NationalityManage';
+import KindOfRoomManage from '~/pages/Admin/KindOfRoomManage';
 import Signup from '~/pages/Signup';
 import Notfound from '~/pages/Notfound';
 import SearchRoom from '~/pages/Customer/SearchRoom';
@@ -49,6 +50,7 @@ const privateRoutes = [
     { path: config.routes.createRoomManage, component: CreateRoomManage },
     { path: config.routes.createOptionRoomManage, component: CreateOptionRoomManage },
     { path: config.routes.handOverManage, component: HandOverManage },
+    { path: config.routes.kindOfRoom, component: KindOfRoomManage },
     { path: config.routes.nationality, component: Nationality },
     { path: config.routes.rentalTypeManage, component: RentalTypes },
     { path: config.routes.authorization, component: Authorization },
