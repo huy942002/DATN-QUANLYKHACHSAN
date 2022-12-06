@@ -114,7 +114,7 @@ function RoomDetail() {
                         ))}
 
                     </div>
-                    <h5 className="font-bold text-xl text-red-500 mt-6">Giá phòng : {room?.kindOfRoom?.prices_by_day || ''} \1 Đêm</h5>
+                    <h5 className="font-bold text-xl text-red-500 mt-6">Giá phòng : {room?.kindOfRoom?.priceByDay || ''} \1 Đêm</h5>
 
                 </div>
                 <div className="border-2 border-slate-200 rounded-md p-5">

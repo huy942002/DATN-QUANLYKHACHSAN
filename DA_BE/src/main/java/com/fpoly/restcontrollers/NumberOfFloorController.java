@@ -3,6 +3,7 @@
  */
 package com.fpoly.restcontrollers;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,12 @@ public class NumberOfFloorController {
 	@GetMapping
 	public ResponseEntity<Iterable<NumberOfFloors>> getAllNumberOfFloor() {
 		return new ResponseEntity<>(repository.findAll(), HttpStatus.OK);
+	}
+
+	@GetMapping("/last")
+	public ResponseEntity<NumberOfFloors> getOneNumberOfFloor() {
+		List<NumberOfFloors> numOptional = (List<NumberOfFloors>) repository.findAll();
+		return new ResponseEntity<>(numOptional.get(numOptional.size()-1), HttpStatus.OK);
 	}
 
 	// add new

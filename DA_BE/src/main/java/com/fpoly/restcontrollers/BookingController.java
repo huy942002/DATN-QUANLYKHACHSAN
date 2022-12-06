@@ -3,9 +3,12 @@
  */
 package com.fpoly.restcontrollers;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import com.fpoly.entities.Bills;
 import com.fpoly.entities.KindOfRoom;
@@ -15,6 +18,7 @@ import com.fpoly.repositories.repo.BillRepository;
 import com.fpoly.repositories.repo.BookingRepository;
 import com.fpoly.repositories.repo.RoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -28,6 +32,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fpoly.entities.Booking;
+import com.fpoly.config.Config;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  *
@@ -63,14 +70,20 @@ public class BookingController {
 	@Autowired
 	IPaymentTypeService repositoryPT;
 
+	@Autowired
+	HttpServletRequest req;
 	// getAll
-	@GetMapping
-	public ResponseEntity<Iterable<Booking>> getAllBooking() {
-		return new ResponseEntity<>(repository.findAll(), HttpStatus.OK);
+//	@GetMapping
+//	public ResponseEntity<Iterable<Booking>> getAllBooking() {
+//		return new ResponseEntity<>(repository.findAll(), HttpStatus.OK);
+//	}
+	@GetMapping("/status")
+	public ResponseEntity<Iterable<Booking>> getAllBookingByStatus() {
+		return new ResponseEntity<>(bkr.findByStatus(1), HttpStatus.OK);
 	}
 
-	@GetMapping("/{dateOfHire}/{checkOutDay}/{idKindOfRoom}")
-	public ResponseEntity<Iterable<Rooms>> SeachRoomBydateBooking(@PathVariable String dateOfHire, @PathVariable String checkOutDay, @PathVariable int idKindOfRoom) {
+	@GetMapping("/{dateOfHire}/{checkOutDay}/{idKindOfRoom}/{id}")
+	public ResponseEntity<Iterable<Rooms>> SeachRoomBydateBooking(@PathVariable String dateOfHire, @PathVariable String checkOutDay, @PathVariable int idKindOfRoom,@PathVariable Integer id) {
 		Optional<KindOfRoom> kindOptional = repositoryKindOfRoom.findById(idKindOfRoom);
 		int countRoom = rr.CountRoomByKindOfRoom(kindOptional);
 		System.out.println(countRoom);
@@ -85,9 +98,11 @@ public class BookingController {
 		}
 	}
 
-	@PostMapping("/{dateOfHire}/{checkOutDay}/{idKindOfRoom}/{id}")
-	public ResponseEntity<Booking> createNewBookingByctm(@PathVariable String dateOfHire, @PathVariable String checkOutDay, @PathVariable int idKindOfRoom ,@PathVariable Integer id) {
+	@GetMapping("add/{dateOfHire}/{checkOutDay}/{idKindOfRoom}/{id}/{name}/{number}/{email}/{citizenIdCode}/{Deposits}")
+	public ResponseEntity<Booking> createNewBookingByctm(@PathVariable String dateOfHire, @PathVariable String checkOutDay, @PathVariable int idKindOfRoom ,@PathVariable Integer id, @PathVariable String name, @PathVariable String number, @PathVariable String email, @PathVariable String citizenIdCode, @PathVariable String Deposits) {
+
 		Bills bill = new Bills();
+		bill.setDeposits(Double.parseDouble(Deposits));
 		bill.setCustomer(repositoryCTM.findById(id).get());
 		bill.setStatus(1);
 		bill.setPaymentType(repositoryPT.findById(1).get());
@@ -97,6 +112,10 @@ public class BookingController {
 
 		Optional<KindOfRoom> kindOptional = repositoryKindOfRoom.findById(idKindOfRoom);
 		Booking booking = new Booking();
+		booking.setName(name);
+		booking.setEmail(email);
+		booking.setPhoneNumber(number);
+		booking.setCitizenIdCode(citizenIdCode);
 		booking.setBills(listBill.get(listBill.size()-1));
 		booking.setDateOfHire(LocalDate.parse(dateOfHire));
 		booking.setCheckOutDay(LocalDate.parse(checkOutDay));
@@ -104,8 +123,8 @@ public class BookingController {
 		booking.setTimeOut("12h");
 		booking.setKindOfRoom(kindOptional.get());
 		booking.setStatus(1);
-
-		return new ResponseEntity<>(repository.save(booking), HttpStatus.OK);
+		repository.save(booking);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	// add new

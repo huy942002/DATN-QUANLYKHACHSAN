@@ -22,5 +22,6 @@ const routes = {
     kindOfRoom: '/admin/kind-of-room',
     rentalManage: '/admin/rental-manage/:type/:idRoomChoose',
     booking: '/booking',
+    bookingmanage: '/admin/booking-manage'
 };
 export default routes;

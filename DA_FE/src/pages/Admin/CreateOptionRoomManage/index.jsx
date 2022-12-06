@@ -29,8 +29,8 @@ const objRoom = {
         id: '',
         name: '',
         note: '',
-        prices_by_day: '',
-        hourly_prices: '',
+        priceByDay: '',
+        hourlyPrice: '',
         status: ''
     },
     numberOfFloors: {
@@ -52,42 +52,46 @@ const NumberOfFloorss = {
 
 const obj = {
     id: '',
-    quantity: '',
-    prices: '',
-    status: '',
-    rooms: {
+    ServiceAvailables: {
         id: '',
-        name: '',
-        note: '',
-        img: '',
-        img1: '',
-        img2: '',
-        img3: '',
-        status: '',
-        kindOfRoom: {
+        quantity: '',
+        prices: '',
+        status: 1,
+        rooms: {
             id: '',
             name: '',
             note: '',
-            prices_by_day: '',
-            hourly_prices: '',
-            status: ''
+            img: '',
+            img1: '',
+            img2: '',
+            img3: '',
+            status: '',
+            kindOfRoom: {
+                id: '',
+                name: '',
+                note: '',
+                priceByDay: '',
+                hourlyPrice: '',
+                status: ''
+            },
+            numberOfFloors: {
+                id: '',
+                numberOfFloors: '',
+                status: ''
+            }
         },
-        numberOfFloors: {
-            id: '',
-            numberOfFloors: '',
-            status: ''
-        }
-    },
-    servicess: {
-        id: '',
-        name: '',
-        note: '',
-        status: '',
-        serviceType: {
+        servicess: {
             id: '',
             name: '',
+            prices: '',
             note: '',
-            status: ''
+            status: '',
+            serviceType: {
+                id: '',
+                name: '',
+                note: '',
+                status: ''
+            }
         }
     }
 }
@@ -106,6 +110,7 @@ function CreateOptionRoomManager() {
     const services = useSelector((state) => state.service.services);
     const [FacilitieDetails, setFacilitieDetails] = useState([]);
     const [ServiceAvailable, setServiceAvailable] = useState([]);
+    const [ServiceAvailableUD, setServiceAvailableUD] = useState([obj]);
     const [data2, setData] = useState(dataOption);
     const [NumberOfFlooradd, setNumberOfFloor] = useState(NumberOfFloorss);
     const [image, setImage] = useState("");
@@ -142,8 +147,8 @@ function CreateOptionRoomManager() {
                     id: '',
                     name: '',
                     note: '',
-                    prices_by_day: '',
-                    hourly_prices: '',
+                    priceByDay: '',
+                    hourlyPrice: '',
                     status: ''
                 },
                 numberOfFloors: {
@@ -191,8 +196,8 @@ function CreateOptionRoomManager() {
                     id: '',
                     name: '',
                     note: '',
-                    prices_by_day: '',
-                    hourly_prices: '',
+                    priceByDay: '',
+                    hourlyPrice: '',
                     status: ''
                 },
                 numberOfFloors: {
@@ -225,8 +230,8 @@ function CreateOptionRoomManager() {
         }
         else {
             console.log(parseInt(NumberOfFloor.numberOfFloors) + 1);
-            console.log({ ...NumberOfFlooradd, numberOfFloors: parseInt(NumberOfFloor.numberOfFloors) + 1});
-            dispatch(AddNBF({ ...NumberOfFlooradd, numberOfFloors: parseInt(NumberOfFloor.numberOfFloors) + 1}));
+            console.log({ ...NumberOfFlooradd, numberOfFloors: parseInt(NumberOfFloor.numberOfFloors) + 1 });
+            dispatch(AddNBF({ ...NumberOfFlooradd, numberOfFloors: parseInt(NumberOfFloor.numberOfFloors) + 1 }));
             const data = new FormData()
             data.append("file", image)
             data.append("upload_preset", "datnqlks")
@@ -344,20 +349,14 @@ function CreateOptionRoomManager() {
             }
         }).catch(err => {
             setTimeout(() => {
-                
+
             }, 1000);
         }).finally(() => {
 
         });
 
-        
+
     };
-
-
-
-    function addFSV() {
-
-    }
 
     function getModal() {
         setVisibleAdd(true);
@@ -367,13 +366,13 @@ function CreateOptionRoomManager() {
         setVisibleAdd2(true);
     }
 
-    const updateSL = (id1, sl2) => {
-        if (sl2 <= 0) {
+    const updateSL = (id1, sl) => {
+        if (sl <= 0) {
             toast.error('Lỗi', { autoClose: 2000 })
         } else {
-            let array = [...ServiceAvailable];
+            let array = [...ServiceAvailableUD];
             array.map((o, i) => {
-                if (o.id === id1) array[i] = { id: id1, sl: sl2, name: o.name };
+                if (o.id === id1) array[i] = { id: id1, ServiceAvailables: { quantity: sl } };
             });
 
             setServiceAvailable([...array]);
@@ -493,8 +492,8 @@ function CreateOptionRoomManager() {
                                                     id: KindOfRoom[index].id,
                                                     name: KindOfRoom[index].name,
                                                     note: KindOfRoom[index].note,
-                                                    prices_by_day: KindOfRoom[index].prices_by_day,
-                                                    hourly_prices: KindOfRoom[index].hourly_prices,
+                                                    priceByDay: KindOfRoom[index].priceByDay,
+                                                    hourlyPrice: KindOfRoom[index].hourlyPrice,
                                                     status: KindOfRoom[index].status,
                                                 },
                                             });
@@ -504,8 +503,8 @@ function CreateOptionRoomManager() {
                                                     id: KindOfRoom[index].id,
                                                     name: KindOfRoom[index].name,
                                                     note: KindOfRoom[index].note,
-                                                    prices_by_day: KindOfRoom[index].prices_by_day,
-                                                    hourly_prices: KindOfRoom[index].hourly_prices,
+                                                    priceByDay: KindOfRoom[index].priceByDay,
+                                                    hourlyPrice: KindOfRoom[index].hourlyPrice,
                                                     status: KindOfRoom[index].status,
                                                 },
                                             });
@@ -530,7 +529,7 @@ function CreateOptionRoomManager() {
                                     <input
                                         type="number"
                                         id=""
-                                        defaultValue={Room?.kindOfRoom?.prices_by_day || ''}
+                                        defaultValue={Room?.kindOfRoom?.priceByDay || ''}
                                         className="w-40 p-1 rounded"
                                         placeholder=""
                                     /></div>
@@ -543,7 +542,7 @@ function CreateOptionRoomManager() {
                                     <input
                                         type="number"
                                         id=""
-                                        defaultValue={Room?.kindOfRoom?.hourly_prices || ''}
+                                        defaultValue={Room?.kindOfRoom?.hourlyPrice || ''}
                                         className="w-40 p-1 rounded"
                                         placeholder=""
                                     /></div>

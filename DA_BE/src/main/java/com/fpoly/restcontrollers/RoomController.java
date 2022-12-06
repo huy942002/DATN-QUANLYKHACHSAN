@@ -75,15 +75,15 @@ public class RoomController {
 		List<Rooms> listRoom = new ArrayList<>();
 		for (int i = 1; i < SLRoom + 1; i++) {
 			Rooms r = new Rooms();
-			r.setKindOfRoom(room.getRooms().getKindOfRoom());
-			r.setNote(room.getRooms().getNote());
-//				r.setImg(room.getImg());
-// 				r.setImg1(room.getImg1());
-// 				r.setImg2(room.getImg2());
-// 				r.setImg3(room.getImg3());
-			r.setStatus(1);
-			r.setName(room.getRooms().getName() + n.get(n.size() - 1).getNumberOfFloors() + "0" + i);
-			r.setNumberOfFloors(n.get(n.size() - 1));
+				r.setKindOfRoom(room.getRooms().getKindOfRoom());
+				r.setNote(room.getRooms().getNote());
+				r.setImg("https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg");
+				r.setImg("https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg");
+				r.setImg("https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg");
+				r.setImg("https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg");
+				r.setStatus(1);
+				r.setName(room.getRooms().getName() + n.get(n.size() - 1).getNumberOfFloors() + "0" + i);
+				r.setNumberOfFloors(n.get(n.size() - 1));
 			listRoom.add(r);
 		}
 		roomRepo.saveAll(listRoom);
@@ -92,9 +92,11 @@ public class RoomController {
 		List<FacilitiesDetails> facilitiesDetailsList = new ArrayList<>();
 		for (int i = 1; i < SLRoom + 2; i++) {
 			for (FacilitiesDetails facilitiesDetailsDTO : room.getFacilitiesDetailsList()){
-				System.out.println(listRoomnew.get(listRoomnew.size()-i).getId()+"???????????????????????????");
-				facilitiesDetailsDTO.setRooms(listRoomnew.get(listRoomnew.size()-i));
-				facilitiesDetailsList.add(facilitiesDetailsDTO);
+				FacilitiesDetails f = new FacilitiesDetails();
+				f.setRooms(listRoomnew.get(listRoomnew.size()-i));
+				f.setStatus(facilitiesDetailsDTO.getStatus());
+				f.setFacilities(facilitiesDetailsDTO.getFacilities());
+				facilitiesDetailsList.add(f);
 			}
 
 		}
@@ -107,10 +109,13 @@ public class RoomController {
 		for (int i = 1; i < SLRoom + 2; i++) {
 
 			for (ServiceAvailable serviceAvailableDTO : room.getServiceAvailableList()){
-//				serviceAvailableDTO.setId();
-				System.out.println(listRoomnew.get(listRoomnew.size()-i).getId()+"???????????????????????????");
-				serviceAvailableDTO.setRooms(listRoomnew.get(listRoomnew.size()-i));
-				serviceAvailableList.add(serviceAvailableDTO);
+ 				ServiceAvailable s = new ServiceAvailable();
+				s.setRooms(listRoomnew.get(listRoomnew.size()-i));
+				s.setPrices(serviceAvailableDTO.getPrices());
+				s.setQuantity(serviceAvailableDTO.getQuantity());
+				s.setServicess(serviceAvailableDTO.getServicess());
+				s.setStatus(serviceAvailableDTO.getStatus());
+				serviceAvailableList.add(s);
 			}
 
 		}

@@ -21,21 +21,23 @@ const objRoom = {
     name: '',
     note: '',
     img: '',
+    img1: '',
+    img2: '',
+    img3: '',
     status: '',
     kindOfRoom: {
         id: '',
         name: '',
         note: '',
-        prices_by_day: '',
-        hourly_prices: '',
+        priceByDay: '',
+        hourlyPrice: '',
         status: ''
     },
     numberOfFloors: {
         id: '',
-        numberOfFloors: '',
+        numberOfFloors: 0,
         status: ''
     }
-
 };
 
 function CreateRoomManager() {
@@ -64,13 +66,13 @@ function CreateRoomManager() {
         console.log(FacilitieDetails);
     };
 
-    const updateSL =(id1,sl2) =>{
+    const updateSL = (id1, sl2) => {
         let array = [...ServiceAvailable];
         array.map((o, i) => {
-            if (o.id === id1) array[i] = { id: id1, sl:sl2 , name: o.name};
-          });
+            if (o.id === id1) array[i] = { id: id1, sl: sl2, name: o.name };
+        });
 
-          setServiceAvailable([...array]);
+        setServiceAvailable([...array]);
     }
 
     function deleteItem(id) {
@@ -86,7 +88,7 @@ function CreateRoomManager() {
     function uploadImage(data2) {
         if (data2.name === '') {
             toast.error("Bạn chưa điền tên phòng!", { autoClose: 2000 })
-        }else {
+        } else {
             const data = new FormData()
             data.append("file", image)
             data.append("upload_preset", "datnqlks")
@@ -118,17 +120,17 @@ function CreateRoomManager() {
         setRoomAdd(data);
         if (roomAdd.kindOfRoom.id === '') {
 
-            dispatch(addRoom({ ...roomAdd, kindOfRoom: KindOfRoom[0], img: url2 , status: 1}));
+            dispatch(addRoom({ ...roomAdd, kindOfRoom: KindOfRoom[0], img: url2, status: 1 }));
         } else if (roomAdd.numberOfFloors.id === '') {
 
-            dispatch(addRoom({ ...roomAdd, numberOfFloors: NumberOfFloors[0], img: url2 , status: 1}));
+            dispatch(addRoom({ ...roomAdd, numberOfFloors: NumberOfFloors[0], img: url2, status: 1 }));
         }
         else if (roomAdd.note === '') {
 
-            dispatch(addRoom({ ...roomAdd, note: '', img: url2 , status: 1}));
+            dispatch(addRoom({ ...roomAdd, note: '', img: url2, status: 1 }));
         }
         else {
-            dispatch(addRoom({ ...roomAdd, img: url2 , status: 1}));
+            dispatch(addRoom({ ...roomAdd, img: url2, status: 1 }));
         }
 
         if (FacilitieDetails.length !== 0) {
@@ -211,101 +213,102 @@ function CreateRoomManager() {
                                     className="w-96 p-1 rounded"
                                 />
                             </div>
-                            <div className="grid grid-cols-2 mt-8 text-black">
-                                <div>
-                                    <span className="mr-3 font-bold">Loại phòng :</span>
-                                    <select
-                                        name="KindOfRoom"
-                                        id="KindOfRoom"
-                                        className="w-40 p-1 rounded"
-                                        onChange={(e) => {
-                                            const index = e.target.options[e.target.selectedIndex].id;
-                                            setRoomAdd({
-                                                ...roomAdd,
-                                                kindOfRoom: {
-                                                    id: KindOfRoom[index].id,
-                                                    name: KindOfRoom[index].name,
-                                                    note: KindOfRoom[index].note,
-                                                    prices_by_day: KindOfRoom[index].prices_by_day,
-                                                    hourly_prices: KindOfRoom[index].hourly_prices,
-                                                    status: KindOfRoom[index].status,
-                                                },
-                                            });
-                                            setRoom({...Room,
-                                                kindOfRoom: {
-                                                    id: KindOfRoom[index].id,
-                                                    name: KindOfRoom[index].name,
-                                                    note: KindOfRoom[index].note,
-                                                    prices_by_day: KindOfRoom[index].prices_by_day,
-                                                    hourly_prices: KindOfRoom[index].hourly_prices,
-                                                    status: KindOfRoom[index].status,
-                                                },});
-                                        }}
-                                    >
-                                        {KindOfRoom.map((x, index) => (
-                                            <option key={x.id} value={x.name} id={index}>
-                                                {x.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <button type="button" className="" >
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                                    </button>
-                                </div>
-                                <div>
-                                    <span className="ml-3 mr-3 font-bold">Tầng :</span>
-                                    <select
-                                        name="numberOfFloors"
-                                        id="numberOfFloors"
-                                        className="w-40 p-1 rounded"
-                                        onChange={(e) => {
-                                            const index = e.target.options[e.target.selectedIndex].id;
-                                            setRoomAdd({
-                                                ...roomAdd,
-                                                numberOfFloors: {
-                                                    id: NumberOfFloors[index].id,
-                                                    numberOfFloors: NumberOfFloors[index].name,
-                                                    status: NumberOfFloors[index].status
-                                                },
-                                            });
-                                        }}                                >
-                                        {NumberOfFloors.map((n, index) => (
-                                            <option key={n.id} value={n.numberOfFloors} id={index}>
-                                                {n.numberOfFloors}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <button type="button" className="" >
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                                    </button>
-                                </div>
+
+                            <div className='mt-4'>
+                                <span className="mr-3 mt-4 font-bold">Loại phòng :</span>
+                                <select
+                                    name="KindOfRoom"
+                                    id="KindOfRoom"
+                                    className="w-40 p-1 rounded"
+
+                                    onChange={(e) => {
+                                        const index = e.target.options[e.target.selectedIndex].id;
+                                        setRoomAdd({
+                                            ...roomAdd,
+                                            kindOfRoom: {
+                                                id: KindOfRoom[index].id,
+                                                name: KindOfRoom[index].name,
+                                                note: KindOfRoom[index].note,
+                                                priceByDay: KindOfRoom[index].priceByDay,
+                                                hourlyPrice: KindOfRoom[index].hourlyPrice,
+                                                status: KindOfRoom[index].status,
+                                            },
+                                        });
+                                        setRoom({
+                                            ...Room,
+                                            kindOfRoom: {
+                                                id: KindOfRoom[index].id,
+                                                name: KindOfRoom[index].name,
+                                                note: KindOfRoom[index].note,
+                                                priceByDay: KindOfRoom[index].priceByDay,
+                                                hourlyPrice: KindOfRoom[index].hourlyPrice,
+                                                status: KindOfRoom[index].status,
+                                            },
+                                        });
+                                    }}
+                                >
+                                    {KindOfRoom.map((x, index) => (
+                                        <option key={x.id} value={x.name} id={index}>
+                                            {x.name}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
+
+                            <div className='mt-4'>
+                                <span className="mr-3 font-bold">Tầng :</span>
+                                <select
+                                    name="numberOfFloors"
+                                    id="numberOfFloors"
+                                    className="w-40 p-1 rounded"
+                                    onChange={(e) => {
+                                        const index = e.target.options[e.target.selectedIndex].id;
+                                        setRoomAdd({
+                                            ...roomAdd,
+                                            numberOfFloors: {
+                                                id: NumberOfFloors[index].id,
+                                                numberOfFloors: NumberOfFloors[index].name,
+                                                status: NumberOfFloors[index].status
+                                            },
+                                        });
+                                    }}                                >
+                                    {NumberOfFloors.map((n, index) => (
+                                        <option key={n.id} value={n.numberOfFloors} id={index}>
+                                            {n.numberOfFloors}
+                                        </option>
+                                    ))}
+                                </select>
+                                <button type="button" className="" >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                                </button>
+                            </div>
+
 
                             <div className="grid grid-cols-2 mt-8 text-black">
                                 <div><label
                                     htmlFor=""
-                                    className="mb-2 mt-8 mr-9 text-gray-900 dark:text-gray-300 font-bold"
+                                    className="mb-2 mt-8 mr-6 text-gray-900 dark:text-gray-300 font-bold"
                                 >
                                     Giá Tiền Theo Ngày:
                                 </label>
                                     <input
                                         type="number"
                                         id=""
-                                        defaultValue={Room?.kindOfRoom?.prices_by_day || ''}
-                                        className="w-64 p-1 rounded"
+                                        defaultValue={Room?.kindOfRoom?.priceByDay || ''}
+                                        className="w-40 p-1 rounded"
                                         placeholder=""
                                     /></div>
                                 <div><label
                                     htmlFor=""
-                                    className="mb-2 mt-8 mr-9 text-gray-900 dark:text-gray-300 font-bold"
+                                    className="mb-2 mt-8 mr-6 text-gray-900 dark:text-gray-300 font-bold"
                                 >
-                                    Giá Tiền Theo Giờ:
+                                    Giá Tiền Theo Giờ :
                                 </label>
                                     <input
                                         type="number"
                                         id=""
-                                        defaultValue={Room?.kindOfRoom?.hourly_prices || ''}
-                                        className="w-64 p-1 rounded"
+                                        defaultValue={Room?.kindOfRoom?.hourlyPrice || ''}
+                                        className="w-40 p-1 rounded"
                                         placeholder=""
                                     /></div>
                             </div>
@@ -353,9 +356,9 @@ function CreateRoomManager() {
                                 <div className="grid gap-x-8 gap-y-4 grid-cols-3 items-center pl-3">
                                     {ServiceAvailable.map((s) => (
                                         <div key={s.id} id="toast-default" className="flex items-center p-4 w-full max-w-xs text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800" role="alert">
-                                            <input id="vue-checkbox-list" type="number" value={s.sl} 
-                                            onChange={(e) => updateSL(s.id,e.target.value)} 
-                                            className="w-24 h-8 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500" />
+                                            <input id="vue-checkbox-list" type="number" value={s.sl}
+                                                onChange={(e) => updateSL(s.id, e.target.value)}
+                                                className="w-24 h-8 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500" />
                                             <label htmlFor="vue-checkbox-list" className="py-3 ml-2 w-full text-sm font-medium text-gray-900 dark:text-gray-300">{s.name}</label>
                                             <button type="button" onClick={() => deleteItem2(s.id)} className="ml-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" data-dismiss-target="#toast-default" aria-label="Close">
                                                 <svg aria-hidden="true" className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd"
@@ -414,7 +417,7 @@ function CreateRoomManager() {
                                     onClick={() => {
                                         uploadImage(roomAdd);
                                     }}
-                                    className="py-2 px-3 text-sm font-medium text-center text-white bg-lime-500 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                                    className="py-2 px-3 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                                 >
                                     <span className="mx-2">THÊM</span>
                                 </button>
@@ -447,7 +450,7 @@ function CreateRoomManager() {
                                                     {fs.name}
                                                 </td>
                                                 <td className="py-4 px-6 ">
-                                                    <label htmlFor="" className="rounded-full dark:text-gpy-2 px-3 text-sm font-medium text-white bg-lime-500"></label>
+                                                    <label htmlFor="" className="rounded-full dark:text-gpy-2 px-3 text-sm font-medium text-white bg-blue-700"></label>
                                                 </td>
                                                 <td className="py-4 px-6">
                                                     <button
@@ -456,7 +459,7 @@ function CreateRoomManager() {
                                                         onClick={() => {
                                                             addFacilitieDetails(fs.id, fs.name)
                                                         }}
-                                                        className="py-2 px-3 text-sm font-medium text-center text-white bg-lime-500 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                                                        className="py-2 px-3 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                                                     >
                                                         <span className="mx-2">Add</span>
                                                     </button>
@@ -487,9 +490,6 @@ function CreateRoomManager() {
                                                 PRICES
                                             </th>
                                             <th scope="col" className="py-3 px-6">
-                                                STATUS
-                                            </th>
-                                            <th scope="col" className="py-3 px-6">
                                                 ACTION
                                             </th>
                                         </tr>
@@ -506,9 +506,6 @@ function CreateRoomManager() {
                                                 <td scope="row" className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                                     {s.prices}
                                                 </td>
-                                                <td className="py-4 px-6 ">
-                                                    <label htmlFor="" className="rounded-full dark:text-gpy-2 px-3 text-sm font-medium text-white bg-lime-500"></label>
-                                                </td>
                                                 <td className="py-4 px-6">
                                                     <button
                                                         value={s}
@@ -516,7 +513,7 @@ function CreateRoomManager() {
                                                         onClick={() => {
                                                             addServiceAvailable(s.id, s.name, 1)
                                                         }}
-                                                        className="py-2 px-3 text-sm font-medium text-center text-white bg-lime-500 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                                                        className="py-2 px-3 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                                                     >
                                                         <span className="mx-2">Add</span>
                                                     </button>
@@ -529,8 +526,8 @@ function CreateRoomManager() {
                         </Modal.Body>
                     </Modal>
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }
 export default CreateRoomManager;
