@@ -11,7 +11,7 @@ import { toast } from 'react-toastify';
 
 import { add, getAllKindOfRoom, getKindOfRoomById, update } from '~/app/reducers/kindOfRoom';
 
-const objServiceType = {
+const objKindOfRoom = {
     name: '',
     priceByDay: '',
     hourlyPrice: '',
@@ -19,7 +19,7 @@ const objServiceType = {
     status: '',
 };
 
-const ServiceTypeSchema = Yup.object().shape({
+const KindOfRoomSchema = Yup.object().shape({
     name: Yup.string().required('Loại phòng không được để trống'),
     priceByDay: Yup.number().typeError('Giá theo ngày phải là số').required('Giá theo ngày không được để trống'),
     hourlyPrice: Yup.number().typeError('Giá theo giờ phải là số').required('Giá theo giờ không được để trống'),
@@ -32,16 +32,16 @@ function KindOfRoomManage() {
     const [visibleUpdateType, setVisibleUpdateType] = useState(false);
     const [visibleAddType, setVisibleAddType] = useState(false);
     const [valueSearch2, setValueSearch2] = useState('');
-    const [serviceTypes, setServiceTypes] = useState(objServiceType);
+    const [kindOfRooms, setKindOfRoom] = useState(objKindOfRoom);
     const kindOfRoom = useSelector((state) => state.kindOfRoom.kindOfRoom);
-    const serviceTypee = useSelector((state) => state.serviceType.serviceType);
+    const kindRoom = useSelector((state) => state.kindOfRoom.kindRoom);
     const dispatch = useDispatch();
 
     useEffect(() => {
         dispatch(getAllKindOfRoom());
-        setServiceTypes(serviceTypee);
+        setKindOfRoom(kindRoom);
         // eslint-disable-next-line
-    }, [serviceTypee]);
+    }, [kindRoom]);
 
     function openAddType() {
         setVisibleAddType(true);
@@ -58,8 +58,8 @@ function KindOfRoomManage() {
     }
 
     function handleDeleteByIdType() {
-        setServiceTypes(serviceTypes);
-        dispatch(update({ ...serviceTypes, status: '0' }));
+        setKindOfRoom(kindOfRooms);
+        dispatch(update({ ...kindOfRooms, status: '0' }));
         toast.success('Xóa thành công', { autoClose: 2000 });
         setVisibleDeleteType(false);
     }
@@ -118,7 +118,7 @@ function KindOfRoomManage() {
                                 </th>
                                 <th scope="col" className="py-3 px-6">
                                     Giá theo ngày
-                                </th>{' '}
+                                </th>
                                 <th scope="col" className="py-3 px-6">
                                     Giá theo giờ
                                 </th>
@@ -201,11 +201,13 @@ function KindOfRoomManage() {
                                 <Formik
                                     enableReinitialize
                                     initialValues={{
-                                        ...serviceTypes,
-                                        name: serviceTypes.name || '',
-                                        note: serviceTypes.note || '',
+                                        ...kindOfRooms,
+                                        name: kindOfRooms.name || '',
+                                        priceByDay: kindOfRooms.priceByDay || '',
+                                        hourlyPrice: kindOfRooms.hourlyPrice || '',
+                                        note: kindOfRooms.note || '',
                                     }}
-                                    validationSchema={ServiceTypeSchema}
+                                    validationSchema={KindOfRoomSchema}
                                     onSubmit={(values) => {
                                         handleUpdateType(values);
                                     }}
@@ -218,7 +220,7 @@ function KindOfRoomManage() {
                                                         htmlFor="name"
                                                         className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
                                                     >
-                                                        Tên loại dịch vụ
+                                                        Tên loại dịch phòng
                                                     </label>
                                                     <Field
                                                         name="name"
@@ -274,8 +276,8 @@ function KindOfRoomManage() {
                         <Modal.Header />
                         <Modal.Body>
                             <Formik
-                                initialValues={objServiceType}
-                                validationSchema={ServiceTypeSchema}
+                                initialValues={objKindOfRoom}
+                                validationSchema={KindOfRoomSchema}
                                 onSubmit={(values) => {
                                     handleAddType(values);
                                 }}

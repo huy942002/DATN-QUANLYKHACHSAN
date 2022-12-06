@@ -75,6 +75,7 @@ const AdminLayout = ({ children }) => {
         dispatch(
             updateHandOver({
                 ...userLogin,
+                personnel: currentUser,
                 note: userLogin.note + '. ' + data.note,
                 moneyReal: Number(data.moneyReal),
             }),
