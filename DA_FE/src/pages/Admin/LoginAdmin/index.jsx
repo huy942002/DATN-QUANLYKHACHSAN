@@ -9,7 +9,10 @@ import axios from 'axios';
 import { faLock, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { getAllHandOver } from '~/app/reducers/handOver';
 
 const objLogin = {
     username: '',
@@ -24,8 +27,20 @@ const LoginSchema = Yup.object().shape({
 const url = 'http://localhost:8080/api/auth/login';
 
 function LoginAdmin() {
+    const handOvers = useSelector((state) => state.handOver.handOvers);
+    const userLogin = handOvers
+        .filter((x) => x.status === 0)
+        .reduce((prev, current) => (prev.dateTimeStart > current.dateTimeStart ? prev : current), {});
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
+    useEffect(() => {
+        dispatch(getAllHandOver());
+        window.localStorage.removeItem('token');
+        window.localStorage.removeItem('username');
+        window.localStorage.setItem('isHandOver', false);
+        // eslint-disable-next-line
+    }, []);
     const handleLogin = async (data) => {
         await axios
             .post(url, data)
@@ -33,6 +48,7 @@ function LoginAdmin() {
                 navigate('/admin/room-plan');
                 window.localStorage.setItem('token', res.headers.token);
                 window.localStorage.setItem('username', res.headers.username);
+                window.localStorage.setItem('dateTimeStart', userLogin.dateTimeStart);
                 window.location.reload();
             })
             .catch((error) => {

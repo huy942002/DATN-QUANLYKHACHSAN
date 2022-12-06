@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import config from '~/config';
 
 import { faCircleCheck, faClock } from '@fortawesome/free-regular-svg-icons';
@@ -55,6 +55,7 @@ function HandOver() {
     const { totalCash, totalCard, totalDeposits } = useSelector((state) => state.handOverBill);
     const { resetMoneyFromUserLogin } = useSelector((state) => state.resetHandOver);
     const dispatch = useDispatch();
+    const navigate = new useNavigate();
     const userLogin = handOvers
         .filter((x) => x.status === 0)
         .reduce((prev, current) => (prev.dateTimeStart > current.dateTimeStart ? prev : current), {});
@@ -62,8 +63,8 @@ function HandOver() {
 
     useEffect(() => {
         dispatch(getAllPersonnel());
-        dispatch(getAllHandOverBill());
         dispatch(getAllHandOver());
+        dispatch(getAllHandOverBill());
         dispatch(getAllResetHandOver());
         setNow(new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 19));
         // eslint-disable-next-line
@@ -154,6 +155,8 @@ function HandOver() {
             } else {
                 refNote.current.style.borderColor = 'rgb(209 213 219)';
                 handleDispatch();
+                navigate('/admin/login');
+                window.localStorage.setItem('isHandOver', true);
                 toast.success('Giao ca thành công', { autoClose: 2000 });
             }
         } else {
@@ -164,6 +167,7 @@ function HandOver() {
             } else {
                 refNote.current.style.borderColor = 'rgb(209 213 219)';
                 handleDispatch();
+                window.localStorage.setItem('isHandOver', true);
                 toast.success('Giao ca thành công', { autoClose: 2000 });
             }
         }

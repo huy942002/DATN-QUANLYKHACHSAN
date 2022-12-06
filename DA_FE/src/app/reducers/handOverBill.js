@@ -2,7 +2,6 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import http from '~/services/apiSevices';
 
 // Generates pending, fulfilled and rejected action types
-
 export const getAllHandOverBill = createAsyncThunk('hand-over-bill/getAllHandOver', () => {
     return http.httpGet('bill');
 });
@@ -12,7 +11,6 @@ const slice = createSlice({
     name: 'handOverBill',
     initialState: {
         bills: [],
-        handOvers: [],
         error: '',
         totalCash: 0,
         totalCard: 0,
@@ -20,7 +18,7 @@ const slice = createSlice({
         loading: false,
     },
     extraReducers: (builder) => {
-        // getAllHandOver
+        // getAllHandOver Bill
         builder.addCase(getAllHandOverBill.pending, (state) => {
             state.totalCash = 0;
             state.totalCard = 0;
@@ -32,17 +30,14 @@ const slice = createSlice({
                 .toISOString()
                 .replace('T', ' ')
                 .slice(0, 19);
-            const userLogin = state.handOvers
-                .filter((x) => x.status === 0)
-                .reduce((prev, current) => (prev.dateTimeStart > current.dateTimeStart ? prev : current), {});
-            const dateOfLogin = '2022-10-13 00:00'; // dateTimeStart từ hand-over của user login
+            const dateOfLogin = window.localStorage.getItem('dateTimeStart'); // dateTimeStart từ hand-over của user login
             state.loading = false;
             state.bills = action.payload.filter((x) => x.status === 1);
             state.bills
-                .filter((x) => dateOfLogin <= x.hireDate && x.checkOutDay <= now)
+                .filter((x) => dateOfLogin <= x.dateOfPayment <= now)
                 .map((x) => (state.totalCash += x.totalCash));
             state.bills
-                .filter((x) => dateOfLogin <= x.hireDate && x.checkOutDay <= now)
+                .filter((x) => dateOfLogin <= x.dateOfPayment <= now)
                 .map((x) => (state.totalCard += x.totalCard));
             state.bills
                 .filter((x) => dateOfLogin <= x.hireDate && x.checkOutDay <= now)

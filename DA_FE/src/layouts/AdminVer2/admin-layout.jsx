@@ -47,6 +47,7 @@ const ConfirmSchema = Yup.object().shape({
 
 const AdminLayout = ({ children }) => {
     const [collapsed, setCollapsed] = useState(false);
+    const [isHandOver, setIsHandOver] = useState(true);
     const navigate = new useNavigate();
 
     const [notice, setNotice] = useState(false);
@@ -61,6 +62,7 @@ const AdminLayout = ({ children }) => {
 
     useEffect(() => {
         dispatch(getAllHandOver());
+        setIsHandOver(window.localStorage.getItem('isHandOver') === 'true' ? true : false);
         authorServices.currentUser().then((res) => setCurrentUser(res));
         // eslint-disable-next-line
     }, []);
@@ -70,8 +72,6 @@ const AdminLayout = ({ children }) => {
     }
 
     function handleConfirm(data) {
-        console.log(userLogin);
-        console.log(data);
         dispatch(update({ ...userLogin, note: userLogin.note + '. ' + data.note, moneyReal: Number(data.moneyReal) }));
         toast.success('Nhận ca thành công', { autoClose: 2000 });
     }
@@ -177,9 +177,7 @@ const AdminLayout = ({ children }) => {
                             icon: <FontAwesomeIcon icon={faRightFromBracket} />,
                             label: 'Đăng xuất',
                             onClick: () => {
-                                window.localStorage.removeItem('token');
-                                window.localStorage.removeItem('username');
-                                window.location.reload();
+                                navigate('/admin/login');
                             },
                         },
                     ]}
@@ -211,7 +209,7 @@ const AdminLayout = ({ children }) => {
                         ></MenuFoldOutlined>
                     )}
                     <BellFilled onClick={showNotice} className="trigger text-lg mr-3" />
-                    <Modal show={notice} size="3xl" popup={true} onClose={() => setNotice(false)}>
+                    <Modal show={isHandOver} size="3xl" popup={true} onClose={() => setNotice(false)}>
                         <Modal.Header>
                             <div className="p-3">Thông báo giao ca</div>
                         </Modal.Header>
