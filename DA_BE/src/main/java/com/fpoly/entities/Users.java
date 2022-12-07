@@ -55,6 +55,10 @@ public class Users implements Serializable {
 	@OneToMany(mappedBy = "users")
 	@JsonIgnore
 	private Set<Customer> customer;
+	
+	@OneToMany(mappedBy = "users")
+	@JsonIgnore
+	private Set<History> history;
 
 	@OneToMany(mappedBy = "users", cascade = CascadeType.ALL)
 	@JsonIgnore

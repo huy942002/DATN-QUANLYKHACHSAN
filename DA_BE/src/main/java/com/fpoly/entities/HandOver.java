@@ -67,6 +67,9 @@ public class HandOver implements Serializable {
 	@Column(name = "NOTE", length = 255)
 	private String note;
 
+	@Column(name = "MONEY_STATUS", nullable = false, precision = 10)
+	private int moneyStatus;
+	
 	@Column(name = "STATUS", nullable = false, precision = 10)
 	private int status;
 
