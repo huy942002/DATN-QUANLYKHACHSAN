@@ -54,6 +54,15 @@ public class Booking implements Serializable {
 	@Column(name = "TIME_OUT", length = 15)
 	private String timeOut;
 
+	@Column(name = "NUMBER_OF_ADULTS", nullable = false, precision = 10)
+	private int numberOfAdults;
+
+	@Column(name = "NUMBER_OF_KIDS", nullable = false, precision = 10)
+	private int numberOfKids;
+
+	@Column(name = "NOTE", length = 255)
+	private String note;
+
 	@Column(name = "STATUS", nullable = false, precision = 10)
 	private int status;
 
