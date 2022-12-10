@@ -7,14 +7,16 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { getAllKindOfRoom } from '~/app/reducers/kindOfRoom';
 import { getAllNumberOfFloors } from '~/app/reducers/numberOfFloor';
 import { getAllFacility } from '~/app/reducers/facilities';
+import { Label, FileInput } from 'flowbite-react';
 
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllService } from '~/app/reducers/service';
 import { addRoom } from '~/app/reducers/room';
 import { Button, Modal } from 'flowbite-react';
-import { addf } from '~/app/reducers/facilityDetail';
-import { adds } from '~/app/reducers/serviceAvailable';
+
+import axios from 'axios';
+
 
 const objRoom = {
     id: '',
@@ -54,24 +56,102 @@ function CreateRoomManager() {
     const [ServiceAvailable, setServiceAvailable] = useState([]);
     const [Service, setService] = useState("");
     const [image, setImage] = useState("");
+    const [image1, setImage1] = useState("");
+    const [image2, setImage2] = useState("");
+    const [image3, setImage3] = useState("");
 
-    const addServiceAvailable = (id, value, sl) => {
-        let obj = { id: id, sl: sl, name: value }
+    const addServiceAvailable = (id, value, sl, services) => {
+        let obj = {
+            id: id,
+            quantity: sl,
+            prices: value,
+            status: 1,
+            rooms: {
+                id: '',
+                name: '',
+                note: '',
+                img: '',
+                img1: '',
+                img2: '',
+                img3: '',
+                status: '',
+                kindOfRoom: {
+                    id: '',
+                    name: '',
+                    note: '',
+                    priceByDay: '',
+                    hourlyPrice: '',
+                    status: ''
+                },
+                numberOfFloors: {
+                    id: '',
+                    numberOfFloors: '',
+                    status: ''
+                }
+            },
+            servicess: {
+                id: services.id,
+                name: services.name,
+                prices: services.prices,
+                note: services.note,
+                status: services.status,
+                serviceType: {
+                    id: services.serviceType.id,
+                    name: services.serviceType.name,
+                    note: services.serviceType.note,
+                    status: services.serviceType.status
+                }
+            }
+        }
         setServiceAvailable(() => [...ServiceAvailable, obj]);
     };
 
     const addFacilitieDetails = (id, value) => {
-        let obj = { id: id, name: value }
+        let obj = {
+            id: id,
+            status: '',
+            facilities: {
+                id: value.id,
+                name: value.name,
+                status: value.status
+            },
+            rooms: {
+                id: '',
+                name: '',
+                note: '',
+                img: '',
+                img1: '',
+                img2: '',
+                img3: '',
+                status: '',
+                kindOfRoom: {
+                    id: '',
+                    name: '',
+                    note: '',
+                    priceByDay: '',
+                    hourlyPrice: '',
+                    status: ''
+                },
+                numberOfFloors: {
+                    id: '',
+                    numberOfFloors: '',
+                    status: ''
+                }
+            }
+        }
+
         setFacilitieDetails(() => [...FacilitieDetails, obj]);
         console.log(FacilitieDetails);
     };
 
-    const updateSL = (id1, sl2) => {
+    const updateSL = (id1, value) => {
         let array = [...ServiceAvailable];
         array.map((o, i) => {
-            if (o.id === id1) array[i] = { id: id1, sl: sl2, name: o.name };
+            if (o.id === id1) {
+                array[i] = { id: id1, quantity: value, prices: o.prices, status: o.status, rooms: o.rooms, servicess: o.servicess }
+                console.log(array[i])
+            }
         });
-
         setServiceAvailable([...array]);
     }
 
@@ -116,37 +196,38 @@ function CreateRoomManager() {
         setFacilitieDetails(FacilitieDetails);
     }, [FacilitieDetails])
 
-    function handleAdd(data, url2) {
+    const handleAdd = async (data, url2) => {
         setRoomAdd(data);
         if (roomAdd.kindOfRoom.id === '') {
 
-            dispatch(addRoom({ ...roomAdd, kindOfRoom: KindOfRoom[0], img: url2, status: 1 }));
+            setRoomAdd({ ...roomAdd, kindOfRoom: KindOfRoom[0], img: url2, status: 1 });
         } else if (roomAdd.numberOfFloors.id === '') {
 
-            dispatch(addRoom({ ...roomAdd, numberOfFloors: NumberOfFloors[0], img: url2, status: 1 }));
+            setRoomAdd({ ...roomAdd, numberOfFloors: NumberOfFloors[0], img: url2, status: 1 });
         }
         else if (roomAdd.note === '') {
 
-            dispatch(addRoom({ ...roomAdd, note: '', img: url2, status: 1 }));
+            setRoomAdd({ ...roomAdd, note: '', img: url2, status: 1 });
         }
         else {
-            dispatch(addRoom({ ...roomAdd, img: url2, status: 1 }));
+            setRoomAdd({ ...roomAdd, img: url2, status: 1 });
         }
 
-        if (FacilitieDetails.length !== 0) {
-            for (let index = 0; index < FacilitieDetails.length; index++) {
-                dispatch(addf(FacilitieDetails[index].id));
+        const response = await axios.post('http://localhost:8080/api/room/', {
+            rooms: roomAdd,
+            facilitiesDetailsList: FacilitieDetails,
+            serviceAvailableList: ServiceAvailable,
+        }).then(res => {
+            if (res) {
+                toast.success('Thêm thành công', { autoClose: 2000 });
             }
-        }
+        }).catch(err => {
+            setTimeout(() => {
 
-        if (ServiceAvailable.length !== 0) {
-            for (let index = 0; index < ServiceAvailable.length; index++) {
-                dispatch(adds(ServiceAvailable[index]));
+            }, 1000);
+        }).finally(() => {
 
-            }
-        }
-
-        toast.success('Thêm thành công', { autoClose: 2000 });
+        });
 
         setVisibleAdd(false);
     }
@@ -172,9 +253,17 @@ function CreateRoomManager() {
                         </Link>
                     </li>
                     <li>
+                        <Link
+                            to={config.routes.roomManage}
+                        >
+                            <FontAwesomeIcon icon={faChevronRight}></FontAwesomeIcon>
+                            Quản lý Chi tiết phòng
+                        </Link>
+                    </li>
+                    <li>
                         <div className="flex items-center">
                             <FontAwesomeIcon icon={faChevronRight} />
-                            <span className="px-2">Quản lý Chi tiết phòng</span>
+                            <span className="px-2">Thêm một phòng phòng</span>
                         </div>
                     </li>
                 </ol>
@@ -194,338 +283,392 @@ function CreateRoomManager() {
                 </ul>
             </div>
 
-            <div className="grid grid-cols-6 gap-4 mt-8 rounded-full">
-                <div className='col-start-2 col-span-4'>
-                    <form>
-                        <div className="text-black">
-                            <div>
-                                <label
-                                    htmlFor=""
-                                    className="mb-2 mr-3 text-gray-900 dark:text-gray-300 font-bold"
-                                >
-                                    Tên Phòng  :
-                                </label>
-                                <input
-                                    type="text"
-                                    id="nameRoom"
-                                    name="nameRoom"
-                                    onChange={(e) => setRoomAdd({ ...roomAdd, name: e.target.value })}
-                                    className="w-96 p-1 rounded"
+            <div className='shadow-2xl'>
+
+                <form className='mx-4 my-4 divide-y-4 divide-slate-400/25'>
+                    <div className="grid grid-cols-5 gap-4 text-black mb-4">
+                        <div className="mt-4">
+                            <label
+                                htmlFor=""
+                                className="mb-2 mr-3 text-gray-900 dark:text-gray-300 font-bold"
+                            >
+                                Tên Phòng  :
+                            </label>
+                        </div>
+                        <div className="col-span-4 mt-4">
+                            <input
+                                type="text"
+                                id="nameRoom"
+                                name="nameRoom"
+                                onChange={(e) => setRoomAdd({ ...roomAdd, name: e.target.value })}
+                                className="w-full  rounded"
+                            />
+                        </div>
+                        <div className="mt-4">
+                            <span className="mr-3 mt-4 font-bold">Loại phòng :</span>
+                        </div>
+                        <div className="col-span-4 mt-4">
+                            <select
+                                name="KindOfRoom"
+                                id="KindOfRoom"
+                                className="w-full rounded"
+
+                                onChange={(e) => {
+                                    const index = e.target.options[e.target.selectedIndex].id;
+                                    setRoomAdd({
+                                        ...roomAdd,
+                                        kindOfRoom: {
+                                            id: KindOfRoom[index].id,
+                                            name: KindOfRoom[index].name,
+                                            note: KindOfRoom[index].note,
+                                            priceByDay: KindOfRoom[index].priceByDay,
+                                            hourlyPrice: KindOfRoom[index].hourlyPrice,
+                                            status: KindOfRoom[index].status,
+                                        },
+                                    });
+                                    setRoom({
+                                        ...Room,
+                                        kindOfRoom: {
+                                            id: KindOfRoom[index].id,
+                                            name: KindOfRoom[index].name,
+                                            note: KindOfRoom[index].note,
+                                            priceByDay: KindOfRoom[index].priceByDay,
+                                            hourlyPrice: KindOfRoom[index].hourlyPrice,
+                                            status: KindOfRoom[index].status,
+                                        },
+                                    });
+                                }}
+                            >
+                                {KindOfRoom.map((x, index) => (
+                                    <option key={x.id} value={x.name} id={index}>
+                                        {x.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="mt-4">
+                            <span className="mr-3 font-bold">Tầng :</span>
+                        </div>
+                        <div className="col-span-4 mt-4">
+                            <select
+                                name="numberOfFloors"
+                                id="numberOfFloors"
+                                className="w-full rounded"
+                                onChange={(e) => {
+                                    const index = e.target.options[e.target.selectedIndex].id;
+                                    setRoomAdd({
+                                        ...roomAdd,
+                                        numberOfFloors: {
+                                            id: NumberOfFloors[index].id,
+                                            numberOfFloors: NumberOfFloors[index].name,
+                                            status: NumberOfFloors[index].status
+                                        },
+                                    });
+                                }}                                >
+                                {NumberOfFloors.map((n, index) => (
+                                    <option key={n.id} value={n.numberOfFloors} id={index}>
+                                        {n.numberOfFloors}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="mt-4">
+                            <label
+                                htmlFor=""
+                                className="mb-2 mt-8 mr-6 text-gray-900 dark:text-gray-300 font-bold"
+                            >
+                                Giá Tiền Theo Ngày:
+                            </label>
+                        </div>
+                        <div className="col-span-4 mt-4">
+                            <input
+                                type="number"
+                                id=""
+                                defaultValue={Room?.kindOfRoom?.priceByDay || ''}
+                                className="w-full rounded"
+                                placeholder=""
+                            />
+                        </div>
+                        <div className="mt-4">
+                            <label
+                                htmlFor=""
+                                className="mb-2 mt-8 mr-6 text-gray-900 dark:text-gray-300 font-bold"
+                            >
+                                Giá Tiền Theo Giờ :
+                            </label>
+                        </div>
+                        <div className="col-span-4 mt-4">
+                            <input
+                                type="number"
+                                id=""
+                                defaultValue={Room?.kindOfRoom?.hourlyPrice || ''}
+                                className="w-full  rounded"
+                                placeholder=""
+                            />
+                        </div>
+                        <div className="mt-4">
+                            <label
+                                htmlFor=""
+                                className="text-gray-900 dark:text-gray-300 font-bold"
+                            >
+                                Ảnh :
+                            </label>
+                        </div>
+                        <div className="col-span-4 mt-4">
+                            <div id="fileUpload">
+                                <div className="mb-2 block">
+                                    <Label
+                                        htmlFor="file"
+                                        value="Upload file"
+                                    />
+                                </div>
+                                <FileInput
+                                    id="file"
+                                    onChange={(e) => setImage(e.target.files[0])}
+                                    helperText="A profile picture is useful to confirm your are logged into your account"
                                 />
                             </div>
-
-                            <div className='mt-4'>
-                                <span className="mr-3 mt-4 font-bold">Loại phòng :</span>
-                                <select
-                                    name="KindOfRoom"
-                                    id="KindOfRoom"
-                                    className="w-40 p-1 rounded"
-
-                                    onChange={(e) => {
-                                        const index = e.target.options[e.target.selectedIndex].id;
-                                        setRoomAdd({
-                                            ...roomAdd,
-                                            kindOfRoom: {
-                                                id: KindOfRoom[index].id,
-                                                name: KindOfRoom[index].name,
-                                                note: KindOfRoom[index].note,
-                                                priceByDay: KindOfRoom[index].priceByDay,
-                                                hourlyPrice: KindOfRoom[index].hourlyPrice,
-                                                status: KindOfRoom[index].status,
-                                            },
-                                        });
-                                        setRoom({
-                                            ...Room,
-                                            kindOfRoom: {
-                                                id: KindOfRoom[index].id,
-                                                name: KindOfRoom[index].name,
-                                                note: KindOfRoom[index].note,
-                                                priceByDay: KindOfRoom[index].priceByDay,
-                                                hourlyPrice: KindOfRoom[index].hourlyPrice,
-                                                status: KindOfRoom[index].status,
-                                            },
-                                        });
-                                    }}
-                                >
-                                    {KindOfRoom.map((x, index) => (
-                                        <option key={x.id} value={x.name} id={index}>
-                                            {x.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <div className='mt-4'>
-                                <span className="mr-3 font-bold">Tầng :</span>
-                                <select
-                                    name="numberOfFloors"
-                                    id="numberOfFloors"
-                                    className="w-40 p-1 rounded"
-                                    onChange={(e) => {
-                                        const index = e.target.options[e.target.selectedIndex].id;
-                                        setRoomAdd({
-                                            ...roomAdd,
-                                            numberOfFloors: {
-                                                id: NumberOfFloors[index].id,
-                                                numberOfFloors: NumberOfFloors[index].name,
-                                                status: NumberOfFloors[index].status
-                                            },
-                                        });
-                                    }}                                >
-                                    {NumberOfFloors.map((n, index) => (
-                                        <option key={n.id} value={n.numberOfFloors} id={index}>
-                                            {n.numberOfFloors}
-                                        </option>
-                                    ))}
-                                </select>
-                                <button type="button" className="" >
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                                </button>
-                            </div>
-
-
-                            <div className="grid grid-cols-2 mt-8 text-black">
-                                <div><label
-                                    htmlFor=""
-                                    className="mb-2 mt-8 mr-6 text-gray-900 dark:text-gray-300 font-bold"
-                                >
-                                    Giá Tiền Theo Ngày:
-                                </label>
-                                    <input
-                                        type="number"
-                                        id=""
-                                        defaultValue={Room?.kindOfRoom?.priceByDay || ''}
-                                        className="w-40 p-1 rounded"
-                                        placeholder=""
-                                    /></div>
-                                <div><label
-                                    htmlFor=""
-                                    className="mb-2 mt-8 mr-6 text-gray-900 dark:text-gray-300 font-bold"
-                                >
-                                    Giá Tiền Theo Giờ :
-                                </label>
-                                    <input
-                                        type="number"
-                                        id=""
-                                        defaultValue={Room?.kindOfRoom?.hourlyPrice || ''}
-                                        className="w-40 p-1 rounded"
-                                        placeholder=""
-                                    /></div>
-                            </div>
-
-                            <div className="mt-8">
-                                <label
-                                    htmlFor=""
-                                    className="mb-2 mt-8 mr-9 text-gray-900 dark:text-gray-300 font-bold"
-                                >
-                                    Tiện Ích :
-                                </label>
-                                <div className="grid gap-x-8 gap-y-4 grid-cols-3 items-center pl-3">
-
-                                    {FacilitieDetails.map((f) => (
-
-                                        <div key={f.id} id="toast-default" className="flex items-center p-4 w-full max-w-xs text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800" role="alert">
-                                            <div className="inline-flex flex-shrink-0 justify-center items-center w-8 h-8 text-blue-500 bg-blue-100 rounded-lg dark:bg-blue-800 dark:text-blue-200">
-                                                <svg aria-hidden="true" className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clipRule="evenodd"></path></svg>
-                                                <span className="sr-only"></span>
-                                            </div>
-                                            <div className="ml-3 text-sm font-normal">{f.name}</div>
-                                            <button type="button" onClick={() => { deleteItem(f.id) }} className="ml-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" data-dismiss-target="#toast-default" aria-label="Close">
-                                                <svg aria-hidden="true" className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd"></path></svg>
-                                            </button>
-                                        </div>
-                                    ))}
+                            <div id="fileUpload">
+                                <div className="mb-2 block">
+                                    <Label
+                                        htmlFor="file"
+                                        value="Upload file"
+                                    />
                                 </div>
-
-                                <button type="button" className="mt-4 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                                    onClick={() => {
-                                        getModal();
-                                    }} >
-                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                                    Add
-                                </button>
+                                <FileInput
+                                    id="file"
+                                    onChange={(e) => setImage1(e.target.files[0])}
+                                    helperText="A profile picture is useful to confirm your are logged into your account"
+                                />
                             </div>
-
-                            <div className="mt-8">
-                                <label
-                                    htmlFor=""
-                                    className="mb-2 mt-8 mr-9 text-gray-900 dark:text-gray-300 font-bold"
-                                >
-                                    Dịch Vụ :
-                                </label>
-                                <div className="grid gap-x-8 gap-y-4 grid-cols-3 items-center pl-3">
-                                    {ServiceAvailable.map((s) => (
-                                        <div key={s.id} id="toast-default" className="flex items-center p-4 w-full max-w-xs text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800" role="alert">
-                                            <input id="vue-checkbox-list" type="number" value={s.sl}
-                                                onChange={(e) => updateSL(s.id, e.target.value)}
-                                                className="w-24 h-8 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500" />
-                                            <label htmlFor="vue-checkbox-list" className="py-3 ml-2 w-full text-sm font-medium text-gray-900 dark:text-gray-300">{s.name}</label>
-                                            <button type="button" onClick={() => deleteItem2(s.id)} className="ml-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" data-dismiss-target="#toast-default" aria-label="Close">
-                                                <svg aria-hidden="true" className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd"
-                                                ></path></svg>
-                                            </button>
-                                        </div>
-                                    ))}
+                            <div id="fileUpload">
+                                <div className="mb-2 block">
+                                    <Label
+                                        htmlFor="file"
+                                        value="Upload file"
+                                    />
                                 </div>
-
-                                <button type="button" className="mt-4 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                                    onClick={() => {
-                                        getModal2();
-                                    }} >
-                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                                    Add
-                                </button>
-
+                                <FileInput
+                                    id="file"
+                                    onChange={(e) => setImage2(e.target.files[0])}
+                                    helperText="A profile picture is useful to confirm your are logged into your account"
+                                />
                             </div>
-
-                            <div className="mt-8">
-                                <label
-                                    htmlFor=""
-                                    className="mb-2 mt-8 mr-9 text-gray-900 dark:text-gray-300 font-bold"
-                                >
-                                    Ảnh :
-                                </label>
-                                <div className="flex justify-center items-center w-full mt-8">
-                                    <label htmlFor="dropzone-file" className="flex flex-col justify-center items-center w-full h-64 bg-gray-50 rounded-lg border-2 border-gray-300 border-dashed cursor-pointer dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
-                                        <div className="flex flex-col justify-center items-center pt-5 pb-6">
-                                            <svg aria-hidden="true" className="mb-3 w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
-                                            <p className="mb-2 text-sm text-gray-500 dark:text-gray-400"><span className="font-semibold">Click to upload</span> or drag and drop</p>
-                                            <p className="text-xs text-gray-500 dark:text-gray-400">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
-                                        </div>
-                                        <input id="dropzone-file" type="file" className="hidden" onChange={(e) => setImage(e.target.files[0])} />
-                                    </label>
+                            <div id="fileUpload">
+                                <div className="mb-2 block">
+                                    <Label
+                                        htmlFor="file"
+                                        value="Upload file"
+                                    />
                                 </div>
+                                <FileInput
+                                    id="file"
+                                    onChange={(e) => setImage3(e.target.files[0])}
+                                    helperText="A profile picture is useful to confirm your are logged into your account"
+                                />
                             </div>
-
-                            <div className="mt-8">
-                                <label
-                                    htmlFor=""
-                                    className="mb-2 mt-8 mr-9 text-gray-900 dark:text-gray-300 font-bold"
-                                >
-                                    Ghi Chú :
-                                </label>
-                                <textarea id="message" rows="4" onChange={(e) => setRoomAdd({ ...roomAdd, note: e.target.value })} className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Note..."></textarea>
-                            </div>
-
-
-
                         </div>
+                        <div className="mt-4">
+                            <label
+                                htmlFor=""
+                                className="mb-2 mt-8 mr-9 text-gray-900 dark:text-gray-300 font-bold"
+                            >
+                                Ghi Chú :
+                            </label>
+                        </div>
+                        <div className="col-span-4 mt-4">
+                            <textarea id="message" rows="4" onChange={(e) => setRoomAdd({ ...roomAdd, note: e.target.value })} className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Note..."></textarea>
+                        </div>
+                        <div className="mt-4">
+                        </div>
+                        <div className="col-span-4 mt-4">
+                        </div>
+                    </div>
+                    <div className="text-black">
                         <div className="mt-8">
-                            <div>
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        uploadImage(roomAdd);
-                                    }}
-                                    className="py-2 px-3 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                                >
-                                    <span className="mx-2">THÊM</span>
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                    <Modal show={visibleAdd} size="md" popup={false} onClose={() => setVisibleAdd(false)}>
-                        <Modal.Header >
-                        </Modal.Header >
-                        <Modal.Body>
-                            <div className="overflow-x-auto relative shadow-md md:rounded-lg">
-                                <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 md:h-auto">
-                                    <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                                        <tr>
-                                            <th scope="col" className="py-3 px-6">
-                                                NAME
-                                            </th>
-                                            <th scope="col" className="py-3 px-6">
-                                                STATUS
-                                            </th>
-                                            <th scope="col" className="py-3 px-6">
-                                                ACTION
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {Facility.map((fs) => (
-                                            <tr key={fs.id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                                <td scope="row" className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                                    {fs.name}
-                                                </td>
-                                                <td className="py-4 px-6 ">
-                                                    <label htmlFor="" className="rounded-full dark:text-gpy-2 px-3 text-sm font-medium text-white bg-blue-700"></label>
-                                                </td>
-                                                <td className="py-4 px-6">
-                                                    <button
-                                                        value={fs}
-                                                        type="button"
-                                                        onClick={() => {
-                                                            addFacilitieDetails(fs.id, fs.name)
-                                                        }}
-                                                        className="py-2 px-3 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                                                    >
-                                                        <span className="mx-2">Add</span>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </Modal.Body>
-                    </Modal>
+                            <label
+                                htmlFor=""
+                                className="mb-2 mt-8 mr-9 text-gray-900 dark:text-gray-300 font-bold"
+                            >
+                                Tiện Ích :
+                            </label>
+                            <div className="grid gap-x-8 gap-y-4 grid-cols-3 items-center pl-3">
 
-                    <Modal show={visibleAdd2} size="mx" popup={false} onClose={() => setVisibleAdd2(false)}>
-                        <Modal.Header >
-                        </Modal.Header >
-                        <Modal.Body>
-                            <div className="overflow-x-auto relative shadow-md md:rounded-lg">
-                                <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 md:h-auto">
-                                    <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                                        <tr>
-                                            <th scope="col" className="py-3 px-6">
-                                                NAME
-                                            </th>
-                                            <th scope="col" className="py-3 px-6">
-                                                SERVICE TYPE
-                                            </th>
-                                            <th scope="col" className="py-3 px-6">
-                                                PRICES
-                                            </th>
-                                            <th scope="col" className="py-3 px-6">
-                                                ACTION
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {services.map((s) => (
-                                            <tr key={s.id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                                <td scope="row" className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                                    {s.name}
-                                                </td>
-                                                <td scope="row" className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                                    {s.serviceType.name}
-                                                </td>
-                                                <td scope="row" className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                                    {s.prices}
-                                                </td>
-                                                <td className="py-4 px-6">
-                                                    <button
-                                                        value={s}
-                                                        type="button"
-                                                        onClick={() => {
-                                                            addServiceAvailable(s.id, s.name, 1)
-                                                        }}
-                                                        className="py-2 px-3 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                                                    >
-                                                        <span className="mx-2">Add</span>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+                                {FacilitieDetails.map((f) => (
+
+                                    <div key={f.id} id="toast-default" className="flex items-center p-4 w-full max-w-xs text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800" role="alert">
+                                        <div className="ml-3 text-sm font-normal">{f.facilities.name}</div>
+                                        <button type="button" onClick={() => { deleteItem(f.id) }} className="ml-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" data-dismiss-target="#toast-default" aria-label="Close">
+                                            <svg aria-hidden="true" className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd"></path></svg>
+                                        </button>
+                                    </div>
+                                ))}
                             </div>
-                        </Modal.Body>
-                    </Modal>
-                </div>
+
+                            <button type="button" className="mt-4 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                                onClick={() => {
+                                    getModal();
+                                }} >
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                                Add
+                            </button>
+                        </div>
+
+                        <div className="mt-8">
+                            <label
+                                htmlFor=""
+                                className="mb-2 mt-8 mr-9 text-gray-900 dark:text-gray-300 font-bold"
+                            >
+                                Dịch Vụ :
+                            </label>
+                            <div className="grid gap-x-8 gap-y-4 grid-cols-3 items-center pl-3">
+                                {ServiceAvailable.map((s) => (
+                                    <div key={s.id} id="toast-default" className="flex items-center p-4 w-full max-w-xs text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800" role="alert">
+                                        <input id="vue-checkbox-list" type="number" value={s.quantity}
+                                            onChange={(e) => {
+                                                updateSL(s.id, e.target.value)
+                                            }}
+                                            className="w-full h-8 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500" />
+                                        <label htmlFor="vue-checkbox-list" className="py-3 ml-2 w-full text-sm font-medium text-gray-900 dark:text-gray-300">{s.servicess.name}</label>
+                                        <button type="button" onClick={() => deleteItem2(s.id)} className="ml-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" data-dismiss-target="#toast-default" aria-label="Close">
+                                            <svg aria-hidden="true" className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd"
+                                            ></path></svg>
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <button type="button" className="mt-4 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                                onClick={() => {
+                                    getModal2();
+                                }} >
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                                Add
+                            </button>
+
+                        </div>
+                    </div>
+
+                    <div className="grid justify-items-end grid-cols-3 gap-4 mt-8 ">
+                        <div className="col-span-2 mt-4">
+                            <div></div>
+                        </div>
+                        <div className="mb-4 mt-4">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    uploadImage(roomAdd);
+                                }}
+                                className="py-5 px-32 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                            >
+                                <span className="mx-2">THÊM</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                <Modal show={visibleAdd} size="md" popup={false} onClose={() => setVisibleAdd(false)}>
+                    <Modal.Header >
+                        Tiện Ích
+                    </Modal.Header >
+                    <Modal.Body>
+                        <div className="overflow-x-auto relative shadow-md md:rounded-lg">
+                            <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 md:h-auto">
+                                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                    <tr>
+                                        <th scope="col" className="py-3 px-6">
+                                            NAME
+                                        </th>
+                                        <th scope="col" className="py-3 px-6">
+                                            STATUS
+                                        </th>
+                                        <th scope="col" className="py-3 px-6">
+                                            ACTION
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {Facility.map((fs) => (
+                                        <tr key={fs.id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                            <td scope="row" className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                                {fs.name}
+                                            </td>
+                                            <td className="py-4 px-6 ">
+                                                <label htmlFor="" className="rounded-full dark:text-gpy-2 px-3 text-sm font-medium text-white bg-blue-700"></label>
+                                            </td>
+                                            <td className="py-4 px-6">
+                                                <button
+                                                    value={fs}
+                                                    type="button"
+                                                    onClick={() => {
+                                                        addFacilitieDetails(fs.id, fs)
+                                                    }}
+                                                    className="py-2 px-3 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                                                >
+                                                    <span className="mx-2">Add</span>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </Modal.Body>
+                </Modal>
+
+                <Modal show={visibleAdd2} size="mx" popup={false} onClose={() => setVisibleAdd2(false)}>
+                    <Modal.Header >
+                        Dịch Vụ
+                    </Modal.Header >
+                    <Modal.Body>
+                        <div className="overflow-x-auto relative shadow-md md:rounded-lg">
+                            <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 md:h-auto">
+                                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                    <tr>
+                                        <th scope="col" className="py-3 px-6">
+                                            NAME
+                                        </th>
+                                        <th scope="col" className="py-3 px-6">
+                                            SERVICE TYPE
+                                        </th>
+                                        <th scope="col" className="py-3 px-6">
+                                            PRICES
+                                        </th>
+                                        <th scope="col" className="py-3 px-6">
+                                            ACTION
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {services.map((s) => (
+                                        <tr key={s.id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                            <td scope="row" className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                                {s.name}
+                                            </td>
+                                            <td scope="row" className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                                {s.serviceType.name}
+                                            </td>
+                                            <td scope="row" className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                                {s.prices}
+                                            </td>
+                                            <td className="py-4 px-6">
+                                                <button
+                                                    value={s}
+                                                    type="button"
+                                                    onClick={() => {
+                                                        addServiceAvailable(s.id, s.prices, 1, s)
+                                                    }}
+                                                    className="py-2 px-3 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                                                >
+                                                    <span className="mx-2">Add</span>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </Modal.Body>
+                </Modal>
             </div >
         </div >
     );

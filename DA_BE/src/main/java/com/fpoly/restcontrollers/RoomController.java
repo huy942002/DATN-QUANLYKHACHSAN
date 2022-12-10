@@ -63,8 +63,50 @@ public class RoomController {
 
 	// add new
 	@PostMapping
-	public ResponseEntity<Rooms> createNewRoom(@RequestBody Rooms room) {
-		return new ResponseEntity<>(repository.save(room), HttpStatus.OK);
+	public ResponseEntity<Rooms> createNewRoom(@RequestBody RoomManageDTO room) {
+		Rooms r = new Rooms();
+		r.setKindOfRoom(room.getRooms().getKindOfRoom());
+		r.setNote(room.getRooms().getNote());
+		r.setImg("https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg");
+		r.setImg1("https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg");
+		r.setImg2("https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg");
+		r.setImg3("https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg");
+		r.setStatus(1);
+		r.setName(room.getRooms().getName());
+		r.setNumberOfFloors(room.getRooms().getNumberOfFloors());
+		repository.save(r);
+
+		List<Rooms> listRoomnew = roomRepo.findAll();
+		List<FacilitiesDetails> facilitiesDetailsList = new ArrayList<>();
+			for (FacilitiesDetails facilitiesDetailsDTO : room.getFacilitiesDetailsList()){
+				FacilitiesDetails f = new FacilitiesDetails();
+				f.setRooms(listRoomnew.get(listRoomnew.size()-1));
+				f.setStatus(facilitiesDetailsDTO.getStatus());
+				f.setFacilities(facilitiesDetailsDTO.getFacilities());
+				facilitiesDetailsList.add(f);
+			}
+
+		for (FacilitiesDetails ff :
+				facilitiesDetailsList) {
+			System.out.println(ff);
+		}
+		facilityDetailRepository.saveAll(facilitiesDetailsList);
+		List<ServiceAvailable> serviceAvailableList = new ArrayList<>();
+			for (ServiceAvailable serviceAvailableDTO : room.getServiceAvailableList()){
+				ServiceAvailable s = new ServiceAvailable();
+				s.setRooms(listRoomnew.get(listRoomnew.size()-1));
+				s.setPrices(serviceAvailableDTO.getPrices());
+				s.setQuantity(serviceAvailableDTO.getQuantity());
+				s.setServicess(serviceAvailableDTO.getServicess());
+				s.setStatus(serviceAvailableDTO.getStatus());
+				serviceAvailableList.add(s);
+			}
+		for (ServiceAvailable ss :
+				serviceAvailableList) {
+			System.out.println(ss);
+		}
+		serviceAvailableRepository.saveAll(serviceAvailableList);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@PostMapping("/Option/{SLRoom}")
@@ -78,9 +120,9 @@ public class RoomController {
 				r.setKindOfRoom(room.getRooms().getKindOfRoom());
 				r.setNote(room.getRooms().getNote());
 				r.setImg("https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg");
-				r.setImg("https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg");
-				r.setImg("https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg");
-				r.setImg("https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg");
+				r.setImg1("https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg");
+				r.setImg2("https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg");
+				r.setImg3("https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg");
 				r.setStatus(1);
 				r.setName(room.getRooms().getName() + n.get(n.size() - 1).getNumberOfFloors() + "0" + i);
 				r.setNumberOfFloors(n.get(n.size() - 1));
