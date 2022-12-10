@@ -18,7 +18,7 @@ const RoomPlan = () => {
     //Data
     const [roomPlan, setRoomPlan] = useState();
     const [kindOfRoomList, setKindOfRoomList] = useState();
-    const [queryFloor, setQueryFloor] = useState("ALL");
+    const [queryFloor,  setQueryFloor] = useState("ALL");
     const [queryKindOfRoom, setQueryKindOfRoom] = useState("ALL");
     const [queryStatus, setQueryStatus] = useState("ALL");
     const [queryName, setQueryName] = useState("");
