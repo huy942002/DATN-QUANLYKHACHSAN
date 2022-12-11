@@ -9,9 +9,10 @@ import axios from 'axios';
 import { faLock, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
 import { getCustomerByNameUser } from '~/app/reducers/customer';
-import { useNavigate } from 'react-router-dom';
+import config from '~/config';
 
 const objLogin = {
     username: '',
@@ -32,11 +33,9 @@ function LoginAdmin() {
         await axios
             .post(url, data)
             .then((res) => {
-                console.log(res);
-                console.log(data.username);
                 dispatch(getCustomerByNameUser(data.username));
                 navigate('/');
-                window.localStorage.setItem('token', res.headers.token);
+                window.sessionStorage.setItem('token', res.headers.token);
             })
             .catch((error) => {
                 toast.error('Sai thông tin đăng nhập', { autoClose: 2000 });
@@ -45,8 +44,8 @@ function LoginAdmin() {
     };
 
     return (
-        <div className="grid grid-cols-3 gap-4 place-content-center p-8 bg-admin-login-hotel bg-cover h-screen">
-            <div className="col-start-2 bg-slate-50 p-8 rounded">
+        <div className="grid grid-cols-3 gap-4 place-content-center p-6 h-screen">
+            <div className="col-start-2 bg-slate-50 p-5 rounded">
                 <div className="flex justify-center items-center">
                     <img src={logo} alt="logo" />
                 </div>
@@ -75,10 +74,10 @@ function LoginAdmin() {
                                         bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
                                         ${errors.username && touched.username ? 'border-2 border-rose-600' : ''} `}
                                     />
-                                    {errors.username && touched.username ? (
-                                        <div className="text-sm text-red-600 mt-2">{errors.username}</div>
-                                    ) : null}
                                 </div>
+                                {errors.username && touched.username ? (
+                                    <div className="text-sm text-red-600 mt-2">{errors.username}</div>
+                                ) : null}
                             </div>
                             <div className="mt-4">
                                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">
@@ -95,13 +94,16 @@ function LoginAdmin() {
                                         bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
                                         ${errors.password && touched.password ? 'border-2 border-rose-600' : ''} `}
                                     />
-                                    {errors.password && touched.password ? (
-                                        <div className="text-sm text-red-600 mt-2">{errors.password}</div>
-                                    ) : null}
                                 </div>
+                                {errors.password && touched.password ? (
+                                    <div className="text-sm text-red-600 mt-2">{errors.password}</div>
+                                ) : null}
                             </div>
-                            <div className="mt-4">
-                                <span>Quên mật khẩu ?</span>
+                            <div className="mt-3">
+                                Chưa có tài khoản ?
+                                <Link to={config.routes.signup} className="ml-3 text-blue-500">
+                                    Đăng ký
+                                </Link>
                             </div>
                             <div className="mt-4">
                                 <button

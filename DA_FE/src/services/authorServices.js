@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-let username = window.localStorage.getItem('username');
+let username = window.sessionStorage.getItem('username');
 
 const currentUser = async () => {
     return await axios

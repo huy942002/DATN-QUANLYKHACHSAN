@@ -67,10 +67,11 @@ function HandOver() {
     }
 
     function handleHandOverConfirm() {
-        // update status to 1
-        dispatch(update({ ...handOvers.find((x) => x.id === Number(id)), status: 1 }));
+        // update money status to 1
+        dispatch(update({ ...handOvers.find((x) => x.id === Number(id)), moneyStatus: 1 }));
         toast.success('Xác thực thành công', { autoClose: 2000 });
         setVisibleConfirm(false);
+        window.location.reload();
     }
 
     return (
@@ -148,6 +149,7 @@ function HandOver() {
                             <tbody>
                                 {handOverss
                                     .filter((x) => x.personnel.fullname.toLowerCase().includes(valueSearch))
+                                    .reverse()
                                     .map((x) => (
                                         <tr className="bg-white dark:bg-gray-800" key={x.id}>
                                             <td className="py-4 px-6">{x.id}</td>
@@ -240,11 +242,22 @@ function HandOver() {
                                                         : 'text-red-600 font-bold'
                                                 }`}
                                             >
-                                                Trạng thái :{' '}
-                                                {handOver.status === 1 ? 'Đã giao ca' : 'Giao ca thiếu tiền'}
+                                                Trạng thái ca : {handOver.status === 1 ? 'Đã giao ca' : 'Đang trong ca'}
                                             </span>
                                         </div>
                                         <div>
+                                            <span
+                                                className={`${
+                                                    handOver.moneyStatus === 1
+                                                        ? 'text-green-500 font-bold'
+                                                        : 'text-red-600 font-bold'
+                                                }`}
+                                            >
+                                                Trạng thái tiền :{' '}
+                                                {handOver.moneyStatus === 1 ? 'Giao đủ' : 'Tiền phát sinh'}
+                                            </span>
+                                        </div>
+                                        <div className="col-span-2 col-end-4">
                                             <span>Ghi chú : </span>
                                             <textarea
                                                 type="text"
@@ -256,14 +269,16 @@ function HandOver() {
                                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                             />
                                         </div>
-                                        <div className="col-start-3 flex justify-center items-center">
-                                            <button
-                                                onClick={showConfirm}
-                                                className="py-2 px-2 w-full text-sm font-medium text-center text-white focus:ring-4 focus:outline-none bg-green-700 rounded-lg hover:bg-green-800 focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
-                                            >
-                                                Xác thực tiền giao ca
-                                            </button>
-                                        </div>
+                                        {handOver.status === 1 && handOver.moneyStatus === 0 && (
+                                            <div className="flex justify-center items-center">
+                                                <button
+                                                    onClick={showConfirm}
+                                                    className="py-2 px-2 w-full text-sm font-medium text-center text-white focus:ring-4 focus:outline-none bg-green-700 rounded-lg hover:bg-green-800 focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+                                                >
+                                                    Xác thực tiền phát sinh
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </Modal.Body>

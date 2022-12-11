@@ -9,7 +9,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getAllRoom } from '~/app/reducers/room';
 import { getAllKindOfRoom } from '~/app/reducers/kindOfRoom';
 import { seachRoomBooking } from '~/app/reducers/booking';
-// import { setvaluecheckInday, setvaluevalueDay, setvalueCheckOutday } from '~/app/reducers/seach';
 
 import { Carousel } from 'flowbite-react';
 import Footer from '~/layouts/Customer/Footer';
@@ -20,7 +19,6 @@ const futureDate = date.getDate() + 5;
 date.setDate(futureDate);
 const defaultValue = date.toLocaleDateString('en-CA');
 function Home() {
-
     const rooms = useSelector((state) => state.room.rooms);
     const KindOfRoom = useSelector((state) => state.kindOfRoom.kindOfRoom);
     const dispatch = useDispatch();
@@ -42,16 +40,17 @@ function Home() {
     function CheckSeach() {
         console.log(valueSLday);
         if (valueid.length === 0) {
-            dispatch(seachRoomBooking({ v1: valuedateCheckin,v2: valuedateCheckout, v3:KindOfRoom[0].id , v4: valueSLday}));
+            dispatch(
+                seachRoomBooking({ v1: valuedateCheckin, v2: valuedateCheckout, v3: KindOfRoom[0].id, v4: valueSLday }),
+            );
         } else {
-            dispatch(seachRoomBooking({ v1: valuedateCheckin,v2: valuedateCheckout, v3: valueid, v4: valueSLday}));
+            dispatch(seachRoomBooking({ v1: valuedateCheckin, v2: valuedateCheckout, v3: valueid, v4: valueSLday }));
         }
     }
 
     useEffect(() => {
         dispatch(getAllRoom());
         dispatch(getAllKindOfRoom());
-
     }, []);
 
     return (
@@ -150,8 +149,11 @@ function Home() {
                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                 onChange={(e) => {
                                     setvalueid(KindOfRoom[e.target.options[e.target.selectedIndex].id].id);
-                                    setTimeout(() => setValueSearch(KindOfRoom[e.target.options[e.target.selectedIndex].id].id), 1000);
-
+                                    setTimeout(
+                                        () =>
+                                            setValueSearch(KindOfRoom[e.target.options[e.target.selectedIndex].id].id),
+                                        1000,
+                                    );
                                 }}
                             >
                                 {KindOfRoom.map((x, index) => (
@@ -188,15 +190,14 @@ function Home() {
 
                 <div className="grid grid-cols-4 gap-4 mt-8">
                     {rooms
-                        .filter((x) => (x.kindOfRoom.id + "").toLowerCase().includes(valueSearch))
+                        .filter((x) => (x.kindOfRoom.id + '').toLowerCase().includes(valueSearch))
                         .map((x) => (
-                            <div key={x.id} className="max-w-sm bg-white rounded-lg border border-gray-200 shadow-md dark:bg-gray-800 dark:border-gray-700">
+                            <div
+                                key={x.id}
+                                className="max-w-sm bg-white rounded-lg border border-gray-200 shadow-md dark:bg-gray-800 dark:border-gray-700"
+                            >
                                 <Link to={config.routes.home}>
-                                    <img
-                                        className="rounded-t-lg"
-                                        src={x.img}
-                                        alt=""
-                                    />
+                                    <img className="rounded-t-lg" src={x.img} alt="" />
                                 </Link>
                                 <div className="p-5">
                                     <Link to={config.routes.home}>

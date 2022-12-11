@@ -12,11 +12,30 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { getAllHandOver } from '~/app/reducers/handOver';
+import { add as addHistory } from '~/app/reducers/history';
+import { add as addHandOver, getAllHandOver } from '~/app/reducers/handOver';
+import { getAllUser } from '~/app/reducers/user';
 
 const objLogin = {
     username: '',
     password: '',
+};
+
+const objHandOver = {
+    receiver: '',
+    dateTimeStart: '',
+    dateTimeEnd: '',
+    totalMoney: '',
+    totalCash: '',
+    totalMoneyCard: '',
+    surcharge: '',
+    moneyHandOver: '',
+    moneyReal: '',
+    moneyFirst: '',
+    note: '',
+    moneyStatus: '',
+    status: '',
+    personnel: {},
 };
 
 const LoginSchema = Yup.object().shape({
@@ -27,27 +46,62 @@ const LoginSchema = Yup.object().shape({
 const url = 'http://localhost:8080/api/auth/login';
 
 function LoginAdmin() {
+    const users = useSelector((state) => state.user.users);
     const handOvers = useSelector((state) => state.handOver.handOvers);
-    const userLogin = handOvers
-        .filter((x) => x.status === 0)
-        .reduce((prev, current) => (prev.dateTimeStart > current.dateTimeStart ? prev : current), {});
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
     useEffect(() => {
+        window.sessionStorage.removeItem('token');
+        window.sessionStorage.removeItem('username');
+        window.sessionStorage.removeItem('dateTimeStart');
+        dispatch(getAllUser());
         dispatch(getAllHandOver());
-        window.localStorage.removeItem('token');
-        window.localStorage.removeItem('username');
         // eslint-disable-next-line
     }, []);
     const handleLogin = async (data) => {
+        const now = new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000)
+            .toISOString()
+            .replace('T', ' ')
+            .slice(0, 16);
         await axios
             .post(url, data)
             .then((res) => {
+                window.sessionStorage.setItem('token', res.headers.token);
+                window.sessionStorage.setItem('username', res.headers.username);
+                window.sessionStorage.setItem('dateTimeStart', now);
                 navigate('/admin/room-plan');
-                window.localStorage.setItem('token', res.headers.token);
-                window.localStorage.setItem('username', res.headers.username);
-                window.localStorage.setItem('dateTimeStart', userLogin.dateTimeStart);
+                if (handOvers.length == 0) {
+                    dispatch(
+                        addHistory({
+                            timeIn: now,
+                            timeOut: now,
+                            handOverStatus: 1,
+                            status: 0,
+                            users: users.find((x) => x.username === data.username),
+                        }),
+                    );
+                    dispatch(
+                        addHandOver({
+                            ...objHandOver,
+                            personnel: users.find((x) => x.username === data.username),
+                            dateTimeStart: now,
+                            dateTimeEnd: now,
+                            moneyStatus: 0,
+                            status: 0,
+                        }),
+                    );
+                } else {
+                    dispatch(
+                        addHistory({
+                            timeIn: now,
+                            timeOut: now,
+                            handOverStatus: 0,
+                            status: 0,
+                            users: users.find((x) => x.username === data.username),
+                        }),
+                    );
+                }
                 window.location.reload();
             })
             .catch((error) => {
@@ -58,12 +112,13 @@ function LoginAdmin() {
 
     return (
         <div className="grid grid-cols-3 gap-4 place-content-center p-8 bg-admin-login-hotel bg-cover h-screen">
-            <div className="col-start-2 bg-gray-300 p-8 rounded">
+            <div className="col-start-2 bg-gray-100 p-8 rounded">
                 <div className="flex justify-center items-center">
                     <img src={logo} alt="logo" />
                 </div>
                 <h1 className="mb-5 text-3xl text-center font-bold text-blue-400">Wellcome</h1>
                 <Formik
+                    enableReinitialize
                     initialValues={objLogin}
                     validationSchema={LoginSchema}
                     onSubmit={(values) => {
@@ -87,10 +142,10 @@ function LoginAdmin() {
                                         bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
                                         ${errors.username && touched.username ? 'border-2 border-rose-600' : ''} `}
                                     />
-                                    {errors.username && touched.username ? (
-                                        <div className="text-sm text-red-600 mt-2">{errors.username}</div>
-                                    ) : null}
                                 </div>
+                                {errors.username && touched.username ? (
+                                    <div className="text-sm text-red-600 mt-2">{errors.username}</div>
+                                ) : null}
                             </div>
                             <div className="mt-4">
                                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">
@@ -107,13 +162,10 @@ function LoginAdmin() {
                                         bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
                                         ${errors.password && touched.password ? 'border-2 border-rose-600' : ''} `}
                                     />
-                                    {errors.password && touched.password ? (
-                                        <div className="text-sm text-red-600 mt-2">{errors.password}</div>
-                                    ) : null}
                                 </div>
-                            </div>
-                            <div className="mt-4">
-                                <span>Quên mật khẩu ?</span>
+                                {errors.password && touched.password ? (
+                                    <div className="text-sm text-red-600 mt-2">{errors.password}</div>
+                                ) : null}
                             </div>
                             <div className="mt-4">
                                 <button

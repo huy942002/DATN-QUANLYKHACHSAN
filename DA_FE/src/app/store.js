@@ -14,12 +14,13 @@ import handOverBill from './reducers/handOverBill';
 import nationality from './reducers/nationality';
 import kindOfRoom from './reducers/kindOfRoom';
 import room from './reducers/room';
+import user from './reducers/user';
+import history from './reducers/history';
 import authority from './reducers/authority';
 import resetHandOver from './reducers/resetHandOver';
 import customer from './reducers/customer';
-import serviceAvailable from './reducers/serviceAvailable'
-import booking from './reducers/booking'
-
+import serviceAvailable from './reducers/serviceAvailable';
+import booking from './reducers/booking';
 
 const reducer = combineReducers({
     // here we will be adding reducers
@@ -30,6 +31,8 @@ const reducer = combineReducers({
     serviceType: serviceType,
     numberOfFloor: numberOfFloor,
     room: room,
+    user: user,
+    history: history,
     authority: authority,
     kindOfRoom: kindOfRoom,
     handOver: handOver,

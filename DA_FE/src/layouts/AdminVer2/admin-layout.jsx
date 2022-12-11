@@ -22,6 +22,8 @@ import {
     faBell,
     faRightFromBracket,
     faShield,
+    faPersonWalkingArrowLoopLeft,
+    faChartSimple,
 } from '@fortawesome/free-solid-svg-icons';
 import { Modal, Button } from 'flowbite-react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -32,6 +34,7 @@ import { Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 
 import authorServices from '~/services/authorServices';
+import { getAllHistory, update as updateHistory } from '~/app/reducers/history';
 
 const { Header, Sider, Content } = Layout;
 
@@ -48,8 +51,8 @@ const ConfirmSchema = Yup.object().shape({
 const AdminLayout = ({ children }) => {
     const [collapsed, setCollapsed] = useState(false);
     const [isHandOver, setIsHandOver] = useState(true);
+    const histories = useSelector((state) => state.history.histories);
     const navigate = new useNavigate();
-
     const [notice, setNotice] = useState(false);
     const handOvers = useSelector((state) => state.handOver.handOvers);
     const userLogin = handOvers
@@ -62,7 +65,7 @@ const AdminLayout = ({ children }) => {
 
     useEffect(() => {
         dispatch(getAllHandOver());
-        setIsHandOver(window.localStorage.getItem('isHandOver') === 'true' ? true : false);
+        dispatch(getAllHistory());
         authorServices.currentUser().then((res) => setCurrentUser(res));
         // eslint-disable-next-line
     }, []);
@@ -80,7 +83,7 @@ const AdminLayout = ({ children }) => {
                 moneyReal: Number(data.moneyReal),
             }),
         );
-        window.localStorage.setItem('isHandOver', false);
+        dispatch(updateHistory({ ...histories[histories.length - 1], handOverStatus: 1 }));
         window.location.reload();
         toast.success('Nhận ca thành công', { autoClose: 2000 });
     }
@@ -109,7 +112,7 @@ const AdminLayout = ({ children }) => {
                                     key: '3',
                                     // icon: <UploadOutlined />,
                                     label: 'Quản lý tầng',
-                                    // onClick: () => setCollapsed(!collapsed),
+                                    onClick: () => navigate('/admin/floor-manage'),
                                 },
                                 {
                                     key: '4',
@@ -166,18 +169,12 @@ const AdminLayout = ({ children }) => {
                                     label: 'Lịch sử giao ca',
                                     onClick: () => navigate('/admin/hand-over-manage'),
                                 },
-                                {
-                                    key: '13',
-                                    // icon: <UploadOutlined />,
-                                    label: 'Lịch sử',
-                                    onClick: () => navigate('/admin/history'),
-                                },
                             ],
                         },
 
                         {
                             key: '14',
-                            icon: <FontAwesomeIcon icon={faListCheck} />,
+                            icon: <FontAwesomeIcon icon={faChartSimple} />,
                             label: 'Thống kê',
                             // onClick: () => setCollapsed(!collapsed),
                         },
@@ -188,12 +185,20 @@ const AdminLayout = ({ children }) => {
                             onClick: () => navigate('/admin/authorization'),
                         },
                         {
+                            key: '13',
+                            icon: <FontAwesomeIcon icon={faPersonWalkingArrowLoopLeft} />,
+                            label: 'Lịch sử truy cập',
+                            onClick: () => navigate('/admin/history'),
+                        },
+                        {
                             key: '16',
                             icon: <FontAwesomeIcon icon={faRightFromBracket} />,
                             label: 'Đăng xuất',
                             onClick: () => {
                                 navigate('/admin/login');
-                                window.localStorage.setItem('isHandOver', false);
+                                dispatch(
+                                    updateHistory({ ...histories[histories.length - 1], status: 0, handOverStatus: 1 }),
+                                );
                             },
                         },
                     ]}
@@ -225,7 +230,12 @@ const AdminLayout = ({ children }) => {
                         ></MenuFoldOutlined>
                     )}
                     <BellFilled onClick={showNotice} className="trigger text-lg mr-3" />
-                    <Modal show={isHandOver} size="3xl" popup={true} onClose={() => setNotice(false)}>
+                    <Modal
+                        show={histories[histories.length - 1]?.handOverStatus === 0 ? true : false}
+                        size="3xl"
+                        popup={true}
+                        onClose={() => setNotice(false)}
+                    >
                         <Modal.Header>
                             <div className="p-3">Thông báo giao ca</div>
                         </Modal.Header>

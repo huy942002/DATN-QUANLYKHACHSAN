@@ -24,9 +24,9 @@ export const AddNBFop = createAsyncThunk('numberOfFloors/AddNBF', (data) => {
     return http.httpPost(`number-of-floor/${data.sl}`, data.NumberOfFloorss);
 });
 
-// export const deleteById = createAsyncThunk('personnel/deleteById', (id) => {
-//     return http.httpDelete('personnel', id);
-// });
+export const update = createAsyncThunk('number-of-floor/update', (data) => {
+    return http.httpPut(`number-of-floor/${data.id}`, data);
+});
 
 // Slice
 const slice = createSlice({
@@ -53,32 +53,35 @@ const slice = createSlice({
             state.error = action.error.message;
         });
 
-        // deleteById
-        // builder.addCase(deleteById.pending, (state) => {
-        //     state.loading = true;
-        // });
-        // builder.addCase(deleteById.fulfilled, (state, action) => {
-        //     state.loading = false;
-        //     if (action.payload.id) {
-        //         state.personnel = state.personnel.filter((item) => item.id !== action.payload.id);
-        //     }
-        // });
-        // builder.addCase(deleteById.rejected, (state, action) => {
-        //     state.loading = false;
-        //     state.error = action.error.message;
-        // });
+        // update
+        builder.addCase(update.pending, (state) => {
+            state.loading = true;
+        });
+        builder.addCase(update.fulfilled, (state, action) => {
+            state.loading = false;
+            if (action.payload.id) {
+                state.numberOfFloors = state.numberOfFloors.map((item) =>
+                    item.id === action.payload.id ? action.payload : item,
+                );
+            }
+            state.numberOfFloors = state.numberOfFloors.filter((x) => x.status === 1);
+        });
+        builder.addCase(update.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.error.message;
+        });
 
         builder.addCase(getByIdNumberOfFloors.pending, (state) => {
             state.loading = true;
         });
         builder.addCase(getByIdNumberOfFloors.fulfilled, (state, action) => {
             state.loading = false;
-            state.numberOfFloor = action.payload;
+            state.NumberOfFloor = action.payload;
             state.error = '';
         });
         builder.addCase(getByIdNumberOfFloors.rejected, (state, action) => {
             state.loading = false;
-            state.numberOfFloor = {};
+            state.NumberOfFloor = {};
             state.error = action.error.message;
         });
 
@@ -93,7 +96,6 @@ const slice = createSlice({
             state.loading = false;
             state.error = action.error.message;
         });
-
 
         builder.addCase(getByIdNumberOfFloorslast.pending, (state) => {
             state.loading = true;

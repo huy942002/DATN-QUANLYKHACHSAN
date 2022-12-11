@@ -18,13 +18,14 @@ import Notfound from '~/pages/Notfound';
 import SearchRoom from '~/pages/Customer/SearchRoom';
 import RoomDetail from '~/pages/Customer/RoomDetail';
 import RoomManage from '~/pages/Admin/RoomManage';
+import FloorManage from '~/pages/Admin/FloorManage';
 import Authorization from '~/pages/Admin/Authorization';
 import CreateRoomManage from '~/pages/Admin/CreateRoomManage';
 import CreateOptionRoomManage from '~/pages/Admin/CreateOptionRoomManage';
 import RoomPlan from '~/pages/Admin/RoomRentalManage/RoomPlan/room-plan';
 import RentalManage from '~/pages/Admin/RoomRentalManage/RentalManage/rental-manage';
 import Booking from '~/pages/Customer/Booking';
-import BookingManage from '~/pages/Admin/BookingManage'
+import BookingManage from '~/pages/Admin/BookingManage';
 
 // Routes public
 
@@ -48,6 +49,7 @@ const privateRoutes = [
     { path: config.routes.handOver, component: HandOver },
     { path: config.routes.customerManage, component: CustomerManage },
     { path: config.routes.roomManage, component: RoomManage },
+    { path: config.routes.floorManage, component: FloorManage },
     { path: config.routes.createRoomManage, component: CreateRoomManage },
     { path: config.routes.createOptionRoomManage, component: CreateOptionRoomManage },
     { path: config.routes.handOverManage, component: HandOverManage },

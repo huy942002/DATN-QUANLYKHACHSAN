@@ -29,7 +29,9 @@ function Header() {
                     <span className="px-3 text-sm">
                         <Link to={config.routes.login}>Đăng nhập</Link>
                     </span>
-                    <span className="px-3 text-sm text-blue-500 font-bold">Đăng ký</span>
+                    <span className="px-3 text-sm text-blue-500 font-bold">
+                        <Link to={config.routes.signup}>Đăng ký</Link>
+                    </span>
                 </div>
             </div>
             <div className="grid grid-cols-6 px-20 pt-1 pb-1 bg-blue-500 text-white">

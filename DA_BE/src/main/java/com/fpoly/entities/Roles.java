@@ -5,6 +5,7 @@ package com.fpoly.entities;
 import java.io.Serializable;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -42,7 +43,7 @@ public class Roles implements Serializable {
 	@Column(name = "STATUS", nullable = false, precision = 10)
 	private int status;
 	
-	@OneToMany(mappedBy = "roles")
+	@OneToMany(mappedBy = "roles", cascade = CascadeType.ALL)
 	@JsonIgnore
 	private Set<Authority> authority;
 

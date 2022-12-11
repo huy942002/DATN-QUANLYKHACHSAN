@@ -10,11 +10,14 @@ import { Button, Modal } from 'flowbite-react';
 import { toast } from 'react-toastify';
 import authorServices from '~/services/authorServices';
 
+import bcrypt from 'bcryptjs';
+
 import { getAllPersonnel } from '~/app/reducers/personnel';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllHandOverBill } from '~/app/reducers/handOverBill';
 import { add, getAllHandOver, update } from '~/app/reducers/handOver';
 import { getAllResetHandOver, add as addReset } from '~/app/reducers/resetHandOver';
+import { getAllHistory, update as updateHistory } from '~/app/reducers/history';
 
 const objHandOver = {
     receiver: '',
@@ -28,6 +31,7 @@ const objHandOver = {
     moneyReal: '',
     moneyFirst: '',
     note: '',
+    moneyStatus: '',
     status: '',
     personnel: {},
 };
@@ -39,6 +43,7 @@ const objResetHandOver = {
     totalMoney: '',
     handMoney: '',
     note: '',
+    moneyStatus: '',
     status: 1,
     personnel: {},
 };
@@ -54,6 +59,7 @@ function HandOver() {
     const [currentUser, setCurrentUser] = useState();
     const personnels = useSelector((state) => state.personnel.personnels);
     const handOvers = useSelector((state) => state.handOver.handOvers);
+    const histories = useSelector((state) => state.history.histories);
     const { totalCash, totalCard, totalDeposits } = useSelector((state) => state.handOverBill);
     const { resetMoneyFromUserLogin } = useSelector((state) => state.resetHandOver);
     const dispatch = useDispatch();
@@ -68,6 +74,7 @@ function HandOver() {
         dispatch(getAllHandOver());
         dispatch(getAllHandOverBill());
         dispatch(getAllResetHandOver());
+        dispatch(getAllHistory());
         authorServices.currentUser().then((res) => setCurrentUser(res));
         setNow(new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 19));
         // eslint-disable-next-line
@@ -104,7 +111,7 @@ function HandOver() {
     function handleDispatch() {
         const receiverDefault = personnels.filter(
             (x) =>
-                x.users.username !== currentUser.users.username &&
+                x.users.username !== currentUser?.users.username &&
                 x.users.roles.some((i) => i.name.includes('Nhân viên')),
         )[0];
         dispatch(
@@ -119,7 +126,8 @@ function HandOver() {
                 totalMoney: totalCard + totalCash,
                 note: `${handOver.note.length === 0 ? '' : handOver.note + '.'}`,
                 receiver: handOver.receiver === '' ? receiverDefault.users.username : handOver.receiver,
-                status: handOver.surcharge === '' ? 1 : 0,
+                moneyStatus: handOver.surcharge === 0 ? 1 : 0,
+                status: 1,
             }),
         );
 
@@ -139,16 +147,17 @@ function HandOver() {
                 surcharge: 0,
                 moneyReal: 0,
                 moneyHandOver: 0,
-                note: `Đã nhận ca từ nhân viên ${currentUser.users.username} lúc ${formatDate(now)}`,
+                note: `Đã nhận ca từ nhân viên ${currentUser.fullname} lúc ${formatDate(now)}`,
                 moneyFirst: 500000,
+                moneyStatus: 0,
                 status: 0,
             }),
         );
+
+        dispatch(updateHistory({ ...histories[histories.length - 1], status: 1, handOverStatus: 0 }));
     }
 
     function handleHandOver() {
-        const moneyHandOverReal =
-            totalDeposits - handOver.moneyReal - handOver.surcharge + handOver.moneyFirst - resetMoneyFromUserLogin;
         if (handOver.receiver === '') {
             // check note if surcharge have
             if (Number(handOver.surcharge) > 0 && refNote.current.value.length === 0) {
@@ -159,19 +168,18 @@ function HandOver() {
                 refNote.current.style.borderColor = 'rgb(209 213 219)';
                 handleDispatch();
                 navigate('/admin/login');
-                window.localStorage.setItem('isHandOver', true);
                 toast.success('Giao ca thành công', { autoClose: 2000 });
             }
         } else {
             // check note if surcharge have
-            if (moneyHandOverReal !== 0 && refNote.current.value.length === 0) {
+            if (Number(handOver.surcharge) > 0 && refNote.current.value.length === 0) {
                 refNote.current.focus();
                 refNote.current.style.borderColor = 'red';
+                toast.error('Vui lòng ghi chú phụ thu', { autoClose: 2000 });
             } else {
                 refNote.current.style.borderColor = 'rgb(209 213 219)';
                 handleDispatch();
                 navigate('/admin/login');
-                window.localStorage.setItem('isHandOver', true);
                 toast.success('Giao ca thành công', { autoClose: 2000 });
             }
         }
@@ -202,21 +210,26 @@ function HandOver() {
                 toast.error('Mật khẩu xác nhận sai', { autoClose: 2000 });
             }
         } else {
-            if (receiverDefault.users.password === passwordReset) {
-                dispatch(
-                    addReset({
-                        ...resetHandOver,
-                        totalMoney: handOver.moneyFirst + totalDeposits,
-                        dateTimeStart: userLogin.dateTimeStart,
-                        dateTimeEnd: formatDate(now),
-                        personnel: currentUser,
-                    }),
-                );
-                toast.success('Reset ca thành công', { autoClose: 2000 });
-                setVisibleReset(false);
-            } else {
-                toast.error('Mật khẩu xác nhận sai', { autoClose: 2000 });
-            }
+            bcrypt.compare(passwordReset, receiverDefault.users.password, function (err, isMatch) {
+                if (err) {
+                    throw err;
+                } else if (!isMatch) {
+                    toast.error('Mật khẩu xác nhận sai', { autoClose: 2000 });
+                } else {
+                    // dispatch(
+                    //     addReset({
+                    //         ...resetHandOver,
+                    //         totalMoney: handOver.moneyFirst + totalDeposits,
+                    //         dateTimeStart: userLogin.dateTimeStart,
+                    //         dateTimeEnd: formatDate(now),
+                    //         personnel: currentUser,
+                    //     }),
+                    // );
+                    toast.success('Reset ca thành công', { autoClose: 2000 });
+                    setVisibleReset(false);
+                }
+            });
+            //
         }
         setVisibleConfirmReset(false);
     }
@@ -249,12 +262,12 @@ function HandOver() {
                 </div>
                 <div className="grid grid-cols-3 mt-6 gap-6">
                     <div>
-                        <span>Tên nhân viên : {userLogin.personnel?.fullname}</span>
+                        <span>Tên nhân viên : {currentUser?.fullname}</span>
                     </div>
                     <div className="col-start-2 col-end-4">
                         <span className="bg-blue-100 text-blue-800 font-medium inline-flex items-center px-2 py-0.5 rounded dark:bg-blue-200 dark:text-blue-800">
                             <FontAwesomeIcon icon={faClock} className="mr-2" />
-                            {userLogin.dateTimeStart} đến {formatDate(now)}
+                            {histories[0]?.timeIn} đến {formatDate(now)}
                         </span>
                     </div>
                     <div>
@@ -344,6 +357,18 @@ function HandOver() {
                             </select>
                         </div>
                         <div>
+                            {/* <span>
+                                Tiền mặt giao ca :
+                                {(totalDeposits - handOver.surcharge + userLogin.moneyFirst - resetMoneyFromUserLogin >=
+                                0
+                                    ? totalDeposits -
+                                      handOver.surcharge +
+                                      userLogin.moneyFirst -
+                                      resetMoneyFromUserLogin
+                                    : 0
+                                ).toLocaleString()}
+                                đ
+                            </span> */}
                             <span>
                                 Tiền mặt giao ca :
                                 {(totalDeposits - handOver.surcharge + userLogin.moneyFirst - resetMoneyFromUserLogin >=
@@ -406,7 +431,7 @@ function HandOver() {
                                             {personnels
                                                 .filter(
                                                     (x) =>
-                                                        x.users.username !== userLogin.personnel?.users.username &&
+                                                        x.users.username !== currentUser?.users.username &&
                                                         x.users.roles.some((i) => i.name.includes('Quản lý')),
                                                 )
                                                 .map((x, index) => (
@@ -429,7 +454,7 @@ function HandOver() {
                                     <div>
                                         <span className="bg-blue-100 text-blue-800 font-medium inline-flex items-center px-2 py-0.5 rounded dark:bg-blue-200 dark:text-blue-800">
                                             <FontAwesomeIcon icon={faClock} className="mr-2" />
-                                            {userLogin.dateTimeStart} đến {formatDate(now)}
+                                            {histories[0]?.timeIn} đến {formatDate(now)}
                                         </span>
                                     </div>
                                     <div>

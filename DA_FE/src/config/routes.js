@@ -11,6 +11,7 @@ const routes = {
     searchRoom: '/room/search',
     room: '/room/detail',
     roomManage: '/admin/room-manage',
+    floorManage: '/admin/floor-manage',
     createRoomManage: '/admin/create-room',
     createOptionRoomManage: '/admin/create-option-room',
     rentalTypeManage: '/admin/rental-type-manage',
@@ -22,6 +23,6 @@ const routes = {
     kindOfRoom: '/admin/kind-of-room',
     rentalManage: '/admin/rental-manage/:type/:idRoomChoose',
     booking: '/booking',
-    bookingmanage: '/admin/booking-manage'
+    bookingmanage: '/admin/booking-manage',
 };
 export default routes;

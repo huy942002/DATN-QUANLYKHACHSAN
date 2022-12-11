@@ -31,20 +31,45 @@ function Booking() {
     const dispatch = useDispatch();
     console.log(room.kindOfRoom.priceByDay);
     console.log(valueDay);
-    const [price, setUrl] = useState((room.kindOfRoom.priceByDay) * valueDay);
+    const [price, setUrl] = useState(room.kindOfRoom.priceByDay * valueDay);
 
     const FacilityDetail = useSelector((state) => state.facilityDetail.facilityDetail);
 
-    const url = "http://localhost:8080/booking-pay/" + checkInday + "/" + checkOutday + "/" + room.kindOfRoom.id + "/" + cutomer.id + "/" + name+ "/" + mobinumber+ "/" + emailaddress+ "/" + citizenIdCode+ "?amount=" + price + "&bankcode=&language=vi&txt_billing_mobile=Thanh+toan+don+hang&txt_billing_email=" + room.email + "&txt_billing_fullname=" +  room.name + "%20anh&txt_inv_addr1=ha%20noi&txt_bill_city=ha%20noi&txt_bill_country=viet%20nam&txt_bill_state=ha%20noi&txt_inv_mobile=0389355471&txt_inv_email=quanganhsaker@gmail.com&txt_inv_customer=Nguy%E1%BB%85n%20Van%20A&txt_inv_addr1=ha%20noi&city&txt_inv_company=fsoft&txt_inv_taxcode=10&cbo_inv_type=other&vnp_OrderType=other&vnp_OrderInfo=order%20info%20test";
-    console.log(url)
+    const url =
+        'http://localhost:8080/booking-pay/' +
+        checkInday +
+        '/' +
+        checkOutday +
+        '/' +
+        room.kindOfRoom.id +
+        '/' +
+        cutomer.id +
+        '/' +
+        name +
+        '/' +
+        mobinumber +
+        '/' +
+        emailaddress +
+        '/' +
+        citizenIdCode +
+        '?amount=' +
+        price +
+        '&bankcode=&language=vi&txt_billing_mobile=Thanh+toan+don+hang&txt_billing_email=' +
+        room.email +
+        '&txt_billing_fullname=' +
+        room.name +
+        '%20anh&txt_inv_addr1=ha%20noi&txt_bill_city=ha%20noi&txt_bill_country=viet%20nam&txt_bill_state=ha%20noi&txt_inv_mobile=0389355471&txt_inv_email=quanganhsaker@gmail.com&txt_inv_customer=Nguy%E1%BB%85n%20Van%20A&txt_inv_addr1=ha%20noi&city&txt_inv_company=fsoft&txt_inv_taxcode=10&cbo_inv_type=other&vnp_OrderType=other&vnp_OrderInfo=order%20info%20test';
+    console.log(url);
     useEffect(() => {
         dispatch(getAllKindOfRoom());
-
     }, []);
 
-
     function handleAdd() {
-        window.open(url, 'mywindow','location=1,status=1,scrollbars=1, resizable=1, directories=1, toolbar=1, titlebar=1');
+        window.open(
+            url,
+            'mywindow',
+            'location=1,status=1,scrollbars=1, resizable=1, directories=1, toolbar=1, titlebar=1',
+        );
     }
     return (
         <div>
@@ -82,20 +107,16 @@ function Booking() {
             <div className="grid grid-cols-3 gap-6 mx-36 mt-10">
                 <div className="col-start-1 col-end-3 border-2 border-slate-200 rounded-md p-5">
                     <h5 className="font-bold">Thông tin chi tiết phòng</h5>
-                    <div className='grid grid-cols-2 gap-6'>
+                    <div className="grid grid-cols-2 gap-6">
                         <div className="mt-4">
-                            <img
-                                className="object-cover rounded-md"
-                                src={room.img}
-                                alt=""
-                            />
+                            <img className="object-cover rounded-md" src={room.img} alt="" />
                         </div>
                         <p className="mt-4">
-                            Phòng nghỉ này có Wi-Fi miễn phí trong tất cả các phòng giúp dễ dàng kết nối và đỗ xe miễn phí.
-                            Nằm ở vị trí trung tâm tại Nusa Penida của Bali, chỗ nghỉ này đặt quý khách ở gần các điểm thu
-                            hút và tùy chọn ăn uống thú vị. Đừng rời đi trước khi ghé thăm Sacred Monkey Forest Sanctuary
-                            nổi tiếng. Được xếp hạng 4 sao, chỗ nghỉ chất lượng cao này cho phép khách nghỉ sử dụng mát-xa,
-                            bể bơi ngoài trời và nhà hàng ngay trong khuôn viên.
+                            Phòng nghỉ này có Wi-Fi miễn phí trong tất cả các phòng giúp dễ dàng kết nối và đỗ xe miễn
+                            phí. Nằm ở vị trí trung tâm tại Nusa Penida của Bali, chỗ nghỉ này đặt quý khách ở gần các
+                            điểm thu hút và tùy chọn ăn uống thú vị. Đừng rời đi trước khi ghé thăm Sacred Monkey Forest
+                            Sanctuary nổi tiếng. Được xếp hạng 4 sao, chỗ nghỉ chất lượng cao này cho phép khách nghỉ sử
+                            dụng mát-xa, bể bơi ngoài trời và nhà hàng ngay trong khuôn viên.
                         </p>
                     </div>
 
@@ -122,83 +143,71 @@ function Booking() {
                                 <span className="mt-4 mx-3 ">{f.facilities.name}</span>
                             </div>
                         ))}
-
                     </div>
-                    <h5 className="font-bold text-xl text-red-500 mt-6">Giá phòng : {room?.kindOfRoom?.priceByDay || ''} \1 Đêm</h5>
-
+                    <h5 className="font-bold text-xl text-red-500 mt-6">
+                        Giá phòng : {room?.kindOfRoom?.priceByDay || ''} \1 Đêm
+                    </h5>
                 </div>
                 <div className="border-2 border-slate-200 rounded-md p-5">
                     <h5 className="font-bold">Thông tin người đặt</h5>
-                    <div className='mt-4'>
-                        <label
-                            htmlFor=""
-                            className="mb-2 mr-3 text-gray-900 dark:text-gray-300 font-bold"
-                        >
-                            Tên người nhận phòng  :
+                    <div className="mt-4">
+                        <label htmlFor="" className="mb-2 mr-3 text-gray-900 dark:text-gray-300 font-bold">
+                            Tên người nhận phòng :
                         </label>
                         <input
-                        onChange={(e) => {
-                            setname(e.target.value)
-                        }}
+                            onChange={(e) => {
+                                setname(e.target.value);
+                            }}
                             type="text"
                             id="nameRoom"
                             name="nameRoom"
                             defaultValue={cutomer.fullname || ''}
-                            className="w-48 p-1 rounded"
+                            className="mt-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         />
                     </div>
-                    <div className='mt-4'>
-                        <label
-                            htmlFor=""
-                            className="mb-2 mr-3 text-gray-900 dark:text-gray-300 font-bold"
-                        >
-                            Số điện thoại  :
+                    <div className="mt-4">
+                        <label htmlFor="" className="mb-2 mr-3 text-gray-900 dark:text-gray-300 font-bold">
+                            Số điện thoại :
                         </label>
                         <input
-                        onChange={(e) => {
-                            setmobinumber(e.target.value)
-                        }}
+                            onChange={(e) => {
+                                setmobinumber(e.target.value);
+                            }}
                             type="text"
                             id="SDT"
                             name="SDT"
                             defaultValue={cutomer.phoneNumber || ''}
-                            className="w-48 p-1 rounded"
+                            className="mt-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         />
                     </div>
-                    <div className='mt-4'>
-                        <label
-                            htmlFor=""
-                            className="mb-2 mr-3 text-gray-900 dark:text-gray-300 font-bold"
-                        >
-                            Địa chỉ Email  :
+                    <div className="mt-4">
+                        <label htmlFor="" className="mb-2 mr-3 text-gray-900 dark:text-gray-300 font-bold">
+                            Địa chỉ Email :
                         </label>
                         <input
-                        onChange={(e) => {
-                            setaddress(e.target.value)
-                        }}
+                            onChange={(e) => {
+                                setaddress(e.target.value);
+                            }}
                             type="text"
                             id="SDT"
                             name="SDT"
                             defaultValue={cutomer.email || ''}
-                            className="w-48 p-1 rounded"
+                            className="mt-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         />
                     </div>
-                    <div className='mt-4'>
-                        <label
-                            htmlFor=""
-                            className="mb-2 mr-3 text-gray-900 dark:text-gray-300 font-bold"
-                        >
+                    <div className="mt-4">
+                        <label htmlFor="" className="mb-2 mr-3 text-gray-900 dark:text-gray-300 font-bold">
                             Số chứng minh thư :
                         </label>
                         <input
-                        onChange={(e) => {
-                           setcitizenIdCode(e.target.value)
-                        }}
+                            onChange={(e) => {
+                                setcitizenIdCode(e.target.value);
+                            }}
                             type="text"
                             id="SDT"
                             name="SDT"
                             defaultValue={cutomer.citizenIdCode || ''}
-                            className="w-48 p-1 rounded"
+                            className="mt-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         />
                     </div>
                 </div>
@@ -208,11 +217,7 @@ function Booking() {
                     <div className="border-2 border-slate-200 rounded-md p-5">
                         <div className="grid grid-cols-3 gap-6">
                             <div>
-                                <img
-                                    className="object-cover h-full rounded-lg"
-                                    src={room.img}
-                                    alt=""
-                                />
+                                <img className="object-cover h-full rounded-lg" src={room.img} alt="" />
                             </div>
                             <div className="col-start-2 col-end-4">
                                 <h5 className="font-bold mt-3 mb-2">Lợi ích có sẵn</h5>
@@ -239,11 +244,11 @@ function Booking() {
                                     </li>
                                     <li>
                                         <FontAwesomeIcon icon={faCheck} color="green" className="mr-2" />
-                                        Check out: {checkOutday} from  12h00
+                                        Check out: {checkOutday} from 12h00
                                     </li>
                                 </ul>
                                 <button
-                                onClick={()=>handleAdd()}
+                                    onClick={() => handleAdd()}
                                     type="button"
                                     className="py-2 px-3 float-right text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                                 >

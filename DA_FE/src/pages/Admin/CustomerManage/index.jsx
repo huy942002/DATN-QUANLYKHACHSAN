@@ -38,7 +38,10 @@ const CustomerSchema = Yup.object().shape({
     fullname: Yup.string().required('Tên khách hàng không được để trống'),
     email: Yup.string().email('Sai định dạng email').required('Email không được để trống'),
     gender: Yup.string().nullable(),
-    citizenIdCode: Yup.number().typeError('CCCD/CMNT phải là số').required('CMND/CCCD không được để trống'),
+    citizenIdCode: Yup.number()
+        .typeError('CCCD/CMNT phải là số')
+        .max(50, 'CCCD không quá 12 số')
+        .required('CMND/CCCD không được để trống'),
     dateOfBirth: Yup.string().required('Ngày sinh không được để trống'),
     phoneNumber: Yup.string().required('Số điện thoại không được để trống'),
     address: Yup.string().required('Địa chỉ không được để trống'),
@@ -569,13 +572,13 @@ function CustomerManage() {
                                                     className={`
                                                     bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
                                                     ${
-                                                        errors.filename && touched.filename
+                                                        errors.fullname && touched.fullname
                                                             ? 'border-2 border-rose-600'
                                                             : ''
                                                     } `}
                                                 />
-                                                {errors.filename && touched.filename ? (
-                                                    <div className="text-sm text-red-600 mt-2">{errors.filename}</div>
+                                                {errors.fullname && touched.fullname ? (
+                                                    <div className="text-sm text-red-600 mt-2">{errors.fullname}</div>
                                                 ) : null}
                                             </div>
                                             <div>

@@ -31,7 +31,7 @@ function KindOfRoomManage() {
     const [visibleDeleteType, setVisibleDeleteType] = useState(false);
     const [visibleUpdateType, setVisibleUpdateType] = useState(false);
     const [visibleAddType, setVisibleAddType] = useState(false);
-    const [valueSearch2, setValueSearch2] = useState('');
+    const [valueSearch, setValueSearch] = useState('');
     const [kindOfRooms, setKindOfRoom] = useState(objKindOfRoom);
     const kindOfRoom = useSelector((state) => state.kindOfRoom.kindOfRoom);
     const kindRoom = useSelector((state) => state.kindOfRoom.kindRoom);
@@ -89,7 +89,7 @@ function KindOfRoomManage() {
                         </div>
                         <input
                             type="search"
-                            onChange={(e) => setTimeout(() => setValueSearch2(e.target.value), 1000)}
+                            onChange={(e) => setTimeout(() => setValueSearch(e.target.value), 1000)}
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                             placeholder="Tìm kiếm..."
                         />
@@ -135,12 +135,12 @@ function KindOfRoomManage() {
                         </thead>
                         <tbody>
                             {kindOfRoom
-                                .filter((x) => x.name.toLowerCase().includes(valueSearch2))
+                                .filter((x) => x.name.toLowerCase().includes(valueSearch))
                                 .map((x) => (
                                     <tr className="bg-white dark:bg-gray-800" key={x.id}>
                                         <td className="py-4 px-6">{x.name}</td>
-                                        <td className="py-4 px-6">{x.priceByDay}</td>
-                                        <td className="py-4 px-6">{x.hourlyPrice}</td>
+                                        <td className="py-4 px-6">{x.priceByDay.toLocaleString()}</td>
+                                        <td className="py-4 px-6">{x.hourlyPrice.toLocaleString()}</td>
                                         <td className="py-4 px-6">{x.note}</td>
                                         <td className="py-4 px-6">{x.status === 1 ? 'Hoạt động' : 'Không tồn tại'}</td>
                                         <td className="py-4 px-6">
@@ -203,8 +203,8 @@ function KindOfRoomManage() {
                                     initialValues={{
                                         ...kindOfRooms,
                                         name: kindOfRooms.name || '',
-                                        priceByDay: kindOfRooms.priceByDay || '',
-                                        hourlyPrice: kindOfRooms.hourlyPrice || '',
+                                        priceByDay: kindOfRooms.priceByDay || 0,
+                                        hourlyPrice: kindOfRooms.hourlyPrice || 0,
                                         note: kindOfRooms.note || '',
                                     }}
                                     validationSchema={KindOfRoomSchema}
@@ -234,6 +234,52 @@ function KindOfRoomManage() {
                                                     />
                                                     {errors.name && touched.name ? (
                                                         <div className="text-sm text-red-600 mt-2">{errors.name}</div>
+                                                    ) : null}
+                                                </div>
+                                                <div>
+                                                    <label
+                                                        htmlFor="priceByDay"
+                                                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                    >
+                                                        Giá theo ngày
+                                                    </label>
+                                                    <Field
+                                                        name="priceByDay"
+                                                        className={`
+                                                        bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                        ${
+                                                            errors.priceByDay && touched.priceByDay
+                                                                ? 'border-2 border-rose-600'
+                                                                : ''
+                                                        } `}
+                                                    />
+                                                    {errors.priceByDay && touched.priceByDay ? (
+                                                        <div className="text-sm text-red-600 mt-2">
+                                                            {errors.priceByDay}
+                                                        </div>
+                                                    ) : null}
+                                                </div>
+                                                <div>
+                                                    <label
+                                                        htmlFor="priceByDay"
+                                                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                    >
+                                                        Giá theo giờ
+                                                    </label>
+                                                    <Field
+                                                        name="hourlyPrice"
+                                                        className={`
+                                                        bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                        ${
+                                                            errors.hourlyPrice && touched.hourlyPrice
+                                                                ? 'border-2 border-rose-600'
+                                                                : ''
+                                                        } `}
+                                                    />
+                                                    {errors.hourlyPrice && touched.hourlyPrice ? (
+                                                        <div className="text-sm text-red-600 mt-2">
+                                                            {errors.hourlyPrice}
+                                                        </div>
                                                     ) : null}
                                                 </div>
                                                 <div className="col-start-1 col-end-3">
@@ -300,6 +346,50 @@ function KindOfRoomManage() {
                                                 />
                                                 {errors.name && touched.name ? (
                                                     <div className="text-sm text-red-600 mt-2">{errors.name}</div>
+                                                ) : null}
+                                            </div>
+                                            <div>
+                                                <label
+                                                    htmlFor="priceByDay"
+                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                >
+                                                    Giá theo ngày
+                                                </label>
+                                                <Field
+                                                    name="priceByDay"
+                                                    className={`
+                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                    ${
+                                                        errors.priceByDay && touched.priceByDay
+                                                            ? 'border-2 border-rose-600'
+                                                            : ''
+                                                    } `}
+                                                />
+                                                {errors.priceByDay && touched.priceByDay ? (
+                                                    <div className="text-sm text-red-600 mt-2">{errors.priceByDay}</div>
+                                                ) : null}
+                                            </div>
+                                            <div>
+                                                <label
+                                                    htmlFor="hourlyPrice"
+                                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                                >
+                                                    Giá theo giờ
+                                                </label>
+                                                <Field
+                                                    name="hourlyPrice"
+                                                    className={`
+                                                    bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                                    ${
+                                                        errors.hourlyPrice && touched.hourlyPrice
+                                                            ? 'border-2 border-rose-600'
+                                                            : ''
+                                                    } `}
+                                                />
+                                                {errors.hourlyPrice && touched.hourlyPrice ? (
+                                                    <div className="text-sm text-red-600 mt-2">
+                                                        {errors.hourlyPrice}
+                                                    </div>
                                                 ) : null}
                                             </div>
                                             <div className="col-start-1 col-end-3">

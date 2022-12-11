@@ -9,8 +9,8 @@ import { toast } from 'react-toastify';
 import { Button, Modal } from 'flowbite-react';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getAllPersonnel, getPersonnelById, update } from '~/app/reducers/personnel';
 import { add as addAutho, getAllAuthority } from '~/app/reducers/authority';
+import { getAllPersonnel, getPersonnelById, update } from '~/app/reducers/personnel';
 
 const objPersonnel = {
     fullname: '',
@@ -100,26 +100,16 @@ function Authorization() {
         } else {
             dispatch(
                 addAutho({
-                    ...objAuth,
                     status: 1,
                     roles: {
                         id: 2,
                         name: 'Nhân viên',
                         status: 1,
                     },
-                    users: {
-                        ...autho.users,
-                        roles: [
-                            ...autho.users.roles,
-                            {
-                                id: 2,
-                                name: 'Nhân viên',
-                                status: 1,
-                            },
-                        ],
-                    },
+                    users: person.users,
                 }),
             );
+            window.location.reload();
             setVisibleUnCheckAdmin(false);
         }
         toast.success('Cập nhật thành công', { autoClose: 2000 });
@@ -139,26 +129,18 @@ function Authorization() {
             );
             setVisibleCheckDirector(false);
         } else {
-            addAutho({
-                ...objAuth,
-                status: 1,
-                roles: {
-                    id: 1,
-                    name: 'Quản lý',
+            dispatch(
+                addAutho({
                     status: 1,
-                },
-                users: {
-                    ...autho.users,
-                    roles: [
-                        ...autho.users.roles,
-                        {
-                            id: 1,
-                            name: 'Quản lý',
-                            status: 1,
-                        },
-                    ],
-                },
-            });
+                    roles: {
+                        id: 1,
+                        name: 'Quản lý',
+                        status: 1,
+                    },
+                    users: person.users,
+                }),
+            );
+            window.location.reload();
             setVisibleUnCheckDirector(false);
         }
         toast.success('Cập nhật thành công', { autoClose: 2000 });
@@ -193,10 +175,10 @@ function Authorization() {
                         <thead className="text-xs text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                             <tr>
                                 <th scope="col" className="py-3 px-6">
-                                    Nhân viên
+                                    Họ tên
                                 </th>
                                 <th scope="col" className="py-3 px-6 text-center">
-                                    Admin
+                                    Nhân viên
                                 </th>
                                 <th scope="col" className="py-3 px-6 text-center">
                                     Quản lý
@@ -210,11 +192,7 @@ function Authorization() {
                                     <td className="py-4 px-6 text-center">
                                         <input
                                             role="button"
-                                            checked={
-                                                x.users.roles.findIndex((x) => x.name === 'Nhân viên') === 0
-                                                    ? true
-                                                    : false
-                                            }
+                                            checked={x.users.roles.find((x) => x.name === 'Nhân viên') ? true : false}
                                             id={x.id}
                                             type="checkbox"
                                             value="admin"

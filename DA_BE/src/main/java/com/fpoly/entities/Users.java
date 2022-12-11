@@ -52,10 +52,10 @@ public class Users implements Serializable {
 	@JoinTable(name = "authority", joinColumns = @JoinColumn(name = "id_user"), inverseJoinColumns = @JoinColumn(name = "id_roles"))
 	private Set<Roles> roles;
 
-	@OneToMany(mappedBy = "users")
+	@OneToMany(mappedBy = "users", cascade = CascadeType.ALL)
 	@JsonIgnore
 	private Set<Customer> customer;
-	
+
 	@OneToMany(mappedBy = "users")
 	@JsonIgnore
 	private Set<History> history;
