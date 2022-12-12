@@ -3,8 +3,20 @@ import config from '~/config';
 
 import { faBook, faCircleQuestion, faPhone, faTag, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useEffect } from 'react';
+import { getCustomerByNameUser } from '~/app/reducers/customer';
+import { useDispatch, useSelector } from 'react-redux';
+
+const user = window.sessionStorage.getItem('user');
 
 function Header() {
+    const userLogin = useSelector((state) => state.customer.customer);
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(getCustomerByNameUser(user));
+    }, []);
+
     return (
         <div>
             <div className="grid grid-cols-6 space-x-2 px-20 bg-slate-200 pt-3 pb-3">
@@ -26,12 +38,18 @@ function Header() {
                 </div>
                 <div className="text-center col-start-5 col-end-7">
                     <FontAwesomeIcon icon={faUser} />
-                    <span className="px-3 text-sm">
-                        <Link to={config.routes.login}>Đăng nhập</Link>
-                    </span>
-                    <span className="px-3 text-sm text-blue-500 font-bold">
-                        <Link to={config.routes.signup}>Đăng ký</Link>
-                    </span>
+                    {user.length > 0 ? (
+                        <span className="ml-2">Xin chào {userLogin.fullname} !</span>
+                    ) : (
+                        <div>
+                            <span className="px-3 text-sm">
+                                <Link to={config.routes.login}>Đăng nhập</Link>
+                            </span>
+                            <span className="px-3 text-sm text-blue-500 font-bold">
+                                <Link to={config.routes.signup}>Đăng ký</Link>
+                            </span>
+                        </div>
+                    )}
                 </div>
             </div>
             <div className="grid grid-cols-6 px-20 pt-1 pb-1 bg-blue-500 text-white">

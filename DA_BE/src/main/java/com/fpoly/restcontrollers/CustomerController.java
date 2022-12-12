@@ -56,8 +56,6 @@ public class CustomerController {
 	@GetMapping("/nameUser/{username}")
 	public ResponseEntity<Customer> getCustomerBynameUser(@PathVariable String username) {
 		Optional<Customer> c = repository2.getCutomer(username);
-		System.out.println("/////////////////");
-		System.out.println(c.get().getFullname()+"///////");
 		return c.map(customer -> new ResponseEntity<>(customer, HttpStatus.OK))
 				.orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
 	}

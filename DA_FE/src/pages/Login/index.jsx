@@ -36,6 +36,8 @@ function LoginAdmin() {
                 dispatch(getCustomerByNameUser(data.username));
                 navigate('/');
                 window.sessionStorage.setItem('token', res.headers.token);
+                window.sessionStorage.setItem('user', data.username);
+                window.location.reload();
             })
             .catch((error) => {
                 toast.error('Sai thông tin đăng nhập', { autoClose: 2000 });

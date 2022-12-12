@@ -31,24 +31,24 @@ const objRoom = {
         note: '',
         priceByDay: '',
         hourlyPrice: '',
-        status: ''
+        status: '',
     },
     numberOfFloors: {
         id: '',
         numberOfFloors: 0,
-        status: ''
-    }
+        status: '',
+    },
 };
 
 const dataOption = {
-    sl1: 0
-}
+    sl1: 0,
+};
 
 const NumberOfFloorss = {
     id: '',
     numberOfFloors: '',
-    status: 1
-}
+    status: 1,
+};
 
 const obj = {
     id: '',
@@ -72,13 +72,13 @@ const obj = {
                 note: '',
                 priceByDay: '',
                 hourlyPrice: '',
-                status: ''
+                status: '',
             },
             numberOfFloors: {
                 id: '',
                 numberOfFloors: '',
-                status: ''
-            }
+                status: '',
+            },
         },
         servicess: {
             id: '',
@@ -90,13 +90,11 @@ const obj = {
                 id: '',
                 name: '',
                 note: '',
-                status: ''
-            }
-        }
-    }
-}
-
-
+                status: '',
+            },
+        },
+    },
+};
 
 function CreateOptionRoomManager() {
     const [visibleAdd2, setVisibleAdd2] = useState(false);
@@ -113,15 +111,15 @@ function CreateOptionRoomManager() {
     const [ServiceAvailableUD, setServiceAvailableUD] = useState([obj]);
     const [data2, setData] = useState(dataOption);
     const [NumberOfFlooradd, setNumberOfFloor] = useState(NumberOfFloorss);
-    const [image, setImage] = useState("");
-    const [image1, setImage1] = useState("");
-    const [image2, setImage2] = useState("");
-    const [image3, setImage3] = useState("");
-    const [url, setUrl] = useState("");
-    const [url1, setUrl1] = useState("");
-    const [url2, setUrl2] = useState("");
-    const [url3, setUrl3] = useState("");
-    const [updatestatus, setupdatestatus] = useState("1");
+    const [image, setImage] = useState('');
+    const [image1, setImage1] = useState('');
+    const [image2, setImage2] = useState('');
+    const [image3, setImage3] = useState('');
+    const [url, setUrl] = useState('');
+    const [url1, setUrl1] = useState('');
+    const [url2, setUrl2] = useState('');
+    const [url3, setUrl3] = useState('');
+    const [updatestatus, setupdatestatus] = useState('1');
     const dispatch = useDispatch();
 
     const addServiceAvailable = (id, value, sl, services) => {
@@ -145,13 +143,13 @@ function CreateOptionRoomManager() {
                     note: '',
                     priceByDay: '',
                     hourlyPrice: '',
-                    status: ''
+                    status: '',
                 },
                 numberOfFloors: {
                     id: '',
                     numberOfFloors: '',
-                    status: ''
-                }
+                    status: '',
+                },
             },
             servicess: {
                 id: services.id,
@@ -163,10 +161,10 @@ function CreateOptionRoomManager() {
                     id: services.serviceType.id,
                     name: services.serviceType.name,
                     note: services.serviceType.note,
-                    status: services.serviceType.status
-                }
-            }
-        }
+                    status: services.serviceType.status,
+                },
+            },
+        };
         setServiceAvailable(() => [...ServiceAvailable, obj]);
     };
 
@@ -177,7 +175,7 @@ function CreateOptionRoomManager() {
             facilities: {
                 id: value.id,
                 name: value.name,
-                status: value.status
+                status: value.status,
             },
             rooms: {
                 id: '',
@@ -194,126 +192,121 @@ function CreateOptionRoomManager() {
                     note: '',
                     priceByDay: '',
                     hourlyPrice: '',
-                    status: ''
+                    status: '',
                 },
                 numberOfFloors: {
                     id: '',
                     numberOfFloors: '',
-                    status: ''
-                }
-            }
-        }
+                    status: '',
+                },
+            },
+        };
 
         setFacilitieDetails(() => [...FacilitieDetails, obj]);
         console.log(FacilitieDetails);
     };
 
     function deleteItem(id) {
-        console.log(id)
-        setFacilitieDetails(FacilitieDetails.filter(item => item.id !== id));
+        console.log(id);
+        setFacilitieDetails(FacilitieDetails.filter((item) => item.id !== id));
     }
 
     function deleteItem2(id) {
-        console.log(id)
-        setServiceAvailable(ServiceAvailable.filter(item => item.id !== id));
+        console.log(id);
+        setServiceAvailable(ServiceAvailable.filter((item) => item.id !== id));
     }
 
     function uploadImage(dataRoom, datasl) {
         if (datasl === 0) {
-            toast.error("Bạn chưa điền số phòng muốn tạo!", { autoClose: 2000 })
+            toast.error('Bạn chưa điền số phòng muốn tạo!', { autoClose: 2000 });
         } else if (dataRoom.name === '') {
-            toast.error("Bạn chưa điền tên phòng!", { autoClose: 2000 })
-        }
-        else {
+            toast.error('Bạn chưa điền tên phòng!', { autoClose: 2000 });
+        } else {
             console.log(parseInt(NumberOfFloor.numberOfFloors) + 1);
             console.log({ ...NumberOfFlooradd, numberOfFloors: parseInt(NumberOfFloor.numberOfFloors) + 1 });
             dispatch(AddNBF({ ...NumberOfFlooradd, numberOfFloors: parseInt(NumberOfFloor.numberOfFloors) + 1 }));
-            const data = new FormData()
-            data.append("file", image)
-            data.append("upload_preset", "datnqlks")
-            data.append("cloud_name", "dbjvfbdix")
-            fetch("https://api.cloudinary.com/v1_1/dbjvfbdix/image/upload", {
-                method: "post",
+            const data = new FormData();
+            data.append('file', image);
+            data.append('upload_preset', 'datnqlks');
+            data.append('cloud_name', 'dbjvfbdix');
+            fetch('https://api.cloudinary.com/v1_1/dbjvfbdix/image/upload', {
+                method: 'post',
                 body: data,
             })
-                .then(resp => resp.json())
-                .then(data => {
+                .then((resp) => resp.json())
+                .then((data) => {
                     setUrl(data.url);
                     console.log(data.url);
                     console.log(data);
-                    const data1 = new FormData()
-                    data1.append("file", image1)
-                    data1.append("upload_preset", "datnqlks")
-                    data1.append("cloud_name", "dbjvfbdix")
-                    fetch("https://api.cloudinary.com/v1_1/dbjvfbdix/image/upload", {
-                        method: "post",
+                    const data1 = new FormData();
+                    data1.append('file', image1);
+                    data1.append('upload_preset', 'datnqlks');
+                    data1.append('cloud_name', 'dbjvfbdix');
+                    fetch('https://api.cloudinary.com/v1_1/dbjvfbdix/image/upload', {
+                        method: 'post',
                         body: data1,
                     })
-                        .then(resp => resp.json())
-                        .then(data11 => {
+                        .then((resp) => resp.json())
+                        .then((data11) => {
                             setUrl1(data11.url);
                             console.log(url1);
                             console.log(data11);
-                            const data2 = new FormData()
-                            data2.append("file", image2)
-                            data2.append("upload_preset", "datnqlks")
-                            data2.append("cloud_name", "dbjvfbdix")
-                            fetch("https://api.cloudinary.com/v1_1/dbjvfbdix/image/upload", {
-                                method: "post",
+                            const data2 = new FormData();
+                            data2.append('file', image2);
+                            data2.append('upload_preset', 'datnqlks');
+                            data2.append('cloud_name', 'dbjvfbdix');
+                            fetch('https://api.cloudinary.com/v1_1/dbjvfbdix/image/upload', {
+                                method: 'post',
                                 body: data2,
                             })
-                                .then(resp => resp.json())
-                                .then(data21 => {
+                                .then((resp) => resp.json())
+                                .then((data21) => {
                                     setUrl2(data21.url);
                                     console.log(url2);
                                     console.log(data21);
-                                    const data3 = new FormData()
-                                    data3.append("file", image3)
-                                    data3.append("upload_preset", "datnqlks")
-                                    data3.append("cloud_name", "dbjvfbdix")
-                                    fetch("https://api.cloudinary.com/v1_1/dbjvfbdix/image/upload", {
-                                        method: "post",
+                                    const data3 = new FormData();
+                                    data3.append('file', image3);
+                                    data3.append('upload_preset', 'datnqlks');
+                                    data3.append('cloud_name', 'dbjvfbdix');
+                                    fetch('https://api.cloudinary.com/v1_1/dbjvfbdix/image/upload', {
+                                        method: 'post',
                                         body: data3,
                                     })
-                                        .then(resp => resp.json())
-                                        .then(data31 => {
+                                        .then((resp) => resp.json())
+                                        .then((data31) => {
                                             setUrl3(data31.url);
                                             console.log(url3);
                                             console.log(data31);
                                             addRoom(dataRoom, datasl);
                                         })
-                                        .catch(err3 => console.log(err3))
+                                        .catch((err3) => console.log(err3));
                                 })
-                                .catch(err2 => console.log(err2))
+                                .catch((err2) => console.log(err2));
                         })
-                        .catch(err1 => console.log(err1))
+                        .catch((err1) => console.log(err1));
                 })
-                .catch(err => console.log(err))
+                .catch((err) => console.log(err));
         }
     }
 
     useEffect(() => {
-        dispatch(getByIdNumberOfFloorslast())
+        dispatch(getByIdNumberOfFloorslast());
         dispatch(getAllNumberOfFloors());
         dispatch(getAllKindOfRoom());
         dispatch(getAllFacility());
         dispatch(getAllService());
-
-    }, [roomAdd])
-
+    }, [roomAdd]);
 
     useEffect(() => {
         dispatch(getAllNumberOfFloors());
         dispatch(getAllKindOfRoom());
         dispatch(getAllFacility());
         dispatch(getAllService());
-
-    }, [])
+    }, []);
 
     useEffect(() => {
         setRoomAdd(roomAdd);
-
-    }, [data2])
+    }, [data2]);
 
     // const getNBF = () => {
     //     dispatch(getAllNumberOfFloors());
@@ -323,35 +316,46 @@ function CreateOptionRoomManager() {
         setRoomAdd(data);
         if (roomAdd.kindOfRoom.id === '') {
             // default no change gender and nationality
-            setRoomAdd({ ...roomAdd, kindOfRoom: KindOfRoom[0], img: url, img1: url1, img2: url2, img3: url3, status: 1 });
-        }
-        else if (roomAdd.note === '') {
+            setRoomAdd({
+                ...roomAdd,
+                kindOfRoom: KindOfRoom[0],
+                img: url,
+                img1: url1,
+                img2: url2,
+                img3: url3,
+                status: 1,
+            });
+        } else if (roomAdd.note === '') {
             // default no change gender and nationality
-            setRoomAdd({ ...roomAdd, kindOfRoom: KindOfRoom[0], img: url, img1: url1, img2: url2, img3: url3, status: 1 });
-        }
-        else {
+            setRoomAdd({
+                ...roomAdd,
+                kindOfRoom: KindOfRoom[0],
+                img: url,
+                img1: url1,
+                img2: url2,
+                img3: url3,
+                status: 1,
+            });
+        } else {
             setRoomAdd({ ...roomAdd, img: url, img1: url1, img2: url2, img3: url3, status: 1 });
         }
         // dispatch(addRoomOption({ sl: datasl, roomAdd, FacilitieDetails, ServiceAvailable }));
 
-
-        const response = await axios.post('http://localhost:8080/api/room/Option/' + datasl, {
-            rooms: roomAdd,
-            facilitiesDetailsList: FacilitieDetails,
-            serviceAvailableList: ServiceAvailable,
-        }).then(res => {
-            if (res) {
-                toast.success('Thêm thành công', { autoClose: 2000 });
-            }
-        }).catch(err => {
-            setTimeout(() => {
-
-            }, 1000);
-        }).finally(() => {
-
-        });
-
-
+        const response = await axios
+            .post('http://localhost:8080/api/room/Option/' + datasl, {
+                rooms: roomAdd,
+                facilitiesDetailsList: FacilitieDetails,
+                serviceAvailableList: ServiceAvailable,
+            })
+            .then((res) => {
+                if (res) {
+                    toast.success('Thêm thành công', { autoClose: 2000 });
+                }
+            })
+            .catch((err) => {
+                setTimeout(() => {}, 1000);
+            })
+            .finally(() => {});
     };
 
     function getModal() {
@@ -366,12 +370,19 @@ function CreateOptionRoomManager() {
         let array = [...ServiceAvailable];
         array.map((o, i) => {
             if (o.id === id1) {
-                array[i] = { id: id1, quantity: value, prices: o.prices, status: o.status, rooms: o.rooms, servicess: o.servicess }
-                console.log(array[i])
+                array[i] = {
+                    id: id1,
+                    quantity: value,
+                    prices: o.prices,
+                    status: o.status,
+                    rooms: o.rooms,
+                    servicess: o.servicess,
+                };
+                console.log(array[i]);
             }
         });
         setServiceAvailable([...array]);
-    }
+    };
 
     return (
         <div className="text-black p-3">
@@ -386,9 +397,7 @@ function CreateOptionRoomManager() {
                         </Link>
                     </li>
                     <li>
-                        <Link
-                            to={config.routes.roomManage}
-                        >
+                        <Link to={config.routes.roomManage}>
                             <FontAwesomeIcon icon={faChevronRight}></FontAwesomeIcon>
                             Quản lý Chi tiết phòng
                         </Link>
@@ -402,37 +411,27 @@ function CreateOptionRoomManager() {
                 </ol>
             </nav>
 
-            <div className="mb-2 border-b-4 mx-14 border-blue-600 dark:border-blue-600">
-                <ul className="flex flex-wrap -mb-px text-sm font-medium text-center">
-
-                </ul>
-            </div>
-
             <div className="mt-8 rounded-full">
-                <div className='shadow-2xl'>
-                    <form className='mx-4 my-4 divide-y-4 divide-slate-400/25'>
+                <div>
+                    <form className="mx-4 my-4 divide-y-4 divide-slate-400/25">
                         <div className="grid grid-cols-5 gap-4 text-black mb-4">
                             <div className="mt-4">
-                                <label
-                                    htmlFor=""
-                                    className="text-gray-900 dark:text-gray-300 font-bold"
-                                >
+                                <label htmlFor="" className="text-gray-900 dark:text-gray-300 font-bold">
                                     Số Phòng muốn tạo :
-                                </label></div>
+                                </label>
+                            </div>
                             <div className="col-span-4 mt-4">
                                 <input
                                     type="number"
                                     id=""
                                     onChange={(e) => setData({ ...data2, sl1: e.target.value })}
-                                    className="w-full p-1 rounded"
+                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                     placeholder=""
-                                /></div>
+                                />
+                            </div>
                             <div className="mt-4">
-                                <label
-                                    htmlFor=""
-                                    className="text-gray-900 dark:text-gray-300 font-bold"
-                                >
-                                    Số Tầng  :
+                                <label htmlFor="" className="text-gray-900 dark:text-gray-300 font-bold">
+                                    Số Tầng :
                                 </label>
                             </div>
                             <div className="col-span-4 mt-4">
@@ -442,13 +441,13 @@ function CreateOptionRoomManager() {
                                     name="nameNBF"
                                     defaultValue={parseInt(NumberOfFloor.numberOfFloors) + 1 || ''}
                                     disabled={true}
-                                    className="w-full p-1 text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
+                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                    placeholder=" "
+                                    required
+                                />
                             </div>
                             <div className="mt-4">
-                                <label
-                                    htmlFor=""
-                                    className="text-gray-900 dark:text-gray-300 font-bold"
-                                >
+                                <label htmlFor="" className="text-gray-900 dark:text-gray-300 font-bold">
                                     Tên Phòng :
                                 </label>
                             </div>
@@ -458,7 +457,7 @@ function CreateOptionRoomManager() {
                                     id="nameRoom"
                                     name="nameRoom"
                                     onChange={(e) => setRoomAdd({ ...roomAdd, name: e.target.value })}
-                                    className="w-full p-1 rounded"
+                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                 />
                             </div>
                             <div className="mt-4">
@@ -468,8 +467,7 @@ function CreateOptionRoomManager() {
                                 <select
                                     name="KindOfRoom"
                                     id="KindOfRoom"
-                                    className="w-full rounded"
-
+                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                     onChange={(e) => {
                                         const index = e.target.options[e.target.selectedIndex].id;
                                         setRoomAdd({
@@ -504,11 +502,8 @@ function CreateOptionRoomManager() {
                                 </select>
                             </div>
                             <div className="mt-4">
-                                <label
-                                    htmlFor=""
-                                    className="text-gray-900 dark:text-gray-300 font-bold"
-                                >
-                                    Giá Tiền Theo Ngày:
+                                <label htmlFor="" className="text-gray-900 dark:text-gray-300 font-bold">
+                                    Giá theo ngày:
                                 </label>
                             </div>
                             <div className="col-span-4 mt-4">
@@ -516,16 +511,13 @@ function CreateOptionRoomManager() {
                                     type="number"
                                     id=""
                                     defaultValue={Room?.kindOfRoom?.priceByDay || ''}
-                                    className="w-full p-1 rounded"
+                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                     placeholder=""
                                 />
                             </div>
                             <div className="mt-4">
-                                <label
-                                    htmlFor=""
-                                    className="text-gray-900 dark:text-gray-300 font-bold"
-                                >
-                                    Giá Tiền Theo Giờ :
+                                <label htmlFor="" className="text-gray-900 dark:text-gray-300 font-bold">
+                                    Giá theo giờ :
                                 </label>
                             </div>
                             <div className="col-span-4 mt-4">
@@ -533,25 +525,19 @@ function CreateOptionRoomManager() {
                                     type="number"
                                     id=""
                                     defaultValue={Room?.kindOfRoom?.hourlyPrice || ''}
-                                    className="w-full p-1 rounded"
+                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                     placeholder=""
                                 />
                             </div>
                             <div className="mt-4">
-                                <label
-                                    htmlFor=""
-                                    className="text-gray-900 dark:text-gray-300 font-bold"
-                                >
+                                <label htmlFor="" className="text-gray-900 dark:text-gray-300 font-bold">
                                     Ảnh :
                                 </label>
                             </div>
                             <div className="col-span-4 mt-4">
                                 <div id="fileUpload">
                                     <div className="mb-2 block">
-                                        <Label
-                                            htmlFor="file"
-                                            value="Upload file"
-                                        />
+                                        <Label htmlFor="file" value="Upload file" />
                                     </div>
                                     <FileInput
                                         id="file"
@@ -561,10 +547,7 @@ function CreateOptionRoomManager() {
                                 </div>
                                 <div id="fileUpload">
                                     <div className="mb-2 block">
-                                        <Label
-                                            htmlFor="file"
-                                            value="Upload file"
-                                        />
+                                        <Label htmlFor="file" value="Upload file" />
                                     </div>
                                     <FileInput
                                         id="file"
@@ -574,10 +557,7 @@ function CreateOptionRoomManager() {
                                 </div>
                                 <div id="fileUpload">
                                     <div className="mb-2 block">
-                                        <Label
-                                            htmlFor="file"
-                                            value="Upload file"
-                                        />
+                                        <Label htmlFor="file" value="Upload file" />
                                     </div>
                                     <FileInput
                                         id="file"
@@ -587,10 +567,7 @@ function CreateOptionRoomManager() {
                                 </div>
                                 <div id="fileUpload">
                                     <div className="mb-2 block">
-                                        <Label
-                                            htmlFor="file"
-                                            value="Upload file"
-                                        />
+                                        <Label htmlFor="file" value="Upload file" />
                                     </div>
                                     <FileInput
                                         id="file"
@@ -600,80 +577,161 @@ function CreateOptionRoomManager() {
                                 </div>
                             </div>
                             <div className="mt-4">
-                                <label
-                                    htmlFor=""
-                                    className="mb-2 mt-8 mr-9 text-gray-900 dark:text-gray-300 font-bold"
-                                >
+                                <label htmlFor="" className="mb-2 mt-8 mr-9 text-gray-900 dark:text-gray-300 font-bold">
                                     Ghi Chú :
                                 </label>
                             </div>
                             <div className="col-span-4 mt-4">
-                                <textarea id="message" rows="4" onChange={(e) => setRoomAdd({ ...roomAdd, note: e.target.value })} className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Note..."></textarea>
+                                <textarea
+                                    id="message"
+                                    rows="4"
+                                    onChange={(e) => setRoomAdd({ ...roomAdd, note: e.target.value })}
+                                    className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                    placeholder="Note..."
+                                ></textarea>
                             </div>
                         </div>
                         <div className="text-black">
-
                             <div className="mt-8">
-                                <label
-                                    htmlFor=""
-                                    className="mb-2 mt-8 mr-9 text-gray-900 dark:text-gray-300 font-bold"
-                                >
+                                <label htmlFor="" className="mb-2 mt-8 mr-9 text-gray-900 dark:text-gray-300 font-bold">
                                     Tiện Ích :
                                 </label>
                                 <div className="grid gap-x-8 gap-y-4 grid-cols-3 items-center pl-3">
-
                                     {FacilitieDetails.map((f) => (
-
-                                        <div key={f.id} id="toast-default" className="flex items-center p-4 w-full max-w-xs text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800" role="alert">
+                                        <div
+                                            key={f.id}
+                                            id="toast-default"
+                                            className="flex items-center p-4 w-full max-w-xs text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800"
+                                            role="alert"
+                                        >
                                             <div className="ml-3 text-sm font-normal">{f.facilities.name}</div>
-                                            <button type="button" onClick={() => { deleteItem(f.id) }} className="ml-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" data-dismiss-target="#toast-default" aria-label="Close">
-                                                <svg aria-hidden="true" className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd"></path></svg>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    deleteItem(f.id);
+                                                }}
+                                                className="ml-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700"
+                                                data-dismiss-target="#toast-default"
+                                                aria-label="Close"
+                                            >
+                                                <svg
+                                                    aria-hidden="true"
+                                                    className="w-5 h-5"
+                                                    fill="currentColor"
+                                                    viewBox="0 0 20 20"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                >
+                                                    <path
+                                                        fillRule="evenodd"
+                                                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                                        clipRule="evenodd"
+                                                    ></path>
+                                                </svg>
                                             </button>
                                         </div>
                                     ))}
                                 </div>
 
-                                <button type="button" className="mt-4 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                                <button
+                                    type="button"
+                                    className="mt-4 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                                     onClick={() => {
                                         getModal();
-                                    }} >
-                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                                    }}
+                                >
+                                    <svg
+                                        className="w-6 h-6"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                                        ></path>
+                                    </svg>
                                     Add
                                 </button>
                             </div>
 
                             <div className="mt-8">
-                                <label
-                                    htmlFor=""
-                                    className="mb-2 mt-8 mr-9 text-gray-900 dark:text-gray-300 font-bold"
-                                >
+                                <label htmlFor="" className="mb-2 mt-8 mr-9 text-gray-900 dark:text-gray-300 font-bold">
                                     Dịch Vụ :
                                 </label>
                                 <div className="grid gap-x-8 gap-y-4 grid-cols-3 items-center pl-3">
                                     {ServiceAvailable.map((s) => (
-                                        <div key={s.id} id="toast-default" className="flex items-center p-4 w-full max-w-xs text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800" role="alert">
-                                            <input id="vue-checkbox-list" type="number" value={s.quantity}
+                                        <div
+                                            key={s.id}
+                                            id="toast-default"
+                                            className="flex items-center p-4 w-full max-w-xs text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800"
+                                            role="alert"
+                                        >
+                                            <input
+                                                id="vue-checkbox-list"
+                                                type="number"
+                                                value={s.quantity}
                                                 onChange={(e) => {
-                                                    updateSL(s.id, e.target.value)
+                                                    updateSL(s.id, e.target.value);
                                                 }}
-                                                className="w-full h-8 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500" />
-                                            <label htmlFor="vue-checkbox-list" className="py-3 ml-2 w-full text-sm font-medium text-gray-900 dark:text-gray-300">{s.servicess.name}</label>
-                                            <button type="button" onClick={() => deleteItem2(s.id)} className="ml-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" data-dismiss-target="#toast-default" aria-label="Close">
-                                                <svg aria-hidden="true" className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd"
-                                                ></path></svg>
+                                                className="w-full h-8 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
+                                            />
+                                            <label
+                                                htmlFor="vue-checkbox-list"
+                                                className="py-3 ml-2 w-full text-sm font-medium text-gray-900 dark:text-gray-300"
+                                            >
+                                                {s.servicess.name}
+                                            </label>
+                                            <button
+                                                type="button"
+                                                onClick={() => deleteItem2(s.id)}
+                                                className="ml-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700"
+                                                data-dismiss-target="#toast-default"
+                                                aria-label="Close"
+                                            >
+                                                <svg
+                                                    aria-hidden="true"
+                                                    className="w-5 h-5"
+                                                    fill="currentColor"
+                                                    viewBox="0 0 20 20"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                >
+                                                    <path
+                                                        fillRule="evenodd"
+                                                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                                        clipRule="evenodd"
+                                                    ></path>
+                                                </svg>
                                             </button>
                                         </div>
                                     ))}
                                 </div>
 
-                                <button type="button" className="mt-4 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                                <button
+                                    type="button"
+                                    className="mt-4 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                                     onClick={() => {
                                         getModal2();
-                                    }} >
-                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                                    }}
+                                >
+                                    <svg
+                                        className="w-6 h-6"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                                        ></path>
+                                    </svg>
                                     Add
                                 </button>
-
                             </div>
                         </div>
                         <div className="grid justify-items-end grid-cols-3 gap-4 mt-8 ">
@@ -693,14 +751,10 @@ function CreateOptionRoomManager() {
                                 </button>
                             </div>
                         </div>
-
                     </form>
 
-
-
                     <Modal show={visibleAdd} size="md" popup={false} onClose={() => setVisibleAdd(false)}>
-                        <Modal.Header >
-                        </Modal.Header >
+                        <Modal.Header></Modal.Header>
                         <Modal.Body>
                             <div className="overflow-x-auto relative shadow-md md:rounded-lg">
                                 <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 md:h-auto">
@@ -719,8 +773,14 @@ function CreateOptionRoomManager() {
                                     </thead>
                                     <tbody>
                                         {Facility.map((fs) => (
-                                            <tr key={fs.id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                                <td scope="row" className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                            <tr
+                                                key={fs.id}
+                                                className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+                                            >
+                                                <td
+                                                    scope="row"
+                                                    className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                                                >
                                                     {fs.name}
                                                 </td>
                                                 <td className="py-4 px-6 ">
@@ -731,7 +791,7 @@ function CreateOptionRoomManager() {
                                                         value={fs}
                                                         type="button"
                                                         onClick={() => {
-                                                            addFacilitieDetails(fs.id, fs)
+                                                            addFacilitieDetails(fs.id, fs);
                                                         }}
                                                         className="py-2 px-3 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                                                     >
@@ -747,8 +807,7 @@ function CreateOptionRoomManager() {
                     </Modal>
 
                     <Modal show={visibleAdd2} size="mx" popup={false} onClose={() => setVisibleAdd2(false)}>
-                        <Modal.Header >
-                        </Modal.Header >
+                        <Modal.Header></Modal.Header>
                         <Modal.Body>
                             <div className="overflow-x-auto relative shadow-md md:rounded-lg">
                                 <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 md:h-auto">
@@ -773,14 +832,26 @@ function CreateOptionRoomManager() {
                                     </thead>
                                     <tbody>
                                         {services.map((s) => (
-                                            <tr key={s.id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                                <td scope="row" className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                            <tr
+                                                key={s.id}
+                                                className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+                                            >
+                                                <td
+                                                    scope="row"
+                                                    className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                                                >
                                                     {s.name}
                                                 </td>
-                                                <td scope="row" className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                                <td
+                                                    scope="row"
+                                                    className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                                                >
                                                     {s.serviceType.name}
                                                 </td>
-                                                <td scope="row" className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                                <td
+                                                    scope="row"
+                                                    className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                                                >
                                                     {s.prices}
                                                 </td>
                                                 <td className="py-4 px-6 ">
@@ -791,7 +862,7 @@ function CreateOptionRoomManager() {
                                                         value={s}
                                                         type="button"
                                                         onClick={() => {
-                                                            addServiceAvailable(s.id, s.prices, 1, s)
+                                                            addServiceAvailable(s.id, s.prices, 1, s);
                                                         }}
                                                         className="py-2 px-3 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                                                     >

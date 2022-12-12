@@ -61,22 +61,22 @@ function Home() {
             <div className="h-56 sm:h-64 xl:h-80 2xl:h-96">
                 <Carousel>
                     <img
-                        src="https://www.vietnambooking.com/wp-content/uploads/2022/02/banner1-dalat.jpg"
-                        alt="banner"
-                    />
-                    <img src="https://www.vietnambooking.com/wp-content/uploads/2017/06/ks_04042022.jpg" alt="banner" />
-                    <img
-                        src="https://www.vietnambooking.com/wp-content/uploads/2022/02/banner1-nhatrang.jpg"
+                        src="https://cdn.pixabay.com/photo/2016/03/28/09/34/bedroom-1285156_960_720.jpg"
                         alt="banner"
                     />
                     <img
-                        src="https://www.vietnambooking.com/wp-content/uploads/2022/02/banner1-dalat.jpg"
+                        src="https://cdn.pixabay.com/photo/2015/10/20/18/57/furniture-998265_960_720.jpg"
                         alt="banner"
                     />
-                    <img src="https://www.vietnambooking.com/wp-content/uploads/2017/06/ks_04042022.jpg" alt="banner" />
+                    <img src="https://cdn.pixabay.com/photo/2016/11/19/13/06/bed-1839183_960_720.jpg" alt="banner" />
+                    <img src="https://cdn.pixabay.com/photo/2014/08/11/21/40/bedroom-416062_960_720.jpg" alt="banner" />
+                    <img
+                        src="https://cdn.pixabay.com/photo/2016/06/10/01/05/hotel-room-1447201_960_720.jpg"
+                        alt="banner"
+                    />
                 </Carousel>
             </div>
-            <div className="text-center">
+            <div className="text-center mt-3">
                 <h3 className="font-bold text-xl">Đặt phòng khách sạn trực tuyến</h3>
             </div>
             {/* Filter room */}

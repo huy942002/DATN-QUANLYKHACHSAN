@@ -17,7 +17,6 @@ import { Button, Modal } from 'flowbite-react';
 
 import axios from 'axios';
 
-
 const objRoom = {
     id: '',
     name: '',
@@ -33,13 +32,13 @@ const objRoom = {
         note: '',
         priceByDay: '',
         hourlyPrice: '',
-        status: ''
+        status: '',
     },
     numberOfFloors: {
         id: '',
         numberOfFloors: 0,
-        status: ''
-    }
+        status: '',
+    },
 };
 
 function CreateRoomManager() {
@@ -54,11 +53,11 @@ function CreateRoomManager() {
     const services = useSelector((state) => state.service.services);
     const [FacilitieDetails, setFacilitieDetails] = useState([]);
     const [ServiceAvailable, setServiceAvailable] = useState([]);
-    const [Service, setService] = useState("");
-    const [image, setImage] = useState("");
-    const [image1, setImage1] = useState("");
-    const [image2, setImage2] = useState("");
-    const [image3, setImage3] = useState("");
+    const [Service, setService] = useState('');
+    const [image, setImage] = useState('');
+    const [image1, setImage1] = useState('');
+    const [image2, setImage2] = useState('');
+    const [image3, setImage3] = useState('');
 
     const addServiceAvailable = (id, value, sl, services) => {
         let obj = {
@@ -81,13 +80,13 @@ function CreateRoomManager() {
                     note: '',
                     priceByDay: '',
                     hourlyPrice: '',
-                    status: ''
+                    status: '',
                 },
                 numberOfFloors: {
                     id: '',
                     numberOfFloors: '',
-                    status: ''
-                }
+                    status: '',
+                },
             },
             servicess: {
                 id: services.id,
@@ -99,10 +98,10 @@ function CreateRoomManager() {
                     id: services.serviceType.id,
                     name: services.serviceType.name,
                     note: services.serviceType.note,
-                    status: services.serviceType.status
-                }
-            }
-        }
+                    status: services.serviceType.status,
+                },
+            },
+        };
         setServiceAvailable(() => [...ServiceAvailable, obj]);
     };
 
@@ -113,7 +112,7 @@ function CreateRoomManager() {
             facilities: {
                 id: value.id,
                 name: value.name,
-                status: value.status
+                status: value.status,
             },
             rooms: {
                 id: '',
@@ -130,15 +129,15 @@ function CreateRoomManager() {
                     note: '',
                     priceByDay: '',
                     hourlyPrice: '',
-                    status: ''
+                    status: '',
                 },
                 numberOfFloors: {
                     id: '',
                     numberOfFloors: '',
-                    status: ''
-                }
-            }
-        }
+                    status: '',
+                },
+            },
+        };
 
         setFacilitieDetails(() => [...FacilitieDetails, obj]);
         console.log(FacilitieDetails);
@@ -148,40 +147,47 @@ function CreateRoomManager() {
         let array = [...ServiceAvailable];
         array.map((o, i) => {
             if (o.id === id1) {
-                array[i] = { id: id1, quantity: value, prices: o.prices, status: o.status, rooms: o.rooms, servicess: o.servicess }
-                console.log(array[i])
+                array[i] = {
+                    id: id1,
+                    quantity: value,
+                    prices: o.prices,
+                    status: o.status,
+                    rooms: o.rooms,
+                    servicess: o.servicess,
+                };
+                console.log(array[i]);
             }
         });
         setServiceAvailable([...array]);
-    }
+    };
 
     function deleteItem(id) {
-        console.log(id)
-        setFacilitieDetails(FacilitieDetails.filter(item => item.id !== id));
+        console.log(id);
+        setFacilitieDetails(FacilitieDetails.filter((item) => item.id !== id));
     }
 
     function deleteItem2(id) {
-        console.log(id)
-        setServiceAvailable(ServiceAvailable.filter(item => item.id !== id));
+        console.log(id);
+        setServiceAvailable(ServiceAvailable.filter((item) => item.id !== id));
     }
 
     function uploadImage(data2) {
         if (data2.name === '') {
-            toast.error("Bạn chưa điền tên phòng!", { autoClose: 2000 })
+            toast.error('Bạn chưa điền tên phòng!', { autoClose: 2000 });
         } else {
-            const data = new FormData()
-            data.append("file", image)
-            data.append("upload_preset", "datnqlks")
-            data.append("cloud_name", "dbjvfbdix")
-            fetch("https://api.cloudinary.com/v1_1/dbjvfbdix/image/upload", {
-                method: "post",
+            const data = new FormData();
+            data.append('file', image);
+            data.append('upload_preset', 'datnqlks');
+            data.append('cloud_name', 'dbjvfbdix');
+            fetch('https://api.cloudinary.com/v1_1/dbjvfbdix/image/upload', {
+                method: 'post',
                 body: data,
             })
-                .then(resp => resp.json())
-                .then(data => {
+                .then((resp) => resp.json())
+                .then((data) => {
                     handleAdd(data2, data.url);
                 })
-                .catch(err => console.log(err))
+                .catch((err) => console.log(err));
         }
     }
 
@@ -194,43 +200,38 @@ function CreateRoomManager() {
         dispatch(getAllService());
 
         setFacilitieDetails(FacilitieDetails);
-    }, [FacilitieDetails])
+    }, [FacilitieDetails]);
 
     const handleAdd = async (data, url2) => {
         setRoomAdd(data);
         if (roomAdd.kindOfRoom.id === '') {
-
             setRoomAdd({ ...roomAdd, kindOfRoom: KindOfRoom[0], img: url2, status: 1 });
         } else if (roomAdd.numberOfFloors.id === '') {
-
             setRoomAdd({ ...roomAdd, numberOfFloors: NumberOfFloors[0], img: url2, status: 1 });
-        }
-        else if (roomAdd.note === '') {
-
+        } else if (roomAdd.note === '') {
             setRoomAdd({ ...roomAdd, note: '', img: url2, status: 1 });
-        }
-        else {
+        } else {
             setRoomAdd({ ...roomAdd, img: url2, status: 1 });
         }
 
-        const response = await axios.post('http://localhost:8080/api/room/', {
-            rooms: roomAdd,
-            facilitiesDetailsList: FacilitieDetails,
-            serviceAvailableList: ServiceAvailable,
-        }).then(res => {
-            if (res) {
-                toast.success('Thêm thành công', { autoClose: 2000 });
-            }
-        }).catch(err => {
-            setTimeout(() => {
-
-            }, 1000);
-        }).finally(() => {
-
-        });
+        const response = await axios
+            .post('http://localhost:8080/api/room/', {
+                rooms: roomAdd,
+                facilitiesDetailsList: FacilitieDetails,
+                serviceAvailableList: ServiceAvailable,
+            })
+            .then((res) => {
+                if (res) {
+                    toast.success('Thêm thành công', { autoClose: 2000 });
+                }
+            })
+            .catch((err) => {
+                setTimeout(() => {}, 1000);
+            })
+            .finally(() => {});
 
         setVisibleAdd(false);
-    }
+    };
 
     function getModal() {
         setVisibleAdd(true);
@@ -253,9 +254,7 @@ function CreateRoomManager() {
                         </Link>
                     </li>
                     <li>
-                        <Link
-                            to={config.routes.roomManage}
-                        >
+                        <Link to={config.routes.roomManage}>
                             <FontAwesomeIcon icon={faChevronRight}></FontAwesomeIcon>
                             Quản lý Chi tiết phòng
                         </Link>
@@ -269,31 +268,11 @@ function CreateRoomManager() {
                 </ol>
             </nav>
 
-            <div className="mb-2 border-b-4 mx-14 border-blue-600 dark:border-blue-600">
-                <ul className="flex flex-wrap -mb-px text-sm font-medium text-center">
-                    <li className="mr-4 ml-6" role="presentation">
-                        <button className="inline-block text-4xl p-4  rounded-t-lg border-b-2 text-blue-600 hover:text-blue-600 dark:text-blue-500 dark:hover:text-blue-500 border-blue-600 dark:border-blue-500" id="profile-tab" ><Link to={config.routes.roomPlan}>Danh sách phòng</Link></button>
-                    </li>
-                    <li className="mr-8 ml-12" role="presentation">
-                        <button className="inline-block text-4xl p-4 rounded-t-lg border-b-2 border-transparent hover:text-blue-600 hover:border-blue-600 dark:hover:text-blue-600 dark:border-transparent text-gray-400 dark:text-blue-600 border-blue-600 dark:border-blue-600" id="dashboard-tab" ><Link to={config.routes.roomPlan}>Tầng</Link></button>
-                    </li>
-                    <li className="mr-2  ml-12" role="presentation">
-                        <button className="inline-block text-4xl p-4 rounded-t-lg border-b-2 border-transparent hover:text-blue-600 hover:border-blue-600 dark:hover:text-blue-600 dark:border-transparent text-gray-400 dark:text-blue-600 border-grablue-600 dark:border-blue-600" id="settings-tab"><Link to={config.routes.roomPlan}>Loại phòng</Link></button>
-                    </li>
-                </ul>
-            </div>
-
-            <div className='shadow-2xl'>
-
-                <form className='mx-4 my-4 divide-y-4 divide-slate-400/25'>
+            <div>
+                <form className="mx-4 my-4 divide-y-4 divide-slate-400/25">
                     <div className="grid grid-cols-5 gap-4 text-black mb-4">
                         <div className="mt-4">
-                            <label
-                                htmlFor=""
-                                className="mb-2 mr-3 text-gray-900 dark:text-gray-300 font-bold"
-                            >
-                                Tên Phòng  :
-                            </label>
+                            <label className="mb-2 mr-3 text-gray-900 dark:text-gray-300 font-bold">Tên phòng :</label>
                         </div>
                         <div className="col-span-4 mt-4">
                             <input
@@ -301,7 +280,7 @@ function CreateRoomManager() {
                                 id="nameRoom"
                                 name="nameRoom"
                                 onChange={(e) => setRoomAdd({ ...roomAdd, name: e.target.value })}
-                                className="w-full  rounded"
+                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                             />
                         </div>
                         <div className="mt-4">
@@ -311,8 +290,7 @@ function CreateRoomManager() {
                             <select
                                 name="KindOfRoom"
                                 id="KindOfRoom"
-                                className="w-full rounded"
-
+                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                 onChange={(e) => {
                                     const index = e.target.options[e.target.selectedIndex].id;
                                     setRoomAdd({
@@ -353,7 +331,7 @@ function CreateRoomManager() {
                             <select
                                 name="numberOfFloors"
                                 id="numberOfFloors"
-                                className="w-full rounded"
+                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                 onChange={(e) => {
                                     const index = e.target.options[e.target.selectedIndex].id;
                                     setRoomAdd({
@@ -361,10 +339,11 @@ function CreateRoomManager() {
                                         numberOfFloors: {
                                             id: NumberOfFloors[index].id,
                                             numberOfFloors: NumberOfFloors[index].name,
-                                            status: NumberOfFloors[index].status
+                                            status: NumberOfFloors[index].status,
                                         },
                                     });
-                                }}                                >
+                                }}
+                            >
                                 {NumberOfFloors.map((n, index) => (
                                     <option key={n.id} value={n.numberOfFloors} id={index}>
                                         {n.numberOfFloors}
@@ -373,11 +352,8 @@ function CreateRoomManager() {
                             </select>
                         </div>
                         <div className="mt-4">
-                            <label
-                                htmlFor=""
-                                className="mb-2 mt-8 mr-6 text-gray-900 dark:text-gray-300 font-bold"
-                            >
-                                Giá Tiền Theo Ngày:
+                            <label htmlFor="" className="mb-2 mt-8 mr-6 text-gray-900 dark:text-gray-300 font-bold">
+                                Giá theo ngày:
                             </label>
                         </div>
                         <div className="col-span-4 mt-4">
@@ -385,16 +361,13 @@ function CreateRoomManager() {
                                 type="number"
                                 id=""
                                 defaultValue={Room?.kindOfRoom?.priceByDay || ''}
-                                className="w-full rounded"
+                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                 placeholder=""
                             />
                         </div>
                         <div className="mt-4">
-                            <label
-                                htmlFor=""
-                                className="mb-2 mt-8 mr-6 text-gray-900 dark:text-gray-300 font-bold"
-                            >
-                                Giá Tiền Theo Giờ :
+                            <label htmlFor="" className="mb-2 mt-8 mr-6 text-gray-900 dark:text-gray-300 font-bold">
+                                Giá theo giờ :
                             </label>
                         </div>
                         <div className="col-span-4 mt-4">
@@ -402,25 +375,19 @@ function CreateRoomManager() {
                                 type="number"
                                 id=""
                                 defaultValue={Room?.kindOfRoom?.hourlyPrice || ''}
-                                className="w-full  rounded"
+                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                 placeholder=""
                             />
                         </div>
                         <div className="mt-4">
-                            <label
-                                htmlFor=""
-                                className="text-gray-900 dark:text-gray-300 font-bold"
-                            >
+                            <label htmlFor="" className="text-gray-900 dark:text-gray-300 font-bold">
                                 Ảnh :
                             </label>
                         </div>
                         <div className="col-span-4 mt-4">
                             <div id="fileUpload">
                                 <div className="mb-2 block">
-                                    <Label
-                                        htmlFor="file"
-                                        value="Upload file"
-                                    />
+                                    <Label htmlFor="file" value="Upload file" />
                                 </div>
                                 <FileInput
                                     id="file"
@@ -430,10 +397,7 @@ function CreateRoomManager() {
                             </div>
                             <div id="fileUpload">
                                 <div className="mb-2 block">
-                                    <Label
-                                        htmlFor="file"
-                                        value="Upload file"
-                                    />
+                                    <Label htmlFor="file" value="Upload file" />
                                 </div>
                                 <FileInput
                                     id="file"
@@ -443,10 +407,7 @@ function CreateRoomManager() {
                             </div>
                             <div id="fileUpload">
                                 <div className="mb-2 block">
-                                    <Label
-                                        htmlFor="file"
-                                        value="Upload file"
-                                    />
+                                    <Label htmlFor="file" value="Upload file" />
                                 </div>
                                 <FileInput
                                     id="file"
@@ -456,10 +417,7 @@ function CreateRoomManager() {
                             </div>
                             <div id="fileUpload">
                                 <div className="mb-2 block">
-                                    <Label
-                                        htmlFor="file"
-                                        value="Upload file"
-                                    />
+                                    <Label htmlFor="file" value="Upload file" />
                                 </div>
                                 <FileInput
                                     id="file"
@@ -469,83 +427,163 @@ function CreateRoomManager() {
                             </div>
                         </div>
                         <div className="mt-4">
-                            <label
-                                htmlFor=""
-                                className="mb-2 mt-8 mr-9 text-gray-900 dark:text-gray-300 font-bold"
-                            >
+                            <label htmlFor="" className="mb-2 mt-8 mr-9 text-gray-900 dark:text-gray-300 font-bold">
                                 Ghi Chú :
                             </label>
                         </div>
                         <div className="col-span-4 mt-4">
-                            <textarea id="message" rows="4" onChange={(e) => setRoomAdd({ ...roomAdd, note: e.target.value })} className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Note..."></textarea>
+                            <textarea
+                                id="message"
+                                rows="4"
+                                onChange={(e) => setRoomAdd({ ...roomAdd, note: e.target.value })}
+                                className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                placeholder="Note..."
+                            ></textarea>
                         </div>
-                        <div className="mt-4">
-                        </div>
-                        <div className="col-span-4 mt-4">
-                        </div>
+                        <div className="mt-4"></div>
+                        <div className="col-span-4 mt-4"></div>
                     </div>
                     <div className="text-black">
                         <div className="mt-8">
-                            <label
-                                htmlFor=""
-                                className="mb-2 mt-8 mr-9 text-gray-900 dark:text-gray-300 font-bold"
-                            >
+                            <label htmlFor="" className="mb-2 mt-8 mr-9 text-gray-900 dark:text-gray-300 font-bold">
                                 Tiện Ích :
                             </label>
                             <div className="grid gap-x-8 gap-y-4 grid-cols-3 items-center pl-3">
-
                                 {FacilitieDetails.map((f) => (
-
-                                    <div key={f.id} id="toast-default" className="flex items-center p-4 w-full max-w-xs text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800" role="alert">
+                                    <div
+                                        key={f.id}
+                                        id="toast-default"
+                                        className="flex items-center p-4 w-full max-w-xs text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800"
+                                        role="alert"
+                                    >
                                         <div className="ml-3 text-sm font-normal">{f.facilities.name}</div>
-                                        <button type="button" onClick={() => { deleteItem(f.id) }} className="ml-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" data-dismiss-target="#toast-default" aria-label="Close">
-                                            <svg aria-hidden="true" className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd"></path></svg>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                deleteItem(f.id);
+                                            }}
+                                            className="ml-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700"
+                                            data-dismiss-target="#toast-default"
+                                            aria-label="Close"
+                                        >
+                                            <svg
+                                                aria-hidden="true"
+                                                className="w-5 h-5"
+                                                fill="currentColor"
+                                                viewBox="0 0 20 20"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                            >
+                                                <path
+                                                    fillRule="evenodd"
+                                                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                                    clipRule="evenodd"
+                                                ></path>
+                                            </svg>
                                         </button>
                                     </div>
                                 ))}
                             </div>
 
-                            <button type="button" className="mt-4 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                            <button
+                                type="button"
+                                className="mt-4 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                                 onClick={() => {
                                     getModal();
-                                }} >
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                                }}
+                            >
+                                <svg
+                                    className="w-6 h-6"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                                    ></path>
+                                </svg>
                                 Add
                             </button>
                         </div>
 
                         <div className="mt-8">
-                            <label
-                                htmlFor=""
-                                className="mb-2 mt-8 mr-9 text-gray-900 dark:text-gray-300 font-bold"
-                            >
+                            <label htmlFor="" className="mb-2 mt-8 mr-9 text-gray-900 dark:text-gray-300 font-bold">
                                 Dịch Vụ :
                             </label>
                             <div className="grid gap-x-8 gap-y-4 grid-cols-3 items-center pl-3">
                                 {ServiceAvailable.map((s) => (
-                                    <div key={s.id} id="toast-default" className="flex items-center p-4 w-full max-w-xs text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800" role="alert">
-                                        <input id="vue-checkbox-list" type="number" value={s.quantity}
+                                    <div
+                                        key={s.id}
+                                        id="toast-default"
+                                        className="flex items-center p-4 w-full max-w-xs text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800"
+                                        role="alert"
+                                    >
+                                        <input
+                                            id="vue-checkbox-list"
+                                            type="number"
+                                            value={s.quantity}
                                             onChange={(e) => {
-                                                updateSL(s.id, e.target.value)
+                                                updateSL(s.id, e.target.value);
                                             }}
-                                            className="w-full h-8 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500" />
-                                        <label htmlFor="vue-checkbox-list" className="py-3 ml-2 w-full text-sm font-medium text-gray-900 dark:text-gray-300">{s.servicess.name}</label>
-                                        <button type="button" onClick={() => deleteItem2(s.id)} className="ml-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" data-dismiss-target="#toast-default" aria-label="Close">
-                                            <svg aria-hidden="true" className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd"
-                                            ></path></svg>
+                                            className="w-full h-8 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
+                                        />
+                                        <label
+                                            htmlFor="vue-checkbox-list"
+                                            className="py-3 ml-2 w-full text-sm font-medium text-gray-900 dark:text-gray-300"
+                                        >
+                                            {s.servicess.name}
+                                        </label>
+                                        <button
+                                            type="button"
+                                            onClick={() => deleteItem2(s.id)}
+                                            className="ml-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700"
+                                            data-dismiss-target="#toast-default"
+                                            aria-label="Close"
+                                        >
+                                            <svg
+                                                aria-hidden="true"
+                                                className="w-5 h-5"
+                                                fill="currentColor"
+                                                viewBox="0 0 20 20"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                            >
+                                                <path
+                                                    fillRule="evenodd"
+                                                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                                    clipRule="evenodd"
+                                                ></path>
+                                            </svg>
                                         </button>
                                     </div>
                                 ))}
                             </div>
 
-                            <button type="button" className="mt-4 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                            <button
+                                type="button"
+                                className="mt-4 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                                 onClick={() => {
                                     getModal2();
-                                }} >
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                                }}
+                            >
+                                <svg
+                                    className="w-6 h-6"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                                    ></path>
+                                </svg>
                                 Add
                             </button>
-
                         </div>
                     </div>
 
@@ -567,9 +605,7 @@ function CreateRoomManager() {
                     </div>
                 </form>
                 <Modal show={visibleAdd} size="md" popup={false} onClose={() => setVisibleAdd(false)}>
-                    <Modal.Header >
-                        Tiện Ích
-                    </Modal.Header >
+                    <Modal.Header>Tiện Ích</Modal.Header>
                     <Modal.Body>
                         <div className="overflow-x-auto relative shadow-md md:rounded-lg">
                             <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 md:h-auto">
@@ -588,19 +624,28 @@ function CreateRoomManager() {
                                 </thead>
                                 <tbody>
                                     {Facility.map((fs) => (
-                                        <tr key={fs.id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                            <td scope="row" className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                        <tr
+                                            key={fs.id}
+                                            className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+                                        >
+                                            <td
+                                                scope="row"
+                                                className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                                            >
                                                 {fs.name}
                                             </td>
                                             <td className="py-4 px-6 ">
-                                                <label htmlFor="" className="rounded-full dark:text-gpy-2 px-3 text-sm font-medium text-white bg-blue-700"></label>
+                                                <label
+                                                    htmlFor=""
+                                                    className="rounded-full dark:text-gpy-2 px-3 text-sm font-medium text-white bg-blue-700"
+                                                ></label>
                                             </td>
                                             <td className="py-4 px-6">
                                                 <button
                                                     value={fs}
                                                     type="button"
                                                     onClick={() => {
-                                                        addFacilitieDetails(fs.id, fs)
+                                                        addFacilitieDetails(fs.id, fs);
                                                     }}
                                                     className="py-2 px-3 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                                                 >
@@ -616,9 +661,7 @@ function CreateRoomManager() {
                 </Modal>
 
                 <Modal show={visibleAdd2} size="mx" popup={false} onClose={() => setVisibleAdd2(false)}>
-                    <Modal.Header >
-                        Dịch Vụ
-                    </Modal.Header >
+                    <Modal.Header>Dịch Vụ</Modal.Header>
                     <Modal.Body>
                         <div className="overflow-x-auto relative shadow-md md:rounded-lg">
                             <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 md:h-auto">
@@ -640,14 +683,26 @@ function CreateRoomManager() {
                                 </thead>
                                 <tbody>
                                     {services.map((s) => (
-                                        <tr key={s.id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                            <td scope="row" className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                        <tr
+                                            key={s.id}
+                                            className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+                                        >
+                                            <td
+                                                scope="row"
+                                                className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                                            >
                                                 {s.name}
                                             </td>
-                                            <td scope="row" className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                            <td
+                                                scope="row"
+                                                className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                                            >
                                                 {s.serviceType.name}
                                             </td>
-                                            <td scope="row" className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                            <td
+                                                scope="row"
+                                                className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                                            >
                                                 {s.prices}
                                             </td>
                                             <td className="py-4 px-6">
@@ -655,7 +710,7 @@ function CreateRoomManager() {
                                                     value={s}
                                                     type="button"
                                                     onClick={() => {
-                                                        addServiceAvailable(s.id, s.prices, 1, s)
+                                                        addServiceAvailable(s.id, s.prices, 1, s);
                                                     }}
                                                     className="py-2 px-3 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                                                 >
@@ -669,8 +724,8 @@ function CreateRoomManager() {
                         </div>
                     </Modal.Body>
                 </Modal>
-            </div >
-        </div >
+            </div>
+        </div>
     );
 }
 export default CreateRoomManager;
