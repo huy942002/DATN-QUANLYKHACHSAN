@@ -70,7 +70,7 @@ public class Customer implements Serializable {
 	@JoinColumn(name = "ID_NATIONALITY", nullable = false)
 	private Nationality nationality;
 
-	@ManyToOne(optional = false, cascade = CascadeType.ALL)
+	@ManyToOne
 	@JoinColumn(name = "ID_USER")
 	private Users users;
 

@@ -19,11 +19,11 @@ function Floor({ theRoomsOfTheFloor, roomPlan, setRoomPlan }) {
 
     return (
         <div className={`${theRoomsOfTheFloor.listRoom.length === 0 && 'hidden'}`}>
-            <div className="w-full rounded-[2px] text-base font-semibold mb-4">
+            <div className="w-full rounded-[2px] text-lg font-semibold mb-3">
                 Tầng {theRoomsOfTheFloor.numberOfFloors}
             </div>
             {theRoomsOfTheFloor.listRoom.length > 0 && (
-                <div className="grid grid-cols-4 gap-2 mb-4">
+                <div className="grid grid-cols-3">
                     {theRoomsOfTheFloor.listRoom.map((element, index) => {
                         return <Room key={index} room={element} roomPlan={roomPlan} setRoomPlan={setRoomPlan}></Room>;
                     })}

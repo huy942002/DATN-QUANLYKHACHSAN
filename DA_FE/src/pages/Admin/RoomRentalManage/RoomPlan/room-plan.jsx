@@ -6,12 +6,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBroom } from '@fortawesome/free-solid-svg-icons';
 import Floor from './floor';
 import axios from 'axios';
-// import { getAllNationality } from '~/app/reducers/Nationality/nationality-api';
-// import { getAllRentalType } from '~/app/reducers/RentalType/rental-type-api';
-// import { getAllServiceByServiceType } from '~/app/reducers/ServiceByServiceType/service-by-service-type-api';
-// import { getAllServiceType } from '~/app/reducers/ServiceType/service-type-api';
-// import { getAllKindOfRoom } from '~/app/reducers/KindOfRoom/kind-of-room-api';
-// import { getAllRoomPlan } from '~/app/reducers/RoomPlan/room-plan-api';
 
 const RoomPlan = () => {
 

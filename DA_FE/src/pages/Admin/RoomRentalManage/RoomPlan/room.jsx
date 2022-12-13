@@ -1,21 +1,64 @@
- import { ExclamationCircleFilled } from '@ant-design/icons';
+ import { DownOutlined, ExclamationCircleFilled, SmileOutlined } from '@ant-design/icons';
 import {
     faArrowUpFromBracket,
     faBed,
     faBroom,
+    faBuildingCircleCheck,
     faCircleExclamation,
     faDollar,
+    faDoorClosed,
+    faDoorOpen,
+    faMoneyCheckDollar,
+    faPersonWalkingArrowRight,
+    faPersonWalkingLuggage,
     faRotate,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ControlledMenu, MenuItem, useMenuState } from '@szhsin/react-menu';
-import { Divider, message, Modal, Tooltip } from 'antd';
+import { Divider, Dropdown, message, Modal, Tooltip, Space } from 'antd';
 import axios from 'axios';
 import { useState, React, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './room.css';
 
 const { confirm } = Modal;
+
+const items = [
+    {
+      key: '1',
+      label: (
+        <span onClick={(disabled) => alert(disabled)}>Check in</span>
+        // <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">
+        //   1st menu item
+        // </a>
+      ),
+      disabled: true,
+    },
+    {
+      key: '2',
+      label: (
+        <a target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">
+          2nd menu item (disabled)
+        </a>
+      ),
+      icon: <SmileOutlined />,
+      disabled: true,
+    },
+    {
+      key: '3',
+      label: (
+        <a target="_blank" rel="noopener noreferrer" href="https://www.luohanacademy.com">
+          3rd menu item (disabled)
+        </a>
+      ),
+      disabled: true,
+    },
+    {
+      key: '4',
+      danger: true,
+      label: 'a danger item',
+    },
+];
 
 function Room({ room, roomPlan, setRoomPlan }) {
 
@@ -30,6 +73,9 @@ function Room({ room, roomPlan, setRoomPlan }) {
     const [confirmLoading, setConfirmLoading] = useState(false);
     const key = 'messageApi';
     const [messageApi, contextHolder] = message.useMessage();
+    const [status, getStatus] = useState(room.rooms.status);
+    const [detailInvoice, setDetailInvoice] = useState(room.detailInvoiceList.find(element => element.status === 1));
+    const [booking, setBooking] = useState(room.detailInvoiceList.find(element => element.status === 3));
     //End Data
 
     //Created
@@ -179,148 +225,81 @@ function Room({ room, roomPlan, setRoomPlan }) {
             >
                 <p>Bạn chắc chắn phòng đã được dọn rồi chứ?</p>
             </Modal>
-            <div
-                className={`h-[230px] rounded-lg cursor-default grid grid-cols-3 grid-rows-5 items-center text-base text-white
-                ${room.rooms.status === 1 ? 'bg-status-1' : ''}
-                ${room.rooms.status === 2 ? 'bg-status-2' : ''}
-                ${room.rooms.status === 3 ? 'bg-status-3' : ''}`}
-                onContextMenu={(e) => {
-                    e.preventDefault();
-                    setAnchorPoint({ x: e.clientX, y: e.clientY });
-                    toggleMenu(true);
-                }}
-            >
-                {room.rooms && room.rooms.status === 2 ? (
+            <div className=' border border-1 text-base p-3 cursor-pointer hover:bg-default-2 hover:border-design-greenLight'>
+                <div className='flex justify-end font-semibold'>
+                    <Dropdown menu={{ items }}>
+                        <a onClick={(e) => e.preventDefault()}>
+                        <Space>
+                            <span className='text-base font-semibold'>{room.rooms.name}</span>
+                            <DownOutlined />
+                        </Space>
+                        </a>
+                    </Dropdown>
+                </div>
+                <div className='flex justify-end font-semibold'>
+                    {room.rooms.kindOfRoom.name}
+                </div>
+                <div className={`flex items-center pt-10`}>
+                    <span className={`px-3 py-1 rounded-full text-white
+                    ${status === 1 ? "bg-design-greenLight" : ""}
+                    ${status === 2 ? "bg-status-2" : ""}
+                    ${status === 3 ? "bg-status-3" : ""}
+                    `}>
+                        {status === 1 && "Sẵn sàng đón khách"}
+                        {status === 2 && "Đang có khách"}
+                        {status === 3 && "Đang dọn dẹp"}
+                    </span>
+                    <span className='ml-3'>{detailInvoice && detailInvoice.bills.customer.fullname}</span>
+                </div>
+                {detailInvoice && (
                     <>
-                        <div className='col-span-3 h-full grid grid-cols-3 font-semibold'>
-                            <div className='w-full h-full flex justify-center items-center text-white'>
-                                <div>
-                                    <div className='text-xl font-semibold w-full flex justify-center items-center'>{room.rooms.name}</div>
-                                    <div className='w-full flex justify-center items-center'>{room.rooms.kindOfRoom.name}</div>
-                                </div>
+                        <div className='grid grid-cols-2 pt-3'>
+                            <div className='flex items-center'>
+                                <span className='rounded-full bg-design-charcoalblack h-7 w-7 text-white p-3 flex justify-center items-center'>
+                                    <FontAwesomeIcon icon={faPersonWalkingArrowRight} className="w-[18px] h-[18px]"></FontAwesomeIcon>
+                                </span>
+                                <span className='ml-3'>
+                                    {detailInvoice && detailInvoice.hireDate}
+                                </span>
                             </div>
-                            <div className='w-full h-full flex justify-center items-center text-white'>
-                                
-                            </div>
-                            <div className='w-full h-full flex justify-center items-center text-white'>
-                                <div>
-                                    <div className='w-full flex justify-center items-center text-xl h-[28px]'>
-                                        <FontAwesomeIcon icon={faBed}></FontAwesomeIcon>
-                                    </div>
-                                    <div className='w-full flex justify-center items-center'>
-                                        {room.rooms && room.rooms.status === 1 ? "Phòng trống" : room.rooms.status === 2 ? "Đã có khách" : "Dọn dẹp"}
-                                    </div>
-                                </div>
+                            <div className='flex items-center'>
+                                <span className='rounded-full bg-design-charcoalblack h-7 w-7 text-white p-3 flex justify-center items-center'>
+                                    <FontAwesomeIcon icon={faBuildingCircleCheck} className="w-[18px] h-[18px]"></FontAwesomeIcon>
+                                </span>
+                                <span className='ml-3'>
+                                    {detailInvoice && detailInvoice.checkOutDay}
+                                </span>
                             </div>
                         </div>
-                        <div className='col-span-3 h-full flex justify-center items-center font-semibold text-xl'>
-                            {room.detailsInvoice && room.detailsInvoice.bills.customer.fullname}
-                        </div>
-                        <div className='col-span-3 h-full flex justify-center items-center row-span-2'>
-                            <div className='flex justify-center items-center mr-3'>
-                                {/* {room.detailsInvoice && room.detailsInvoice.hireDate} */}
-                                <div className='mr-2'>
-                                    <div className='border-b-[1px] font-semibold flex items-center justify-center'>{getDayHireDate() ? getDayHireDate().split("-")[2] : ""}</div>
-                                    <div className='border-t-[1px] font-semibold flex items-center justify-center'>{getDayHireDate() ? getDayHireDate().split("-")[1] : ""}</div>
-                                </div>
-                                <div className='text-2xl'>{getTimeHireDate()}</div>
-                            </div>
-                            <div className='bg-white h-[70px] w-[70px] rounded-full flex justify-center items-center text-black font-semibold'>
-                                {room.detailsInvoice && room.detailsInvoice.rentalTypes.id === 1 && (<span>{dayRental} (D)</span>) }
-                                {room.detailsInvoice && room.detailsInvoice.rentalTypes.id === 2 && (<span>{hourRental} (H)</span>)}
-                            </div>
-                            <div className='flex justify-center items-center ml-3'>
-                                {/* {room.detailsInvoice && room.detailsInvoice.hireDate} */}
-                                <div className='mr-2'>
-                                    <div className='border-b-[1px] font-semibold flex items-center justify-center'>{getDayCheckOutDay() ? getDayCheckOutDay().split("-")[2] : ""}</div>
-                                    <div className='border-t-[1px] font-semibold flex items-center justify-center'>{getDayCheckOutDay() ? getDayCheckOutDay().split("-")[1] : ""}</div>
-                                </div>
-                                <div className='text-2xl'>{getTimeCheckOutDay()}</div>
-                            </div>
-                        </div>
-                        <div className='col-span-3 h-full flex justify-center items-center text-xl font-semibold'>
-                            <FontAwesomeIcon icon={faDollar} className="mr-2"></FontAwesomeIcon> {formatCurrency(genAllMoneyDetail())}
-                        </div>
-                    </>
-                ) : (
-                    <>
-                        <div className='col-span-3 row-span-5 grid grid-cols-2 gap-10 font-semibold'>
-                            <div className='w-full h-full flex justify-end items-center text-white'>
-                                <div>
-                                    <div className='text-xl font-semibold w-full flex justify-center items-center'>{room.rooms.name}</div>
-                                    <div className='w-full flex justify-center items-center'>{room.rooms.kindOfRoom.name}</div>
-                                </div>
-                            </div>
-                            <div className='w-full h-full flex justify-start items-center text-white'>
-                                <div>
-                                    <div className='w-full flex justify-center items-center text-xl h-[28px]'>
-                                        <FontAwesomeIcon icon={faBed}></FontAwesomeIcon>
-                                    </div>
-                                    <div className='w-full flex justify-center items-center'>
-                                        {room.rooms && room.rooms.status === 1 ? "Phòng trống" : room.rooms.status === 2 ? "Đã có khách" : "Đang dọn dẹp"}
-                                    </div>
-                                </div>
-                            </div>
-                            <div className='col-span-2 w-full h-full flex justify-center items-center text-white font-semibold text-xl'>
-                                {room.rooms && room.rooms.status === 1 ? "Sẵn sàng đón khách" : "Đang được dọn dẹp"}
-                            </div>
+                        <div className='flex items-center mt-3'>
+                            <span className='rounded-full bg-design-charcoalblack h-7 w-7 text-white p-3 flex justify-center items-center'>
+                                <FontAwesomeIcon icon={faMoneyCheckDollar} className="w-[18px] h-[18px]"></FontAwesomeIcon>
+                            </span>
+                            <span className='ml-3 text-red-500 font-semibold'>
+                                {formatCurrency(genAllMoneyDetail())}
+                            </span>
                         </div>
                     </>
                 )}
-
-                {/** Menu list */}
-                <div className="rounded-[2px]">
-                    <ControlledMenu
-                        {...menuProps}
-                        anchorPoint={anchorPoint}
-                        onClose={() => toggleMenu(false)}
-                        menuClassName="my-menu"
-                    >
-                        <div className={`${room.rooms.status !== 1 ? 'hidden' : ''}`}>
-                            <MenuItem
-                                className={`rounded-lg`}
-                                onClick={() => {
-                                    navigate('/admin/rental-manage' + '/check-in/' + room.rooms.id);
-                                }}
-                            >
-                                <FontAwesomeIcon
-                                    icon={faArrowUpFromBracket}
-                                    className="rotate-[180deg] h-4 w-4 mr-2"
-                                ></FontAwesomeIcon>
-                                Check in
-                            </MenuItem>
+                {booking && (
+                    <>
+                        <Divider style={{margin: 12}}/>
+                        <div className={`flex items-center w-full`}>
+                            <span className={`px-3 py-1 rounded-full text-white bg-status-4`}>
+                                Khách đặt trước
+                            </span>
+                            <span className='ml-3'>{booking && booking.bills.customer.fullname}</span> 
                         </div>
-                        <div className={`${room.rooms.status !== 2 ? 'hidden' : ''}`}>
-                            <MenuItem className={`rounded-lg`}>
-                                <FontAwesomeIcon
-                                    icon={faArrowUpFromBracket}
-                                    className="rotate-[90deg] h-4 w-4 mr-2"
-                                ></FontAwesomeIcon>
-                                Check out
-                            </MenuItem>
+                        <div className='flex items-center mt-3'>
+                            <span className='rounded-full bg-design-charcoalblack h-7 w-7 text-white p-3 flex justify-center items-center'>
+                                <FontAwesomeIcon icon={faPersonWalkingLuggage} className="w-[18px] h-[18px]"></FontAwesomeIcon>
+                            </span>
+                            <span className='ml-3'>
+                                {booking && booking.hireDate}
+                            </span>
                         </div>
-                        <div onClick={showModal} className={`${room.rooms.status !== 3 ? 'hidden' : ''}`}>
-                            <MenuItem className={`rounded-lg`}>
-                                <FontAwesomeIcon icon={faBroom} className="mr-2 h-4 w-4"></FontAwesomeIcon>
-                                Dọn phòng
-                            </MenuItem>
-                        </div>
-                        <div className={`${room.rooms.status !== 2 ? 'hidden' : ''}`}>
-                            <MenuItem
-                                onClick={() => {
-                                    navigate('/admin/rental-manage' + '/details/' + room.rooms.id );
-                                }}
-                                className={`rounded-lg`}
-                            >
-                                <FontAwesomeIcon icon={faCircleExclamation} className="mr-2 h-4 w-4"></FontAwesomeIcon>
-                                Chi tiết
-                            </MenuItem>
-                        </div>
-                        <MenuItem className={`rounded-lg`}>
-                            <FontAwesomeIcon icon={faRotate} className="mr-2 h-4 w-4"></FontAwesomeIcon>Đổi trạng thái
-                        </MenuItem>
-                    </ControlledMenu>
-                </div>
+                    </>
+                )}
             </div>
         </>
     );

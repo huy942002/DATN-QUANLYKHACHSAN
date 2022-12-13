@@ -21,4 +21,5 @@ import java.util.List;
 public interface IDetailInvoiceService extends IGeneralService<DetailsInvoice>{
     DetailsInvoice findByRoomsAndStatus(Rooms rooms, int status);
     List<DetailsInvoice> findByBillsAndStatus(Bills bills, int status);
+    List<DetailsInvoice> getListDetailInvoiceByDate(Integer roomId, String date);
 }

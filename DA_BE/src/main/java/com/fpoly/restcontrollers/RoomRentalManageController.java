@@ -44,12 +44,17 @@ public class RoomRentalManageController {
         for (Rooms r : rooms) {
             RoomDetailDTO romDetailDTO = new RoomDetailDTO();
             romDetailDTO.setRooms(r);
-            DetailsInvoice detailsInvoice = iDetailInvoiceService.findByRoomsAndStatus(r, 1);
-            if (detailsInvoice != null) {
-                romDetailDTO.setDetailsInvoice(detailsInvoice);
-                romDetailDTO.setServiceDetailsList(iServiceDetailService.listByRoomAndStatus(detailsInvoice, 1));
+//            DetailsInvoice detailsInvoice = iDetailInvoiceService.findByRoomsAndStatus(r, 1);
+            List<DetailsInvoice> detailInvoiceList = iDetailInvoiceService.getListDetailInvoiceByDate(r.getId(), "2022-12-14");
+            if (detailInvoiceList != null) {
+                romDetailDTO.setDetailInvoiceList(detailInvoiceList);
+                for (DetailsInvoice d : detailInvoiceList){
+                    if(d.getStatus() == 1) {
+                        romDetailDTO.setServiceDetailsList(iServiceDetailService.listByRoomAndStatus(d, 1));
+                    }
+                }
             } else {
-                romDetailDTO.setDetailsInvoice(null);
+                romDetailDTO.setDetailInvoiceList(null);
             }
             List<FacilitiesDetails> facilitiesDetailsList = iFacilityDetailService.findByRoomsAndStatus(r, 1);
             if (facilitiesDetailsList != null) {
