@@ -36,8 +36,8 @@ public class RoomRentalManageController {
     @Autowired ServiceDetailRepository serviceDetailRepository;
 
     @Transactional
-    @GetMapping("/get-room-plan")
-    public ResponseEntity<?> getRoomPlan() {
+    @GetMapping("/get-room-plan/{dateChoose}")
+    public ResponseEntity<?> getRoomPlan(@PathVariable String dateChoose) {
         List<Rooms> rooms = (List<Rooms>) iRoomService.findAll();
 //        List<RoomAndBillDto> roomAndBillArrayList = new ArrayList<>();
         List<RoomDetailDTO> roomDetailDTOList = new ArrayList<>();
@@ -45,7 +45,7 @@ public class RoomRentalManageController {
             RoomDetailDTO romDetailDTO = new RoomDetailDTO();
             romDetailDTO.setRooms(r);
 //            DetailsInvoice detailsInvoice = iDetailInvoiceService.findByRoomsAndStatus(r, 1);
-            List<DetailsInvoice> detailInvoiceList = iDetailInvoiceService.getListDetailInvoiceByDate(r.getId(), "2022-12-14");
+            List<DetailsInvoice> detailInvoiceList = iDetailInvoiceService.getListDetailInvoiceByDate(r.getId(), dateChoose);
             if (detailInvoiceList != null) {
                 romDetailDTO.setDetailInvoiceList(detailInvoiceList);
                 for (DetailsInvoice d : detailInvoiceList){

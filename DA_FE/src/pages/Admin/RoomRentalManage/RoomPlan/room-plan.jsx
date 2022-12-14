@@ -6,6 +6,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBroom } from '@fortawesome/free-solid-svg-icons';
 import Floor from './floor';
 import axios from 'axios';
+import dayjs from 'dayjs';
+import { DatePicker } from 'antd';
 
 const RoomPlan = () => {
 
@@ -16,24 +18,13 @@ const RoomPlan = () => {
     const [queryKindOfRoom, setQueryKindOfRoom] = useState("ALL");
     const [queryStatus, setQueryStatus] = useState("ALL");
     const [queryName, setQueryName] = useState("");
+    const [dateChoose, setDateChoose] = useState(dayjs(new Date()).format('YYYY-MM-DD'));
     //End Data
 
     //Created
     useEffect(() => {
         window.scrollTo(0, 0);
-        const getRoomPlan = async () => {
-            await axios.get('http://localhost:8080/api/room-rental-manage/get-room-plan')
-                    .then(res => {
-                        setRoomPlan(res.data);
-                    }).catch(err => {});
-        }
-        const getAllKindOfRoom = async () => {
-            await axios.get('http://localhost:8080/api/kind-of-room')
-                    .then(res => {
-                        setKindOfRoomList(res.data);
-                    }).catch(err => {});
-        }
-        getRoomPlan();
+        getRoomPlan(dateChoose);
         getAllKindOfRoom();
     }, []);
     //End Created
@@ -129,9 +120,31 @@ const RoomPlan = () => {
                     setKindOfRoomList(res.data);
                 }).catch(err => {});
     }
+    const getRoomPlan = async (date) => {
+        await axios.get('http://localhost:8080/api/room-rental-manage/get-room-plan/' + date)
+                .then(res => {
+                    setRoomPlan(res.data);
+                }).catch(err => {});
+    }
+    const getAllKindOfRoom = async () => {
+        await axios.get('http://localhost:8080/api/kind-of-room')
+                .then(res => {
+                    setKindOfRoomList(res.data);
+                }).catch(err => {});
+    }
+    const changeDateChoose = async (date, dateString) => {
+        setDateChoose(formatDateTime(dateString));
+        await getRoomPlan(formatDateTime(dateString));
+    };
     //End Function
 
+    console.log(roomPlan);
+
     //Util
+    const formatDateTime = (value) => {
+        let arrayDate = value.split('-');
+        return arrayDate[2] + '-' + arrayDate[1] + '-' + arrayDate[0];
+    };
     //End Util
     
     return (
@@ -246,6 +259,16 @@ const RoomPlan = () => {
                     </div>
                     <div className="mx-4">Reload</div>
                 </div>
+            </div>
+            <div className='text-base mb-6 font-semibold'>
+                Ngày
+                <DatePicker
+                    className="ml-3"
+                    format="DD-MM-YYYY"
+                    placeholder="Chọn ngày"
+                    value={ dateChoose ? dayjs(dateChoose) : "" }
+                    onChange={ (date, dateString) => changeDateChoose(date, dateString) }
+                />
             </div>
             {filterRoomPlan() && filterRoomPlan().map((element, index) => {
                 return <Floor key={index} theRoomsOfTheFloor={element} roomPlan={roomPlan} setRoomPlan={setRoomPlan}></Floor>;

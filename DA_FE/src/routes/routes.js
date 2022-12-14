@@ -42,7 +42,8 @@ const publicRoutes = [
 const privateRoutes = [
     { path: config.routes.loginAdmin, component: LoginAdmin, layout: null },
     { path: config.routes.roomPlan, component: RoomPlan },
-    { path: config.routes.rentalManage, component: RentalManage },
+    { path: config.routes.rentalManageDetail, component: RentalManage },
+    { path: config.routes.rentalManageCheckIn, component: RentalManage },
     { path: config.routes.historyAdmin, component: HistoryAdmin },
     { path: config.routes.personnelManage, component: PersonnelManage },
     { path: config.routes.serviceManage, component: ServiceManage },

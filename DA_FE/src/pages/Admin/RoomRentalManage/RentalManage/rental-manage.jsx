@@ -34,7 +34,7 @@ const RentalManage = () => {
     const [messageApi, contextHolder] = message.useMessage();
     const [confirmLoading, setConfirmLoading] = useState(false);
     const [open, setOpen] = useState(false);
-    const { idRoomChoose, type } = useParams();
+    const { idRoomChoose, type, dateCheckIn, dateCheckOut } = useParams();
 
     const dateNow = new Date();
     const dateTomorrow = new Date().setDate(dateNow.getDate() + 1);
@@ -115,12 +115,14 @@ const RentalManage = () => {
             newDetailInvoice.facilitiesDetailsList = getRoomChoose().facilitiesDetailsList;
             newDetailInvoice.serviceAvailableList = getRoomChoose().serviceAvailableList;
             newDetailInvoice.key = getRoomChoose().rooms.id;
-            newDetailInvoice.hireDate = dayjs(dateNow).format('YYYY-MM-DD') + " 12:00";
-            newDetailInvoice.checkOutDay = dayjs(dateTomorrow).format('YYYY-MM-DD') + " 12:00";
+            newDetailInvoice.hireDate = dayjs(dateCheckIn).format('YYYY-MM-DD') + " 12:00";
+            newDetailInvoice.checkOutDay = dayjs(dateCheckOut).format('YYYY-MM-DD') + " 12:00";
             newDetailInvoice.rentalTypes = rentalTypes[0];
-            return setDetailInvoices([...detailInvoices, newDetailInvoice]);
+            setDetailInvoices([...detailInvoices, newDetailInvoice]);
         }
     };
+
+    console.log(detailInvoices);
 
     const checkData = async () => {
         const response = await axios.get('http://localhost:8080/api/room-rental-manage/details/' + idRoomChoose);

@@ -15,7 +15,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ControlledMenu, MenuItem, useMenuState } from '@szhsin/react-menu';
-import { Divider, Dropdown, message, Modal, Tooltip, Space } from 'antd';
+import { Divider, Dropdown, message, Modal, Tooltip, Space, Button } from 'antd';
 import axios from 'axios';
 import { useState, React, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -46,22 +46,27 @@ function Room({ room, roomPlan, setRoomPlan }) {
         {
           key: '1',
           label: (
-            <span onClick={() => setOpenCalendar(true)}>Check in</span>
+            <div className={`w-full`} onClick={() => {
+                if(status === 1) {
+                    setOpenCalendar(true)
+                }
+            }}>Check in</div>
             // <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">
             //   1st menu item
             // </a>
           ),
-          disabled: false,
+          disabled: status === 2,
         },
         {
           key: '2',
           label: (
-            <a target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">
-              2nd menu item (disabled)
-            </a>
+            <div className='w-full' onClick={() => {
+                if(status === 2) {
+                    navigate('/admin/rental-manage' + '/details/' + room.rooms.id);
+                }
+            }}>Chi tiết hóa đơn</div>
           ),
-          icon: <SmileOutlined />,
-          disabled: true,
+          disabled: status !== 2,
         },
         {
           key: '3',
@@ -89,6 +94,10 @@ function Room({ room, roomPlan, setRoomPlan }) {
         genDayRental();
         genHourRental();
     })
+    useEffect(() => {
+        setDetailInvoice(room.detailInvoiceList.find(element => element.status === 1));
+        setBooking(room.detailInvoiceList.find(element => element.status === 3));
+    }, [roomPlan])
     //End Created
 
     //Gen Data
@@ -209,6 +218,11 @@ function Room({ room, roomPlan, setRoomPlan }) {
                     }, 1000);
                 });
     }
+    const checkIn = () => {
+        if(inOut.hireDate && inOut.checkOutDay) {
+            navigate('/admin/rental-manage' + '/check-in/' + room.rooms.id + "/" + inOut.hireDate + "/" + inOut.checkOutDay);
+        }
+    }
     //End Function
 
     //Util
@@ -312,8 +326,10 @@ function Room({ room, roomPlan, setRoomPlan }) {
                 title={room.rooms.name}
                 centered
                 open={openCalendar}
-                onOk={() => setOpenCalendar(false)}
+                onOk={() => checkIn()}
                 onCancel={() => setOpenCalendar(false)}
+                okText="Xác nhận"
+                cancelText="Hủy"
                 width={1800}
             >   
                 <MonthlyCalendarRoom roomId={room.rooms.id} inOut={inOut} setInOut={setInOut}></MonthlyCalendarRoom>
