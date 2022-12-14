@@ -24,4 +24,7 @@ public interface DetailInvoiceRepository extends JpaRepository<DetailsInvoice, I
     List<DetailsInvoice> findByBillsAndStatus(Bills bills, int status);
     @Query(value = "select * from DETAILS_INVOICE where ID_ROOMS = :roomId AND (STATUS = 3 OR STATUS = 1) AND CONVERT(DATE,:date) >= CONVERT(DATE, HIRE_DATE) AND CONVERT(DATE,:date) <= CONVERT(DATE, CHECK_OUT_DAY)", nativeQuery = true)
     List<DetailsInvoice> getListDetailInvoiceByDate(Integer roomId, String date);
+
+    @Query(value = "select * from DETAILS_INVOICE where ID_ROOMS = :roomId AND (STATUS = 3 OR STATUS = 1)", nativeQuery = true)
+    List<DetailsInvoice> getAllDetailInvoiceByRoomAndStatus(Integer roomId);
 }

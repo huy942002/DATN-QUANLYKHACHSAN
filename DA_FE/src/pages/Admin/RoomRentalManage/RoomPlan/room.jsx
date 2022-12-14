@@ -19,46 +19,11 @@ import { Divider, Dropdown, message, Modal, Tooltip, Space } from 'antd';
 import axios from 'axios';
 import { useState, React, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import MonthlyCalendarRoom from '../Calendar/MonthlyCalendar';
 import './room.css';
 
 const { confirm } = Modal;
 
-const items = [
-    {
-      key: '1',
-      label: (
-        <span onClick={(disabled) => alert(disabled)}>Check in</span>
-        // <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">
-        //   1st menu item
-        // </a>
-      ),
-      disabled: true,
-    },
-    {
-      key: '2',
-      label: (
-        <a target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">
-          2nd menu item (disabled)
-        </a>
-      ),
-      icon: <SmileOutlined />,
-      disabled: true,
-    },
-    {
-      key: '3',
-      label: (
-        <a target="_blank" rel="noopener noreferrer" href="https://www.luohanacademy.com">
-          3rd menu item (disabled)
-        </a>
-      ),
-      disabled: true,
-    },
-    {
-      key: '4',
-      danger: true,
-      label: 'a danger item',
-    },
-];
 
 function Room({ room, roomPlan, setRoomPlan }) {
 
@@ -70,12 +35,53 @@ function Room({ room, roomPlan, setRoomPlan }) {
     const [dayRental, setDayRental] = useState();
     const [hourRental, setHourRental] = useState();
     const [open, setOpen] = useState(false);
+    const [openCalendar, setOpenCalendar] = useState(false);
     const [confirmLoading, setConfirmLoading] = useState(false);
     const key = 'messageApi';
     const [messageApi, contextHolder] = message.useMessage();
     const [status, getStatus] = useState(room.rooms.status);
     const [detailInvoice, setDetailInvoice] = useState(room.detailInvoiceList.find(element => element.status === 1));
     const [booking, setBooking] = useState(room.detailInvoiceList.find(element => element.status === 3));
+    const items = [
+        {
+          key: '1',
+          label: (
+            <span onClick={() => setOpenCalendar(true)}>Check in</span>
+            // <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">
+            //   1st menu item
+            // </a>
+          ),
+          disabled: false,
+        },
+        {
+          key: '2',
+          label: (
+            <a target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">
+              2nd menu item (disabled)
+            </a>
+          ),
+          icon: <SmileOutlined />,
+          disabled: true,
+        },
+        {
+          key: '3',
+          label: (
+            <a target="_blank" rel="noopener noreferrer" href="https://www.luohanacademy.com">
+              3rd menu item (disabled)
+            </a>
+          ),
+          disabled: true,
+        },
+        {
+          key: '4',
+          danger: true,
+          label: 'a danger item',
+        },
+    ];
+    const [inOut, setInOut] = useState({
+        hireDate: "",
+        checkOutDay: "",
+    });
     //End Data
 
     //Created
@@ -301,6 +307,17 @@ function Room({ room, roomPlan, setRoomPlan }) {
                     </>
                 )}
             </div>
+
+            <Modal
+                title={room.rooms.name}
+                centered
+                open={openCalendar}
+                onOk={() => setOpenCalendar(false)}
+                onCancel={() => setOpenCalendar(false)}
+                width={1800}
+            >   
+                <MonthlyCalendarRoom roomId={room.rooms.id} inOut={inOut} setInOut={setInOut}></MonthlyCalendarRoom>
+            </Modal>
         </>
     );
 }

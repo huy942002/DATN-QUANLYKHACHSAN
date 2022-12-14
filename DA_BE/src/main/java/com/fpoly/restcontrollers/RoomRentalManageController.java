@@ -248,4 +248,8 @@ public class RoomRentalManageController {
         return new ResponseEntity<>(iRoomService.save(room.get()) , HttpStatus.OK);
     }
 
+    @GetMapping("/all-detail-invoice-by-room-and-status/{id}")
+    public ResponseEntity<?> getAllDetailInvoieByRoomAndStatus(@PathVariable Integer id){
+        return new ResponseEntity<>(iDetailInvoiceService.getAllDetailInvoiceByRoomAndStatus(id), HttpStatus.OK);
+    }
 }
