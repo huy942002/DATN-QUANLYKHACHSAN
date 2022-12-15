@@ -14,6 +14,7 @@ import handOverBill from './reducers/handOverBill';
 import nationality from './reducers/nationality';
 import kindOfRoom from './reducers/kindOfRoom';
 import room from './reducers/room';
+import chart from './reducers/chart';
 import user from './reducers/user';
 import history from './reducers/history';
 import authority from './reducers/authority';
@@ -31,6 +32,7 @@ const reducer = combineReducers({
     serviceType: serviceType,
     numberOfFloor: numberOfFloor,
     room: room,
+    chart: chart,
     user: user,
     history: history,
     authority: authority,

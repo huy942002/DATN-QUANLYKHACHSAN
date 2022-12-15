@@ -20,8 +20,11 @@ const objLogin = {
 };
 
 const LoginSchema = Yup.object().shape({
-    username: Yup.string().required('Tên tài khoản không được để trống'),
-    password: Yup.string().required('Mật khẩu không được để trống'),
+    username: Yup.string().max(255, 'Vượt quá 255 kí tự').required('Tên tài khoản không được để trống'),
+    password: Yup.string()
+        .min(8, 'Mật khẩu ít nhất 8 kí tự')
+        .max(255, 'Vượt quá 255 kí tự')
+        .required('Mật khẩu không được để trống'),
 });
 
 const url = 'http://localhost:8080/api/auth/login';
@@ -51,7 +54,7 @@ function LoginAdmin() {
                 <div className="flex justify-center items-center">
                     <img src={logo} alt="logo" />
                 </div>
-                <h1 className="mb-5 text-3xl text-center font-bold text-blue-400">Wellcome</h1>
+                <h1 className="mb-5 text-3xl text-center font-bold text-blue-400">Welcome</h1>
                 <Formik
                     initialValues={objLogin}
                     validationSchema={LoginSchema}

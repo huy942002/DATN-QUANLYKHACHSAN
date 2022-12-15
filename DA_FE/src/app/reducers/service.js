@@ -30,17 +30,20 @@ const slice = createSlice({
     initialState: {
         services: [],
         service: {},
+        totalMoneyService: 0,
         error: '',
         loading: false,
     },
     extraReducers: (builder) => {
         // getAllService
         builder.addCase(getAllService.pending, (state) => {
+            state.totalMoneyService = 0;
             state.loading = true;
         });
         builder.addCase(getAllService.fulfilled, (state, action) => {
             state.loading = false;
             state.services = action.payload.filter((x) => x.status === 1);
+            state.services.map((x) => (state.totalMoneyService += x.prices));
             state.error = '';
         });
         builder.addCase(getAllService.rejected, (state, action) => {

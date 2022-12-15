@@ -176,7 +176,7 @@ const AdminLayout = ({ children }) => {
                             key: '14',
                             icon: <FontAwesomeIcon icon={faChartSimple} />,
                             label: 'Thống kê',
-                            // onClick: () => setCollapsed(!collapsed),
+                            onClick: () => navigate('/admin/chart'),
                         },
                         {
                             key: '15',

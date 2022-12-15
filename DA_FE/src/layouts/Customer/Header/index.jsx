@@ -38,7 +38,7 @@ function Header() {
                 </div>
                 <div className="text-center col-start-5 col-end-7">
                     <FontAwesomeIcon icon={faUser} />
-                    {user.length > 0 ? (
+                    {user?.length > 0 ? (
                         <span className="ml-2">Xin chào {userLogin.fullname} !</span>
                     ) : (
                         <div>

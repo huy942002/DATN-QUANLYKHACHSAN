@@ -10,6 +10,7 @@ const routes = {
     nationality: '/admin/nationality',
     searchRoom: '/room/search',
     room: '/room/detail',
+    chart: '/admin/chart',
     roomManage: '/admin/room-manage',
     floorManage: '/admin/floor-manage',
     createRoomManage: '/admin/create-room',
