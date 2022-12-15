@@ -39,35 +39,44 @@ public class RoomRentalManageController {
     @GetMapping("/get-room-plan/{dateChoose}")
     public ResponseEntity<?> getRoomPlan(@PathVariable String dateChoose) {
         List<Rooms> rooms = (List<Rooms>) iRoomService.findAll();
+
 //        List<RoomAndBillDto> roomAndBillArrayList = new ArrayList<>();
         List<RoomDetailDTO> roomDetailDTOList = new ArrayList<>();
+
         for (Rooms r : rooms) {
             RoomDetailDTO romDetailDTO = new RoomDetailDTO();
-            romDetailDTO.setRooms(r);
+//            romDetailDTO.setRooms(r);
 //            DetailsInvoice detailsInvoice = iDetailInvoiceService.findByRoomsAndStatus(r, 1);
             List<DetailsInvoice> detailInvoiceList = iDetailInvoiceService.getListDetailInvoiceByDate(r.getId(), dateChoose);
+
+            int statusByDate = r.getStatus();
+
             if (detailInvoiceList != null) {
                 romDetailDTO.setDetailInvoiceList(detailInvoiceList);
                 for (DetailsInvoice d : detailInvoiceList){
                     if(d.getStatus() == 1) {
                         romDetailDTO.setServiceDetailsList(iServiceDetailService.listByRoomAndStatus(d, 1));
+                        statusByDate = 2;
                     }
                 }
             } else {
                 romDetailDTO.setDetailInvoiceList(null);
             }
+
             List<FacilitiesDetails> facilitiesDetailsList = iFacilityDetailService.findByRoomsAndStatus(r, 1);
             if (facilitiesDetailsList != null) {
                 romDetailDTO.setFacilitiesDetailsList(facilitiesDetailsList);
             } else {
                 romDetailDTO.setFacilitiesDetailsList(null);
             }
+
             List<ServiceAvailable> serviceAvailableList = iServiceAvailableService.findByRoomsAndStatus(r, 1);
             if (serviceAvailableList != null) {
                 romDetailDTO.setServiceAvailableList(serviceAvailableList);
             } else {
                 romDetailDTO.setServiceAvailableList(null);
             }
+            romDetailDTO.setRooms(r.toRoomByDate(statusByDate));
             roomDetailDTOList.add(romDetailDTO);
 //            DetailsInvoice detailsInvoice = repositoryIDetailInvoiceService.findByRoomsAndStatus(r, 0);
 //            RoomAndBillDto roomAndBill = new RoomAndBillDto();
@@ -80,13 +89,16 @@ public class RoomRentalManageController {
 //            roomAndBillArrayList.add(roomAndBill);
         }
         Map<Integer, List<RoomDetailDTO>> roomPlan = roomDetailDTOList.stream().collect(Collectors.groupingBy(r -> r.getRooms().getNumberOfFloors().getNumberOfFloors()));
+
         List<RoomPlanDTO> roomPlanDTOList = new ArrayList<>();
+
         for (Integer numberOfFloors : roomPlan.keySet()) {
             RoomPlanDTO r = new RoomPlanDTO();
             r.setNumberOfFloors(numberOfFloors);
             r.setListRoom(roomPlan.get(numberOfFloors));
             roomPlanDTOList.add(r);
         }
+
         return new ResponseEntity<>(roomPlanDTOList, HttpStatus.OK);
     }
 

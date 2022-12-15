@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import { MonthlyCalendar } from 'react-rainbow-components';
 
-function MonthlyCalendarRoom({roomId, inOut, setInOut}) {
+function MonthlyCalendarRoom({roomId, inOut, setInOut, dateChoose}) {
     const [initialState, setInitialState] = useState({
         currentMonth: new Date(),
         selectedDate: undefined,
@@ -99,6 +99,7 @@ function MonthlyCalendarRoom({roomId, inOut, setInOut}) {
 
     //Util
     //End Util
+    console.log(dateChoose);
 
     return (
         <>
@@ -109,6 +110,7 @@ function MonthlyCalendarRoom({roomId, inOut, setInOut}) {
                 onSelectDate={({ date }) => {
                     changeInOut(date);
                 }}
+                minDate={dateChoose ? new Date(dateChoose) : new Date()}
                 dateComponent={date => (
                     <div className='ml-3 mr-1 w-full content-end'>
                         {genDetailInvoice(date) &&(

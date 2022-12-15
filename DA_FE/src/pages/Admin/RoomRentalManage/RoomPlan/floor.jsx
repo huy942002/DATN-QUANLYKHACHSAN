@@ -1,6 +1,6 @@
 import Room from './room';
 
-function Floor({ theRoomsOfTheFloor, roomPlan, setRoomPlan }) {
+function Floor({ theRoomsOfTheFloor, roomPlan, setRoomPlan, dateChoose }) {
 
     //Data
     //End Data
@@ -16,6 +16,7 @@ function Floor({ theRoomsOfTheFloor, roomPlan, setRoomPlan }) {
 
     //Util
     //End Util
+    console.log(dateChoose);
 
     return (
         <div className={`${theRoomsOfTheFloor.listRoom.length === 0 && 'hidden'}`}>
@@ -25,7 +26,7 @@ function Floor({ theRoomsOfTheFloor, roomPlan, setRoomPlan }) {
             {theRoomsOfTheFloor.listRoom.length > 0 && (
                 <div className="grid grid-cols-3">
                     {theRoomsOfTheFloor.listRoom.map((element, index) => {
-                        return <Room key={index} room={element} roomPlan={roomPlan} setRoomPlan={setRoomPlan}></Room>;
+                        return <Room key={index} room={element} roomPlan={roomPlan} setRoomPlan={setRoomPlan} dateChoose={dateChoose}></Room>;
                     })}
                 </div>
             )}

@@ -25,7 +25,7 @@ import './room.css';
 const { confirm } = Modal;
 
 
-function Room({ room, roomPlan, setRoomPlan }) {
+function Room({ room, roomPlan, setRoomPlan, dateChoose }) {
 
     //Data
     const navigate = useNavigate();
@@ -39,7 +39,7 @@ function Room({ room, roomPlan, setRoomPlan }) {
     const [confirmLoading, setConfirmLoading] = useState(false);
     const key = 'messageApi';
     const [messageApi, contextHolder] = message.useMessage();
-    const [status, getStatus] = useState(room.rooms.status);
+    // const [status, getStatus] = useState(room.rooms.statusByDate);
     const [detailInvoice, setDetailInvoice] = useState(room.detailInvoiceList.find(element => element.status === 1));
     const [booking, setBooking] = useState(room.detailInvoiceList.find(element => element.status === 3));
     const items = [
@@ -47,7 +47,7 @@ function Room({ room, roomPlan, setRoomPlan }) {
           key: '1',
           label: (
             <div className={`w-full`} onClick={() => {
-                if(status === 1) {
+                if(room.rooms.statusByDate === 1) {
                     setOpenCalendar(true)
                 }
             }}>Check in</div>
@@ -55,18 +55,18 @@ function Room({ room, roomPlan, setRoomPlan }) {
             //   1st menu item
             // </a>
           ),
-          disabled: status === 2,
+          disabled: room.rooms.statusByDate === 2,
         },
         {
           key: '2',
           label: (
             <div className='w-full' onClick={() => {
-                if(status === 2) {
+                if(room.rooms.statusByDate === 2) {
                     navigate('/admin/rental-manage' + '/details/' + room.rooms.id);
                 }
             }}>Chi tiết hóa đơn</div>
           ),
-          disabled: status !== 2,
+          disabled: room.rooms.statusByDate !== 2,
         },
         {
           key: '3',
@@ -261,13 +261,13 @@ function Room({ room, roomPlan, setRoomPlan }) {
                 </div>
                 <div className={`flex items-center pt-10`}>
                     <span className={`px-3 py-1 rounded-full text-white
-                    ${status === 1 ? "bg-design-greenLight" : ""}
-                    ${status === 2 ? "bg-status-2" : ""}
-                    ${status === 3 ? "bg-status-3" : ""}
+                    ${room.rooms.statusByDate === 1 ? "bg-design-greenLight" : ""}
+                    ${room.rooms.statusByDate === 2 ? "bg-status-2" : ""}
+                    ${room.rooms.statusByDate === 3 ? "bg-status-3" : ""}
                     `}>
-                        {status === 1 && "Sẵn sàng đón khách"}
-                        {status === 2 && "Đang có khách"}
-                        {status === 3 && "Đang dọn dẹp"}
+                        {room.rooms.statusByDate === 1 && "Sẵn sàng đón khách"}
+                        {room.rooms.statusByDate === 2 && "Đang có khách"}
+                        {room.rooms.statusByDate === 3 && "Đang dọn dẹp"}
                     </span>
                     <span className='ml-3'>{detailInvoice && detailInvoice.bills.customer.fullname}</span>
                 </div>
@@ -332,7 +332,7 @@ function Room({ room, roomPlan, setRoomPlan }) {
                 cancelText="Hủy"
                 width={1800}
             >   
-                <MonthlyCalendarRoom roomId={room.rooms.id} inOut={inOut} setInOut={setInOut}></MonthlyCalendarRoom>
+                <MonthlyCalendarRoom roomId={room.rooms.id} inOut={inOut} setInOut={setInOut} dateChoose={dateChoose}></MonthlyCalendarRoom>
             </Modal>
         </>
     );

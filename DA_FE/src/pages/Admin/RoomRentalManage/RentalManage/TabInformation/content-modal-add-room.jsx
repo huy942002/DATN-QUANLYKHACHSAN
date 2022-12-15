@@ -22,7 +22,7 @@ function ContentModalAddRoom({ detailInvoices, roomChoose, setRoomChoose }) {
 
     //Function
     const getRoomPlan = async () => {
-        await axios.get('http://localhost:8080/api/room-rental-manage/get-room-plan')
+        await axios.get('http://localhost:8080/api/room-rental-manage/get-room-plan/2022-12-15')
                 .then(res => {
                     if (detailInvoices) {
                         detailInvoices.map((element) => {

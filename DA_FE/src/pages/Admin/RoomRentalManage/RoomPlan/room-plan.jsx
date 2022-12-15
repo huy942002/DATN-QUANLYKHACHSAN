@@ -138,7 +138,7 @@ const RoomPlan = () => {
     };
     //End Function
 
-    console.log(roomPlan);
+    // console.log(roomPlan);
 
     //Util
     const formatDateTime = (value) => {
@@ -271,7 +271,7 @@ const RoomPlan = () => {
                 />
             </div>
             {filterRoomPlan() && filterRoomPlan().map((element, index) => {
-                return <Floor key={index} theRoomsOfTheFloor={element} roomPlan={roomPlan} setRoomPlan={setRoomPlan}></Floor>;
+                return <Floor key={index} theRoomsOfTheFloor={element} roomPlan={roomPlan} setRoomPlan={setRoomPlan} dateChoose={dateChoose}></Floor>;
             })}
         </div>
     );
