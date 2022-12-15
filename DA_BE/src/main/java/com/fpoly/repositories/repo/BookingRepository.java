@@ -23,6 +23,8 @@ import java.util.List;
 public interface BookingRepository extends JpaRepository<Booking, Integer>{
     @Query("SELECT COUNT(*) FROM Booking WHERE (dateOfHire <=:dateOfHire AND checkOutDay >= :dateOfHire) OR (dateOfHire <= :checkOutDay AND checkOutDay >= :checkOutDay) AND status >:status")
     public Integer CountRoomByTimeBooking(@Param("dateOfHire") LocalDate dateOfHire, @Param("checkOutDay") LocalDate checkOutDay, @Param("status") int status);
-    @Query("SELECT entity FROM Booking entity WHERE status=:status")
-    Iterable<Booking> findByStatus (@Param("status") Integer status);
+//    @Query("SELECT entity FROM Booking entity WHERE status=:status")
+//    Iterable<Booking> findByStatus (@Param("status") Integer status);
+
+    List<Booking> findByStatusAndPaymentStatus(Integer status, Integer paymentStatus);
 }

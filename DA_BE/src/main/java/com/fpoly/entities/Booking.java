@@ -2,15 +2,11 @@ package com.fpoly.entities;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Set;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,28 +27,23 @@ public class Booking implements Serializable {
 	private int id;
 
 	@Column(name = "CUSTOMER_NAME", nullable = false, length = 255)
-	private String name;
+	private String customerName;
 
-	@Column(name = "EMAIL", length = 255)
-	private String email;
+	@Column(name = "CUSTOMER_PHONE_NUMBER", nullable = false, length = 255)
+	private String customerPhoneNumber;
 
-	@Column(name = "CITIZEN_ID_CODE", length = 12)
-	private String citizenIdCode;
+	@Column(name = "CUSTOMER_EMAIL", nullable = false, length = 255)
+	private String customerEmail;
 
-	@Column(name = "PHONE_NUMBER", length = 12)
-	private String phoneNumber;
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "ID_KIND_OF_ROOM", nullable = false)
+	private KindOfRoom kindOfRoom;
 
-	@Column(name = "DATE_OF_HIRE", nullable = false)
-	private LocalDate dateOfHire;
+	@Column(name = "HIRE_DATE", nullable = false)
+	private LocalDate hireDate;
 
 	@Column(name = "CHECK_OUT_DAY", nullable = false)
 	private LocalDate checkOutDay;
-
-	@Column(name = "TIME_IN", length = 15)
-	private String timeIn;
-
-	@Column(name = "TIME_OUT", length = 15)
-	private String timeOut;
 
 	@Column(name = "NUMBER_OF_ADULTS", nullable = false, precision = 10)
 	private int numberOfAdults;
@@ -60,18 +51,19 @@ public class Booking implements Serializable {
 	@Column(name = "NUMBER_OF_KIDS", nullable = false, precision = 10)
 	private int numberOfKids;
 
+	@Column(name = "DEPOSITS", precision = 53)
+	private double deposits;
+
 	@Column(name = "NOTE", length = 255)
 	private String note;
+
+	@Column(name = "PAYMENT_STATUS", nullable = false, precision = 10)
+	private int paymentStatus;
 
 	@Column(name = "STATUS", nullable = false, precision = 10)
 	private int status;
 
-	@ManyToOne(optional = false)
-	@JoinColumn(name = "ID_BILL", nullable = false)
-	private Bills bills;
-
-	@ManyToOne(optional = false)
-	@JoinColumn(name = "ID_KIND_OF_ROOM", nullable = false)
-	private KindOfRoom kindOfRoom;
-
+	@OneToMany(mappedBy = "booking")
+	@JsonIgnore
+	private Set<Bills> bills;
 }

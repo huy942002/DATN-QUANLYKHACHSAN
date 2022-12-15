@@ -71,10 +71,6 @@ public class Bills implements Serializable {
 
 	@OneToMany(mappedBy = "bills")
 	@JsonIgnore
-	private Set<Booking> booking;
-
-	@OneToMany(mappedBy = "bills")
-	@JsonIgnore
 	private Set<DetailsInvoice> detailsInvoice;
 
 	@ManyToOne(optional = false)
@@ -92,6 +88,10 @@ public class Bills implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "ID_ROOM_REFUND_CONDITIONS")
 	private RoomRefundConditions roomRefundConditions;
+
+	@ManyToOne
+	@JoinColumn(name = "ID_BOOKING")
+	private Booking booking;
 
 	public static Bills toEntity(BillsDTO billsDTO){
 		if(billsDTO == null){
@@ -113,6 +113,7 @@ public class Bills implements Serializable {
 				.deposits(billsDTO.getDeposits())
 				.totalCard(billsDTO.getTotalCard())
 				.roomRefundConditions(billsDTO.getRoomRefundConditions())
+				.booking(billsDTO.getBooking())
 				.build();
 	}
 
@@ -133,6 +134,7 @@ public class Bills implements Serializable {
 				.deposits(this.deposits)
 				.totalCard(this.totalCard)
 				.roomRefundConditions((this.roomRefundConditions))
+				.booking(this.booking)
 				.build();
 		return billsDTO;
 	}

@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 import com.fpoly.entities.Booking;
 
+import java.util.List;
+
 
 /**
  *
@@ -15,5 +17,5 @@ import com.fpoly.entities.Booking;
  */
 @Service
 public interface IBookingService extends IGeneralService<Booking>{
-
+    List<Booking> findByStatusAndPaymentStatus(Integer status, Integer paymentStatus);
 }

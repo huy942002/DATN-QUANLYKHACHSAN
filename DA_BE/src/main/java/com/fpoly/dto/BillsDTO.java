@@ -1,9 +1,6 @@
 package com.fpoly.dto;
 
-import com.fpoly.entities.Customer;
-import com.fpoly.entities.PaymentType;
-import com.fpoly.entities.Personnel;
-import com.fpoly.entities.RoomRefundConditions;
+import com.fpoly.entities.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,4 +27,5 @@ public class BillsDTO {
     private PaymentType paymentType;
     private Personnel personnel;
     private RoomRefundConditions roomRefundConditions;
+    private Booking booking;
 }

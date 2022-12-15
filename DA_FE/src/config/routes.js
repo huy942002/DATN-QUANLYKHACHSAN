@@ -25,5 +25,6 @@ const routes = {
     rentalManageCheckIn: '/admin/rental-manage/:type/:idRoomChoose/:dateCheckIn/:dateCheckOut',
     booking: '/booking',
     bookingmanage: '/admin/booking-manage',
+    manageBooking: '/admin/manage-booking',
 };
 export default routes;
