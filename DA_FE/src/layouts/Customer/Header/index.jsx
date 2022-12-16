@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 import { getCustomerByNameUser } from '~/app/reducers/customer';
 import { useDispatch, useSelector } from 'react-redux';
 
-const user = window.sessionStorage.getItem('user');
+const user = window.localStorage.getItem('user');
 
 function Header() {
     const userLogin = useSelector((state) => state.customer.customer);

@@ -38,8 +38,8 @@ function LoginAdmin() {
             .then((res) => {
                 dispatch(getCustomerByNameUser(data.username));
                 navigate('/');
-                window.sessionStorage.setItem('token', res.headers.token);
-                window.sessionStorage.setItem('user', data.username);
+                window.localStorage.setItem('token', res.headers.token);
+                window.localStorage.setItem('user', data.username);
                 window.location.reload();
             })
             .catch((error) => {

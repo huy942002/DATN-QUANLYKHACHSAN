@@ -14,7 +14,6 @@ function HistoryAdmin() {
         // eslint-disable-next-line
     }, []);
 
-    console.log(historiess[historiess.length - 1]);
     return (
         <div>
             <div className="grid grid-cols-6">
@@ -67,10 +66,10 @@ function HistoryAdmin() {
                                         <td className="py-4 px-6">{x.timeIn}</td>
                                         <td className="py-4 px-6">{x.timeOut}</td>
                                         <td className="py-4 px-6">
-                                            {x.handOverStatus === 0 ? 'Đã giao ca' : 'Đang trong ca'}
+                                            {x.handOverStatus === 1 ? 'Đã giao ca' : 'Đang trong ca'}
                                         </td>
                                         <td className="py-4 px-6">
-                                            {x.status === 0 ? 'Hoạt động' : 'Không hoạt động'}
+                                            {x.status === 1 ? 'Hoạt động' : 'Không hoạt động'}
                                         </td>
                                     </tr>
                                 ))}

@@ -30,7 +30,7 @@ const slice = createSlice({
                 .toISOString()
                 .replace('T', ' ')
                 .slice(0, 16);
-            const dateOfLogin = window.sessionStorage.getItem('dateTimeStart'); // dateTimeStart từ hand-over của user login
+            const dateOfLogin = window.localStorage.getItem('dateTimeStart'); // dateTimeStart từ hand-over của user login
             state.loading = false;
             state.bills = action.payload.filter((x) => x.status === 2);
             state.bills

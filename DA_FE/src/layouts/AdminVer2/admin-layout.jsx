@@ -83,8 +83,8 @@ const AdminLayout = ({ children }) => {
                 moneyReal: Number(data.moneyReal),
             }),
         );
-        dispatch(updateHistory({ ...histories[histories.length - 1], handOverStatus: 1 }));
-        window.location.reload();
+        dispatch(updateHistory({ ...histories[histories.length - 1], handOverStatus: 0, status: 1 }));
+        dispatch(updateHistory({ ...histories[histories.length - 2], handOverStatus: 1, status: 0 }));
         toast.success('Nhận ca thành công', { autoClose: 2000 });
     }
 
@@ -197,7 +197,7 @@ const AdminLayout = ({ children }) => {
                             onClick: () => {
                                 navigate('/admin/login');
                                 dispatch(
-                                    updateHistory({ ...histories[histories.length - 1], status: 0, handOverStatus: 1 }),
+                                    updateHistory({ ...histories[histories.length - 1], status: 0, handOverStatus: 0 }),
                                 );
                             },
                         },
@@ -231,7 +231,7 @@ const AdminLayout = ({ children }) => {
                     )}
                     <BellFilled onClick={showNotice} className="trigger text-lg mr-3" />
                     <Modal
-                        show={histories[histories.length - 1]?.handOverStatus === 0 ? true : false}
+                        show={histories[histories.length - 1]?.handOverStatus === 1 ? true : false}
                         size="3xl"
                         popup={true}
                         onClose={() => setNotice(false)}

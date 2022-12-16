@@ -126,7 +126,7 @@ function HandOver() {
                 totalMoney: totalCard + totalCash,
                 note: `${handOver.note.length === 0 ? '' : handOver.note + '.'}`,
                 receiver: handOver.receiver === '' ? receiverDefault.users.username : handOver.receiver,
-                moneyStatus: handOver.surcharge === 0 ? 1 : 0,
+                moneyStatus: handOver.surcharge === 0 ? 0 : 1,
                 status: 1,
             }),
         );
@@ -154,7 +154,7 @@ function HandOver() {
             }),
         );
 
-        dispatch(updateHistory({ ...histories[histories.length - 1], status: 1, handOverStatus: 0 }));
+        dispatch(updateHistory({ ...histories[histories.length - 1], status: 1, handOverStatus: 1 }));
     }
 
     function handleHandOver() {
@@ -195,17 +195,21 @@ function HandOver() {
         )[0];
         if (resetHandOver.receiver === '') {
             if (receiverDefault.users.password === passwordReset) {
-                dispatch(
-                    addReset({
-                        ...resetHandOver,
-                        totalMoney: handOver.moneyFirst + totalDeposits,
-                        dateTimeStart: userLogin.dateTimeStart,
-                        dateTimeEnd: formatDate(now),
-                        personnel: currentUser,
-                    }),
-                );
-                toast.success('Reset ca thành công', { autoClose: 2000 });
-                setVisibleReset(false);
+                if (userLogin.moneyFirst + totalDeposits - resetMoneyFromUserLogin > resetHandOver.handMoney) {
+                    dispatch(
+                        addReset({
+                            ...resetHandOver,
+                            totalMoney: handOver.moneyFirst + totalDeposits,
+                            dateTimeStart: userLogin.dateTimeStart,
+                            dateTimeEnd: formatDate(now),
+                            personnel: currentUser,
+                        }),
+                    );
+                    toast.success('Reset ca thành công', { autoClose: 2000 });
+                    setVisibleReset(false);
+                } else {
+                    toast.success('Số tiền không hợp lệ', { autoClose: 2000 });
+                }
             } else {
                 toast.error('Mật khẩu xác nhận sai', { autoClose: 2000 });
             }
@@ -357,18 +361,6 @@ function HandOver() {
                             </select>
                         </div>
                         <div>
-                            {/* <span>
-                                Tiền mặt giao ca :
-                                {(totalDeposits - handOver.surcharge + userLogin.moneyFirst - resetMoneyFromUserLogin >=
-                                0
-                                    ? totalDeposits -
-                                      handOver.surcharge +
-                                      userLogin.moneyFirst -
-                                      resetMoneyFromUserLogin
-                                    : 0
-                                ).toLocaleString()}
-                                đ
-                            </span> */}
                             <span>
                                 Tiền mặt giao ca :
                                 {(totalDeposits - handOver.surcharge + userLogin.moneyFirst - resetMoneyFromUserLogin >=
@@ -461,7 +453,7 @@ function HandOver() {
                                         <span>
                                             Tổng tiền :{' '}
                                             {(
-                                                handOver.moneyFirst +
+                                                userLogin.moneyFirst +
                                                 totalDeposits -
                                                 resetMoneyFromUserLogin
                                             ).toLocaleString()}
@@ -470,7 +462,7 @@ function HandOver() {
                                     </div>
                                     <div>
                                         <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-                                            Số tiền bàn giao (VNĐ)
+                                            Số tiền reset (VNĐ)
                                         </label>
                                         <input
                                             onChange={(e) =>
@@ -488,7 +480,7 @@ function HandOver() {
                                             Số dư :
                                             <span className="ml-1">
                                                 {(
-                                                    handOver.moneyFirst +
+                                                    userLogin.moneyFirst +
                                                     totalDeposits -
                                                     resetHandOver.handMoney -
                                                     resetMoneyFromUserLogin

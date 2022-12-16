@@ -248,13 +248,13 @@ function HandOver() {
                                         <div>
                                             <span
                                                 className={`${
-                                                    handOver.moneyStatus === 1
+                                                    handOver.moneyStatus === 0
                                                         ? 'text-green-500 font-bold'
                                                         : 'text-red-600 font-bold'
                                                 }`}
                                             >
                                                 Trạng thái tiền :{' '}
-                                                {handOver.moneyStatus === 1 ? 'Giao đủ' : 'Tiền phát sinh'}
+                                                {handOver.moneyStatus === 0 ? 'Giao đủ' : 'Tiền phát sinh'}
                                             </span>
                                         </div>
                                         <div className="col-span-2 col-end-4">

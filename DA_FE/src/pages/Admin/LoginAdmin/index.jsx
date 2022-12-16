@@ -12,8 +12,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { add as addHistory } from '~/app/reducers/history';
-import { add as addHandOver, getAllHandOver } from '~/app/reducers/handOver';
+import { add as addHandOver } from '~/app/reducers/handOver';
+import { add as addHistory, getAllHistory, update as updateHistory } from '~/app/reducers/history';
 import { getAllUser } from '~/app/reducers/user';
 
 const objLogin = {
@@ -50,16 +50,16 @@ const url = 'http://localhost:8080/api/auth/login';
 
 function LoginAdmin() {
     const users = useSelector((state) => state.user.users);
-    const handOvers = useSelector((state) => state.handOver.handOvers);
+    const histories = useSelector((state) => state.history.histories);
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
     useEffect(() => {
-        window.sessionStorage.removeItem('token');
-        window.sessionStorage.removeItem('username');
-        window.sessionStorage.removeItem('dateTimeStart');
+        window.localStorage.removeItem('token');
+        window.localStorage.removeItem('username');
+        window.localStorage.removeItem('dateTimeStart');
         dispatch(getAllUser());
-        dispatch(getAllHandOver());
+        dispatch(getAllHistory());
         // eslint-disable-next-line
     }, []);
     const handleLogin = async (data) => {
@@ -70,17 +70,17 @@ function LoginAdmin() {
         await axios
             .post(url, data)
             .then((res) => {
-                window.sessionStorage.setItem('token', res.headers.token);
-                window.sessionStorage.setItem('username', res.headers.username);
-                window.sessionStorage.setItem('dateTimeStart', now);
+                window.localStorage.setItem('token', res.headers.token);
+                window.localStorage.setItem('username', res.headers.username);
+                window.localStorage.setItem('dateTimeStart', now);
                 navigate('/admin/room-plan');
-                if (handOvers.length === 0) {
+                if (histories.length === 0) {
                     dispatch(
                         addHistory({
                             timeIn: now,
                             timeOut: now,
-                            handOverStatus: 1,
-                            status: 0,
+                            handOverStatus: 0,
+                            status: 1,
                             users: users.find((x) => x.username === data.username),
                         }),
                     );
@@ -90,20 +90,24 @@ function LoginAdmin() {
                             personnel: users.find((x) => x.username === data.username),
                             dateTimeStart: now,
                             dateTimeEnd: now,
-                            moneyStatus: 0,
+                            moneyStatus: 1,
                             status: 0,
                         }),
                     );
                 } else {
-                    dispatch(
-                        addHistory({
-                            timeIn: now,
-                            timeOut: now,
-                            handOverStatus: 0,
-                            status: 0,
-                            users: users.find((x) => x.username === data.username),
-                        }),
-                    );
+                    if (histories[histories.length - 1]?.users.username !== data.username) {
+                        dispatch(
+                            addHistory({
+                                timeIn: now,
+                                timeOut: now,
+                                handOverStatus: 1,
+                                status: 1,
+                                users: users.find((x) => x.username === data.username),
+                            }),
+                        );
+                    } else {
+                        dispatch(updateHistory({ ...histories[histories.length - 1], handOverStatus: 0, status: 1 }));
+                    }
                 }
                 window.location.reload();
             })
