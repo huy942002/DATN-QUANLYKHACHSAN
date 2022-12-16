@@ -40,8 +40,8 @@ function Room({ room, roomPlan, setRoomPlan, dateChoose }) {
     const key = 'messageApi';
     const [messageApi, contextHolder] = message.useMessage();
     // const [status, getStatus] = useState(room.rooms.statusByDate);
-    const [detailInvoice, setDetailInvoice] = useState(room.detailInvoiceList.find(element => element.status === 1));
-    const [booking, setBooking] = useState(room.detailInvoiceList.find(element => element.status === 3));
+    // const [detailInvoice, setDetailInvoice] = useState(room.detailInvoiceList.find(element => element.status === 1));
+    // const [booking, setBooking] = useState(room.detailInvoiceList.find(element => element.status === 3));
     const items = [
         {
           key: '1',
@@ -94,13 +94,23 @@ function Room({ room, roomPlan, setRoomPlan, dateChoose }) {
         genDayRental();
         genHourRental();
     })
-    useEffect(() => {
-        setDetailInvoice(room.detailInvoiceList.find(element => element.status === 1));
-        setBooking(room.detailInvoiceList.find(element => element.status === 3));
-    }, [roomPlan])
     //End Created
 
     //Gen Data
+    const genDetailInvoice = () => {
+        let data = null;
+        if(room.detailInvoiceList) {
+            data = room.detailInvoiceList.find(element => element.status === 1);
+        }
+        return data;
+    }
+    const genBooking = () => {
+        let data = null;
+        if(room.detailInvoiceList) {
+            data = room.detailInvoiceList.find(element => element.status === 3);
+        }
+        return data;
+    }
     const genDayRental = () => {
         if(room.detailsInvoice) {
             let d1 = dateNow.getTime();
@@ -231,6 +241,8 @@ function Room({ room, roomPlan, setRoomPlan, dateChoose }) {
     };
     //End Util
 
+    console.log(room);
+
     return (
         <> 
             {contextHolder}
@@ -269,9 +281,9 @@ function Room({ room, roomPlan, setRoomPlan, dateChoose }) {
                         {room.rooms.statusByDate === 2 && "Đang có khách"}
                         {room.rooms.statusByDate === 3 && "Đang dọn dẹp"}
                     </span>
-                    <span className='ml-3'>{detailInvoice && detailInvoice.bills.customer.fullname}</span>
+                    <span className='ml-3'>{genDetailInvoice() && genDetailInvoice().bills.customer.fullname}</span>
                 </div>
-                {detailInvoice && (
+                {genDetailInvoice() && (
                     <>
                         <div className='grid grid-cols-2 pt-3'>
                             <div className='flex items-center'>
@@ -279,7 +291,7 @@ function Room({ room, roomPlan, setRoomPlan, dateChoose }) {
                                     <FontAwesomeIcon icon={faPersonWalkingArrowRight} className="w-[18px] h-[18px]"></FontAwesomeIcon>
                                 </span>
                                 <span className='ml-3'>
-                                    {detailInvoice && detailInvoice.hireDate}
+                                    {genDetailInvoice() && genDetailInvoice().hireDate}
                                 </span>
                             </div>
                             <div className='flex items-center'>
@@ -287,7 +299,7 @@ function Room({ room, roomPlan, setRoomPlan, dateChoose }) {
                                     <FontAwesomeIcon icon={faBuildingCircleCheck} className="w-[18px] h-[18px]"></FontAwesomeIcon>
                                 </span>
                                 <span className='ml-3'>
-                                    {detailInvoice && detailInvoice.checkOutDay}
+                                    {genDetailInvoice() && genDetailInvoice().checkOutDay}
                                 </span>
                             </div>
                         </div>
@@ -301,21 +313,21 @@ function Room({ room, roomPlan, setRoomPlan, dateChoose }) {
                         </div>
                     </>
                 )}
-                {booking && (
+                {genBooking() && (
                     <>
                         <Divider style={{margin: 12}}/>
                         <div className={`flex items-center w-full`}>
                             <span className={`px-3 py-1 rounded-full text-white bg-status-4`}>
                                 Khách đặt trước
                             </span>
-                            <span className='ml-3'>{booking && booking.bills.customer.fullname}</span> 
+                            <span className='ml-3'>{genBooking() && genBooking().bills.customer.fullname}</span> 
                         </div>
                         <div className='flex items-center mt-3'>
                             <span className='rounded-full bg-design-charcoalblack h-7 w-7 text-white p-3 flex justify-center items-center'>
                                 <FontAwesomeIcon icon={faPersonWalkingLuggage} className="w-[18px] h-[18px]"></FontAwesomeIcon>
                             </span>
                             <span className='ml-3'>
-                                {booking && booking.hireDate}
+                                {genBooking() && genBooking().hireDate}
                             </span>
                         </div>
                     </>

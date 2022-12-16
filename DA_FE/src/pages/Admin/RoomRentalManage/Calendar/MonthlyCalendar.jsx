@@ -1,5 +1,6 @@
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Modal } from 'antd';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import moment from 'moment/moment';
@@ -7,14 +8,18 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import { MonthlyCalendar } from 'react-rainbow-components';
 
-function MonthlyCalendarRoom({roomId, inOut, setInOut, dateChoose}) {
+function MonthlyCalendarRoom({openCalendar, setOpenCalendar, roomId, setInOut, dateChoose, room, okBtn}) {
+
+    //Data
+    const [listDetailInvoice, setListDetailInvoice] = useState();
     const [initialState, setInitialState] = useState({
         currentMonth: new Date(),
         selectedDate: undefined,
     });
-
-    //Data
-    const [listDetailInvoice, setListDetailInvoice] = useState();
+    const [inOutCalendar, setInOutCalendar] = useState({
+        hireDate: "",
+        checkOutDay: "",
+    });
     //End Data
 
     //Created
@@ -57,10 +62,10 @@ function MonthlyCalendarRoom({roomId, inOut, setInOut, dateChoose}) {
     }
     const genSelected = (value) => {
         let date = moment(value).format("YYYY-MM-DD");
-        if(inOut.hireDate == date) {
+        if(inOutCalendar.hireDate == date) {
             return true;
         }
-        if(inOut.hireDate <= date && inOut.checkOutDay >= date) {
+        if(inOutCalendar.hireDate <= date && inOutCalendar.checkOutDay >= date) {
             return true;
         } else {
             return false;
@@ -77,21 +82,21 @@ function MonthlyCalendarRoom({roomId, inOut, setInOut, dateChoose}) {
     }
     const changeInOut = (value) => {
         let date = moment(value).format("YYYY-MM-DD");
-        if(!inOut.hireDate) {
-            setInOut({...inOut, hireDate: date})
+        if(!inOutCalendar.hireDate) {
+            setInOutCalendar({...inOutCalendar, hireDate: date})
         }
-        if(inOut.hireDate && !inOut.checkOutDay) {
-            setInOut({...inOut, checkOutDay: date})
+        if(inOutCalendar.hireDate && !inOutCalendar.checkOutDay) {
+            setInOutCalendar({...inOutCalendar, checkOutDay: date})
         }
-        if(inOut.hireDate && inOut.checkOutDay) {
-            if(date > inOut.hireDate) {
-                setInOut({...inOut, checkOutDay: date})
+        if(inOutCalendar.hireDate && inOutCalendar.checkOutDay) {
+            if(date > inOutCalendar.hireDate) {
+                setInOutCalendar({...inOutCalendar, checkOutDay: date})
             }
-            if(date < inOut.hireDate) {
-                setInOut({ hireDate: date, checkOutDay: ""})
+            if(date < inOutCalendar.hireDate) {
+                setInOutCalendar({ hireDate: date, checkOutDay: ""})
             }
-            if(date == inOut.hireDate) {
-                setInOut({ hireDate: "", checkOutDay: ""})
+            if(date == inOutCalendar.hireDate) {
+                setInOutCalendar({ hireDate: "", checkOutDay: ""})
             }
         }
     }
@@ -99,58 +104,68 @@ function MonthlyCalendarRoom({roomId, inOut, setInOut, dateChoose}) {
 
     //Util
     //End Util
-    console.log(dateChoose);
 
     return (
         <>
-            <MonthlyCalendar
-                id="monthly-calendar-1"
-                currentMonth={initialState.currentMonth}
-                onMonthChange={({ month }) => setInitialState({ currentMonth: month })}
-                onSelectDate={({ date }) => {
-                    changeInOut(date);
-                }}
-                minDate={dateChoose ? new Date(dateChoose) : new Date()}
-                dateComponent={date => (
-                    <div className='ml-3 mr-1 w-full content-end'>
-                        {genDetailInvoice(date) &&(
-                            <div>
-                                <span className='bg-status-2 px-3 rounded-full text-white'>
-                                    {/* Đã có khách */}
-                                    {genDetailInvoice(date).bills.customer.fullname}
-                                </span>
-                                <span className='bg-status-2 px-3 rounded-full text-white ml-1'>
-                                    {genInOut(date, genDetailInvoice(date).hireDate, genDetailInvoice(date).checkOutDay)}
-                                </span>
-                            </div>
-                        )}
-                        {/* <div>
-                            <span className='bg-design-charcoalblack px-3 rounded-full text-white'>
-                                {genDetailInvoice(date) && genDetailInvoice(date).hireDate + " - " + genDetailInvoice(date).checkOutDay}
-                            </span>
-                        </div> */}
-                        {genBooking(date) && (
-                            <div>
-                                <span className='bg-status-4 px-3 rounded-full text-white'>
-                                    {/* Khách đặt trước */}
-                                    {genBooking(date).bills.customer.fullname}
-                                </span>
-                                {genInOut(date, genBooking(date).hireDate, genBooking(date).checkOutDay) && (
-                                    <span className='bg-status-4 px-3 rounded-full text-white ml-1'>
-                                        {genInOut(date, genBooking(date).hireDate, genBooking(date).checkOutDay)}
+            <Modal
+                title={room.rooms.name}
+                centered
+                open={openCalendar}
+                onOk={() => {okBtn()}}
+                onCancel={() => setOpenCalendar(false)}
+                okText="Xác nhận"
+                cancelText="Hủy"
+                width={1800}
+            >   
+                <MonthlyCalendar
+                    id="monthly-calendar-1"
+                    currentMonth={initialState.currentMonth}
+                    onMonthChange={({ month }) => setInitialState({ currentMonth: month })}
+                    onSelectDate={({ date }) => {
+                        changeInOut(date);
+                    }}
+                    minDate={dateChoose ? new Date(dateChoose) : new Date()}
+                    dateComponent={date => (
+                        <div className='ml-3 mr-1 w-full content-end'>
+                            {genDetailInvoice(date) &&(
+                                <div>
+                                    <span className='bg-status-2 px-3 rounded-full text-white'>
+                                        {/* Đã có khách */}
+                                        {genDetailInvoice(date).bills.customer.fullname}
                                     </span>
-                                )}
-                            </div>
-                        )}
-                        {genSelected(date) && (
-                            <span className='bg-design-greenLight float-right h-5 w-5 flex justify-center items-center text-white rounded-full'>
-                                <FontAwesomeIcon icon={faCheck}></FontAwesomeIcon>
-                            </span>
-                        )} 
-                        
-                    </div>
-                )}
-            />
+                                    <span className='bg-status-2 px-3 rounded-full text-white ml-1'>
+                                        {genInOut(date, genDetailInvoice(date).hireDate, genDetailInvoice(date).checkOutDay)}
+                                    </span>
+                                </div>
+                            )}
+                            {/* <div>
+                                <span className='bg-design-charcoalblack px-3 rounded-full text-white'>
+                                    {genDetailInvoice(date) && genDetailInvoice(date).hireDate + " - " + genDetailInvoice(date).checkOutDay}
+                                </span>
+                            </div> */}
+                            {genBooking(date) && (
+                                <div>
+                                    <span className='bg-status-4 px-3 rounded-full text-white'>
+                                        {/* Khách đặt trước */}
+                                        {genBooking(date).bills.customer.fullname}
+                                    </span>
+                                    {genInOut(date, genBooking(date).hireDate, genBooking(date).checkOutDay) && (
+                                        <span className='bg-status-4 px-3 rounded-full text-white ml-1'>
+                                            {genInOut(date, genBooking(date).hireDate, genBooking(date).checkOutDay)}
+                                        </span>
+                                    )}
+                                </div>
+                            )}
+                            {genSelected(date) && (
+                                <span className='bg-design-greenLight float-right h-5 w-5 flex justify-center items-center text-white rounded-full'>
+                                    <FontAwesomeIcon icon={faCheck}></FontAwesomeIcon>
+                                </span>
+                            )} 
+                            
+                        </div>
+                    )}
+                />
+            </Modal>
         </>
     );
 }
