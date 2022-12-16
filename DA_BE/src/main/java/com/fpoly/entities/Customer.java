@@ -66,8 +66,8 @@ public class Customer implements Serializable {
 	@JsonIgnore
 	private Set<Bills> bills;
 
-	@ManyToOne(optional = false)
-	@JoinColumn(name = "ID_NATIONALITY", nullable = false)
+	@ManyToOne
+	@JoinColumn(name = "ID_NATIONALITY")
 	private Nationality nationality;
 
 	@ManyToOne

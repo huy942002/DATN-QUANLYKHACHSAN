@@ -3,37 +3,28 @@
  */
 package com.fpoly.restcontrollers;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import com.fpoly.entities.Bills;
-import com.fpoly.entities.KindOfRoom;
-import com.fpoly.entities.Rooms;
+import com.fpoly.dto.BookingRoomDTO;
+import com.fpoly.dto.BookingRoomResponseDTO;
+import com.fpoly.entities.*;
 import com.fpoly.repositories.irepo.*;
 import com.fpoly.repositories.repo.BillRepository;
 import com.fpoly.repositories.repo.BookingRepository;
 import com.fpoly.repositories.repo.RoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.fpoly.entities.Booking;
-import com.fpoly.config.Config;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -48,7 +39,15 @@ import javax.servlet.http.HttpServletRequest;
 public class BookingController {
 
 	@Autowired
-	IBillService repositoryBill;
+	IBillService iBillService;
+
+	@Autowired IDetailInvoiceService iDetailInvoiceService;
+
+	@Autowired ICustomerService iCustomerService;
+
+	@Autowired IPersonnelService iPersonnelService;
+
+	@Autowired IRentalTypeService iRentalTypeService;
 
 	@Autowired
 	BillRepository repositoryBill2;
@@ -167,5 +166,83 @@ public class BookingController {
     public ResponseEntity<?> getListBookingPaid() {
         return new ResponseEntity<>(iBookingService.findByStatusAndPaymentStatus(1, 2), HttpStatus.OK);
     }
+
+	@Transactional
+	@GetMapping("/get-room-booking-list/{idBooking}")
+	public ResponseEntity<?> getRoomBookingList(@PathVariable Integer idBooking) {
+		List<DetailsInvoice> roomBookingList = new ArrayList<>();
+		Bills bills = iBillService.getBillByIdBooking(idBooking);
+		if(bills != null) {
+			roomBookingList = iDetailInvoiceService.getDetailInvoiceByIdBill(bills.getId());
+		}
+		return new ResponseEntity<>(roomBookingList, HttpStatus.OK);
+	}
+
+	@GetMapping("/get-bill-by-booking/{idBooking}")
+	public ResponseEntity<?> getBillByBooking(@PathVariable Integer idBooking) {
+		return new ResponseEntity<>(iBillService.getBillByIdBooking(idBooking), HttpStatus.OK);
+	}
+
+	@Transactional
+	@PostMapping("/booking-room")
+	public ResponseEntity<?> getRoomBookingList(@RequestBody BookingRoomDTO bookingRoomDTO) {
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+		Bills bills = new Bills();
+
+		if(bookingRoomDTO.getBills() != null){
+			bills = bookingRoomDTO.getBills();
+		} else {
+			Customer newCustomer = new Customer();
+			newCustomer.setFullname(bookingRoomDTO.getBooking().getCustomerName());
+			newCustomer.setEmail(bookingRoomDTO.getBooking().getCustomerEmail());
+//			newCustomer.setCitizenIdCode(null);
+//			newCustomer.setGender(null);
+//			newCustomer.setDateOfBirth(null);
+			newCustomer.setPhoneNumber(bookingRoomDTO.getBooking().getCustomerPhoneNumber());
+//			newCustomer.setAddress(null);
+//			newCustomer.setImg(null);
+//			newCustomer.setNationality(null);
+			newCustomer.setStatus(1);
+
+			Customer customer = iCustomerService.save(newCustomer);
+
+			Personnel personnel = iPersonnelService.getPersonnelByUserName(bookingRoomDTO.getUserNamePersonnel());
+
+			Bills newBill = new Bills();
+			newBill.setCustomer(customer);
+			newBill.setPersonnel(personnel);
+//			newBill.setRoomRefundConditions(null);
+//			newBill.setPaymentType(null);
+			newBill.setNumberOfAdults(bookingRoomDTO.getBooking().getNumberOfAdults());
+			newBill.setNumberOfKids(bookingRoomDTO.getBooking().getNumberOfKids());
+			newBill.setHireDate(LocalDateTime.now());
+//			newBill.setCheckOutDay(null);
+			newBill.setDeposits(bookingRoomDTO.getBooking().getDeposits());
+//			newBill.setDateOfPayment(null);
+//			newBill.setTotalCard(0);
+//			newBill.setTotalCash(0);
+			newBill.setStatus(3);
+			newBill.setBooking(bookingRoomDTO.getBooking());
+
+			bills = iBillService.save(newBill);
+		}
+		DetailsInvoice newDetailInvoice = new DetailsInvoice();
+		newDetailInvoice.setBills(bills);
+		newDetailInvoice.setRooms(bookingRoomDTO.getRooms());
+
+		Optional<RentalTypes> rentalTypes = iRentalTypeService.findById(1);
+
+		newDetailInvoice.setRentalTypes(rentalTypes.get());
+		newDetailInvoice.setHireDate(LocalDateTime.parse(bookingRoomDTO.getHireDate(), formatter));
+		newDetailInvoice.setCheckOutDay(LocalDateTime.parse(bookingRoomDTO.getCheckOutDay(), formatter));
+		newDetailInvoice.setStatus(3);
+
+		DetailsInvoice detailsInvoice = iDetailInvoiceService.save(newDetailInvoice);
+
+		BookingRoomResponseDTO bookingRoomResponseDTO = new BookingRoomResponseDTO(bills, detailsInvoice);
+		return new ResponseEntity<>(bookingRoomResponseDTO, HttpStatus.OK);
+	}
 
 }

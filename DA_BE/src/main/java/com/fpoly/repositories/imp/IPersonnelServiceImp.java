@@ -43,4 +43,8 @@ public class IPersonnelServiceImp implements IPersonnelService {
 		personnelRepo.deleteById(id);
 	}
 
+	@Override
+	public Personnel getPersonnelByUserName(String userName) {
+		return personnelRepo.getPersonnelByUserName(userName);
+	}
 }

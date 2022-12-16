@@ -20,6 +20,7 @@ function MonthlyCalendarRoom({openCalendar, setOpenCalendar, roomId, setInOut, d
         hireDate: "",
         checkOutDay: "",
     });
+    const [openModalComfirm, setOpenModalComfirm] = useState(false);
     //End Data
 
     //Created
@@ -75,10 +76,11 @@ function MonthlyCalendarRoom({openCalendar, setOpenCalendar, roomId, setInOut, d
 
     //Function
     const getAllDetailInVoiceByRoom = async () => {
-        await axios.get('http://localhost:8080/api/room-rental-manage/all-detail-invoice-by-room-and-status/' + roomId)
-                .then(res => {
-                    setListDetailInvoice(res.data);
-                }).catch(err => {});
+        await axios
+            .get('http://localhost:8080/api/room-rental-manage/all-detail-invoice-by-room-and-status/' + roomId)
+            .then(res => {
+                setListDetailInvoice(res.data);
+            }).catch(err => {});
     }
     const changeInOut = (value) => {
         let date = moment(value).format("YYYY-MM-DD");
@@ -109,13 +111,13 @@ function MonthlyCalendarRoom({openCalendar, setOpenCalendar, roomId, setInOut, d
         <>
             <Modal
                 title={room.rooms.name}
-                centered
                 open={openCalendar}
-                onOk={() => {okBtn()}}
+                onOk={() => okBtn({room: room.rooms, hireDate: inOutCalendar.hireDate, checkOutDay: inOutCalendar.checkOutDay})}
                 onCancel={() => setOpenCalendar(false)}
                 okText="Xác nhận"
                 cancelText="Hủy"
                 width={1800}
+                style={{ top: 20 }}
             >   
                 <MonthlyCalendar
                     id="monthly-calendar-1"
@@ -166,6 +168,19 @@ function MonthlyCalendarRoom({openCalendar, setOpenCalendar, roomId, setInOut, d
                     )}
                 />
             </Modal>
+            {/* <Modal
+                title="Xác nhận"
+                open={openModalComfirm}
+                onOk={() => okBtn()}
+                onCancel={() => setOpenModalComfirm(false)}
+                okText="Xác nhận"
+                cancelText="Hủy"
+                style={{ top: 20 }}
+            >
+                <div className='py-2'>Phòng: {room.rooms.name}</div>
+                <div className='py-2'>Check in: {inOutCalendar.hireDate}</div>
+                <div className='py-2'>Check out: {inOutCalendar.checkOutDay}</div>
+            </Modal> */}
         </>
     );
 }

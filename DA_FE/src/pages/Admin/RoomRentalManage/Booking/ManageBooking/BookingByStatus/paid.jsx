@@ -10,15 +10,19 @@ function Paid() {
     //Data
     const [listBookingPaid, setListBookingPaid] = useState();
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isModalOpenListRoom, setIsModalOpenListRoom] = useState(false);
-    const [dataModal, setDataModal] = useState();
+    const [openModalListRoom, setOpenModalListRoom] = useState(false);
+    const [dataBooking, setDataBooking] = useState();
+    const [dataBill, setDataBill] = useState();
+    const [roomBookingList, setRoomBookingList] = useState();
     const columns = [
         { title: 'Tên khách hàng', dataIndex: 'customerName', key: '1'},
         { title: 'Số điện thoại', dataIndex: 'customerPhoneNumber', key: '2'},
         { title: 'Email', dataIndex: 'customerEmail', key: '3'},
         { title: 'Loại phòng book', dataIndex: 'kindOfRoom', key: '4',
             render: (kindOfRoom) => (
-                <span>{kindOfRoom.name}</span>
+                <span>
+                    {kindOfRoom.name}
+                </span>
             )
         },
         { title: 'Ngày đến', dataIndex: 'hireDate', key: '5'},
@@ -26,14 +30,19 @@ function Paid() {
         { title: 'Số người lớn', dataIndex: 'numberOfAdults', key: '8'},
         { title: 'Số trẻ em', dataIndex: 'numberOfKids', key: '9'},
         { title: 'Tiền thanh toán', dataIndex: 'deposits', key: '10',
-            render: (deposits) => (<span>{formatCurrency(deposits)}</span>)
+            render: (deposits) => (
+                <span>
+                    {formatCurrency(deposits)}
+                </span>
+            )
         },
         { title: '', dataIndex: '', key: '11',
             render: (element) => (
-                <span onClick={() => {
-                    showModal(element);
-                }}>
-                    <FontAwesomeIcon icon={faCircleExclamation} className="hover:text-design-greenLight cursor-pointer"></FontAwesomeIcon>
+                <span onClick={() => showModal(element)}>
+                    <FontAwesomeIcon
+                        icon={faCircleExclamation}
+                        className="hover:text-design-greenLight cursor-pointer"
+                    ></FontAwesomeIcon>
                 </span>
             ),
         },
@@ -45,6 +54,12 @@ function Paid() {
     useEffect(() => {
         getListBookingPaid();
     }, [])
+    useEffect(() => {
+        if(dataBooking) {
+            getBillByBooking(dataBooking.id)
+            getRoomBookingList(dataBooking.id);
+        }
+    }, [dataBooking])
     //End Created
 
     //Gen Data
@@ -52,42 +67,69 @@ function Paid() {
 
     //Function
     const getListBookingPaid = async () => {
-        await axios.get('http://localhost:8080/api/booking/get-list-booking-paid')
-                .then(res => {
-                    setListBookingPaid(res.data);
-                }).catch(err => {});
+        await axios
+            .get('http://localhost:8080/api/booking/get-list-booking-paid')
+            .then(res => {
+                setListBookingPaid(res.data);
+            })
+            .catch(err => {});
     }
+
+    const getBillByBooking = async (idBooking) => {
+        await axios
+            .get('http://localhost:8080/api/booking/get-bill-by-booking/' + idBooking)
+            .then(res => {
+                setDataBill(res.data);
+            })
+            .catch(err => {});
+    }
+
+    const getRoomBookingList = async (idBooking) => {
+        await axios
+            .get('http://localhost:8080/api/booking/get-room-booking-list/' + idBooking)
+            .then(res => {
+                setRoomBookingList(res.data);
+            })
+            .catch(err => {});
+    }
+
     const showModal = (value) => {
-        setDataModal(value);
+        setDataBooking(value);
         setIsModalOpen(true);
     };
     
     const handleOk = () => {
-
         setIsModalOpen(false);
-        setDataModal();
+        setDataBooking();
     };
 
     const handleCancel = () => {
         setIsModalOpen(false);
-        setDataModal();
+        setDataBooking();
     };
+
     const showModalListRoom = () => {
-        setIsModalOpenListRoom(true);
+        setOpenModalListRoom(true);
     };
-    
+
     const handleOkListRoom = () => {
-        setIsModalOpenListRoom(false);
+        setOpenModalListRoom(false);
     };
 
     const handleCancelListRoom = () => {
-        setIsModalOpenListRoom(false);
+        setOpenModalListRoom(false);
     };
     //End Function
 
     //Util
     const formatCurrency = (value) => {
-        return value.toLocaleString('it-IT', {style : 'currency', currency : 'VND'});
+        return value.toLocaleString(
+            'it-IT',
+            {
+                style : 'currency',
+                currency : 'VND'
+            }
+        );
     };
     //End Util
 
@@ -100,19 +142,48 @@ function Paid() {
                 onCancel={handleCancel}
                 okButtonProps={{ style: { display: 'none' } }}
                 cancelButtonProps={{ style: { display: 'none' } }}
+                style={{ top: 20 }}
             >
-                <div className="my-2">Tên khách hàng: {dataModal && dataModal.customerName}</div>
-                <div className="my-2">Số điện thoại: {dataModal && dataModal.customerPhoneNumber}</div>
-                <div className="my-2">Email: {dataModal && dataModal.customerEmail}</div>
-                <div className="my-2">Loại phòng book: {dataModal && dataModal.kindOfRoom.name}</div>
-                <div className="my-2">Ngày đến: {dataModal && dataModal.hireDate}</div>
-                <div className="my-2">Ngày đi: {dataModal && dataModal.checkOutDay}</div>
-                <div className="my-2">Số người lớn: {dataModal && dataModal.numberOfAdults}</div>
-                <div className="my-2">Số trẻ em: {dataModal && dataModal.numberOfKids}</div>
-                <div className="my-2">Tiền đã thanh toán: {dataModal && formatCurrency(dataModal.deposits)}</div>
+                <div className="my-2">
+                    Tên khách hàng: {dataBooking && dataBooking.customerName}
+                </div>
+                <div className="my-2">
+                    Số điện thoại: {dataBooking && dataBooking.customerPhoneNumber}
+                </div>
+                <div className="my-2">
+                    Email: {dataBooking && dataBooking.customerEmail}
+                </div>
+                <div className="my-2">
+                    Loại phòng book: {dataBooking && dataBooking.kindOfRoom.name}
+                </div>
+                <div className="my-2">
+                    Ngày đến: {dataBooking && dataBooking.hireDate}
+                </div>
+                <div className="my-2">
+                    Ngày đi: {dataBooking && dataBooking.checkOutDay}
+                </div>
+                <div className="my-2">
+                    Số người lớn: {dataBooking && dataBooking.numberOfAdults}
+                </div>
+                <div className="my-2">
+                    Số trẻ em: {dataBooking && dataBooking.numberOfKids}
+                </div>
+                <div className="my-2">
+                    Tiền đã thanh toán: {dataBooking && formatCurrency(dataBooking.deposits)}
+                </div>
+
                 <Divider orientation="left">
                     <span className="font-semibold mr-3">Phòng book</span>
                 </Divider>
+                
+                {roomBookingList && roomBookingList.map(
+                    (x) => (
+                        <div className="text-base font-semibold border rounded-md py-1 px-2">
+                            {x.rooms.name}: {x.hireDate} -> {x.checkOutDay}
+                        </div>
+                    )
+                )}
+
                 <Button type="primary" className="w-full" onClick={() => showModalListRoom()}>
                     {/* <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon> */}
                     Thêm phòng
@@ -121,13 +192,25 @@ function Paid() {
             <Modal 
                 width={1800}
                 title={"Sơ đồ phòng"}
-                open={isModalOpenListRoom}
+                open={openModalListRoom}
                 onOk={handleOkListRoom}
                 onCancel={handleCancelListRoom}
                 okButtonProps={{ style: { display: 'none' } }}
                 cancelButtonProps={{ style: { display: 'none' } }}
+                style={{ top: 20 }}
             >
-                <ListRoom hireDate={dataModal && dataModal.hireDate}></ListRoom>
+                <ListRoom
+                    openModalListRoom={openModalListRoom}
+                    setOpenModalListRoom={setOpenModalListRoom}
+                    hireDate={dataBooking && dataBooking.hireDate}
+                    kindOfRoomBooking={dataBooking && dataBooking.kindOfRoom.id}
+                    dataBooking={dataBooking}
+                    setDataBooking={setDataBooking}
+                    dataBill={dataBill}
+                    setDataBill={setDataBill}
+                    roomBookingList={roomBookingList}
+                    setRoomBookingList={setRoomBookingList}
+                ></ListRoom>
             </Modal>
             <Table
                 size="middle"

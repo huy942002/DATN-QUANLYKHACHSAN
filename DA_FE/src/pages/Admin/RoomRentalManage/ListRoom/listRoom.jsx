@@ -9,7 +9,19 @@ import axios from 'axios';
 import dayjs from 'dayjs';
 import { DatePicker } from 'antd';
 
-const ListRoom = ({hireDate}) => {
+const ListRoom = ({ 
+    openModalListRoom,
+    setOpenModalListRoom,
+    hireDate,
+    kindOfRoomBooking,
+    dataBooking,
+    setDataBooking,
+    dataBill,
+    setDataBill,
+    roomBookingList,
+    setRoomBookingList,
+}) => {
+
     //Data
     const [roomPlan, setRoomPlan] = useState();
     const [kindOfRoomList, setKindOfRoomList] = useState();
@@ -25,6 +37,9 @@ const ListRoom = ({hireDate}) => {
         window.scrollTo(0, 0);
         getRoomPlan(dateChoose);
         getAllKindOfRoom();
+        if(kindOfRoomBooking) {
+            setQueryKindOfRoom(kindOfRoomBooking);
+        }
     }, []);
     //End Created
 
@@ -129,6 +144,9 @@ const ListRoom = ({hireDate}) => {
         setDateChoose(formatDateTime(dateString));
         await getRoomPlan(formatDateTime(dateString));
     };
+    const updateRoomPlan = () => {
+        getRoomPlan(dateChoose);
+    }
     //End Function
 
     //Util
@@ -262,7 +280,21 @@ const ListRoom = ({hireDate}) => {
                 />
             </div>
             {filterRoomPlan() && filterRoomPlan().map((element, index) => {
-                return <Floor key={index} theRoomsOfTheFloor={element} dateChoose={dateChoose}></Floor>;
+                return (
+                    <Floor
+                        key={index}
+                        theRoomsOfTheFloor={element}
+                        setOpenModalListRoom={setOpenModalListRoom}
+                        dateChoose={dateChoose}
+                        dataBooking={dataBooking}
+                        setDataBooking={setDataBooking}
+                        dataBill={dataBill}
+                        setDataBill={setDataBill}
+                        roomBookingList={roomBookingList}
+                        setRoomBookingList={setRoomBookingList}
+                        updateRoomPlan={updateRoomPlan}
+                    ></Floor>
+                );
             })}
         </>
     )

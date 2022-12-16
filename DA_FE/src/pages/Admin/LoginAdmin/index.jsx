@@ -70,6 +70,15 @@ function LoginAdmin() {
                 window.sessionStorage.setItem('token', res.headers.token);
                 window.sessionStorage.setItem('username', res.headers.username);
                 window.sessionStorage.setItem('dateTimeStart', now);
+                
+                //Settime
+                axios
+                .get("http://localhost:8080/api/config-time")
+                .then((resTime) => {
+                    window.sessionStorage.setItem('time-in', resTime.data[0].timeIn);
+                    window.sessionStorage.setItem('time-out', resTime.data[0].timeOut);
+                })
+
                 navigate('/admin/room-plan');
                 if (handOvers.length == 0) {
                     dispatch(

@@ -22,11 +22,11 @@ public class ConfigTime implements Serializable {
     @Column(name = "ID", unique = true, nullable = false, precision = 10)
     private int id;
 
-    @Column(name = "NAME", length = 255)
-    private String name;
+    @Column(name = "TIME_IN", length = 255)
+    private String timeIn;
 
-    @Column(name = "TIME", length = 255)
-    private String time;
+    @Column(name = "TIME_OUT", length = 255)
+    private String timeOut;
 
     @Column(name = "STATUS", nullable = false, precision = 10)
     private int status;

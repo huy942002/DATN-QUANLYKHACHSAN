@@ -7,11 +7,23 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Divider, message, Modal } from 'antd';
 import { useState, React } from 'react'
 import MonthlyCalendarRoom from '../Calendar/MonthlyCalendar';
+import axios from 'axios';
 
 const { confirm } = Modal;
 
 
-const Room = ({ room, dateChoose }) => {
+const Room = ({ 
+    room,
+    setOpenModalListRoom,
+    dateChoose,
+    dataBooking,
+    setDataBooking,
+    dataBill,
+    setDataBill,
+    roomBookingList,
+    setRoomBookingList,
+    updateRoomPlan,
+}) => {
 
     //Data
     const [openCalendar, setOpenCalendar] = useState(false);
@@ -46,8 +58,25 @@ const Room = ({ room, dateChoose }) => {
     //End Gen Data
 
     //Function
-    const booking = () => {
-
+    const booking = async (data) => {
+        const params = {
+            rooms: data.room,
+            bills: dataBill || null,
+            booking: dataBooking,
+            hireDate: data.hireDate + " " + window.sessionStorage.getItem("time-in"),
+            checkOutDay: data.checkOutDay + " " + window.sessionStorage.getItem("time-out"),
+            userNamePersonnel: window.sessionStorage.getItem("username"),
+        }
+        await axios
+            .post('http://localhost:8080/api/booking/booking-room', params)
+            .then((res) => {
+                setDataBill(res.data.bills);
+                setRoomBookingList([...roomBookingList, res.data.detailsInvoice])
+                setOpenCalendar(false);
+                setOpenModalListRoom(false);
+                updateRoomPlan();
+            })
+            .catch((err) => {});
     }
     //End Function
 
@@ -60,34 +89,49 @@ const Room = ({ room, dateChoose }) => {
     return (
         <> 
             {contextHolder}
+
             <div
                 onClick={() => {setOpenCalendar(true)}}
                 className=' border border-1 text-base p-3 cursor-pointer hover:bg-default-2 hover:border-design-greenLight'
             >
+
                 <div className='flex justify-end font-semibold'>
                     <span className='text-base font-semibold'>{room.rooms.name}</span>
                 </div>
+
                 <div className='flex justify-end font-semibold'>
                     {room.rooms.kindOfRoom.name}
                 </div>
+
                 <div className={`flex items-center pt-10`}>
-                    <span className={`px-3 py-1 rounded-full text-white
-                    ${room.rooms.statusByDate === 1 ? "bg-design-greenLight" : ""}
-                    ${room.rooms.statusByDate === 2 ? "bg-status-2" : ""}
-                    ${room.rooms.statusByDate === 3 ? "bg-status-3" : ""}
-                    `}>
+                    
+                    <span
+                        className={`px-3 py-1 rounded-full text-white
+                            ${room.rooms.statusByDate === 1 ? "bg-design-greenLight" : ""}
+                            ${room.rooms.statusByDate === 2 ? "bg-status-2" : ""}
+                            ${room.rooms.statusByDate === 3 ? "bg-status-3" : ""}`
+                        }
+                    >
                         {room.rooms.statusByDate === 1 && "Sẵn sàng đón khách"}
                         {room.rooms.statusByDate === 2 && "Đang có khách"}
                         {room.rooms.statusByDate === 3 && "Đang dọn dẹp"}
                     </span>
-                    <span className='ml-3'>{genDetailInvoice() && genDetailInvoice().bills.customer.fullname}</span>
+
+                    <span className='ml-3'>
+                        {genDetailInvoice() && genDetailInvoice().bills.customer.fullname}
+                    </span>
+
                 </div>
+
                 {genDetailInvoice() && (
                     <>
                         <div className='grid grid-cols-2 pt-3'>
                             <div className='flex items-center'>
                                 <span className='rounded-full bg-design-charcoalblack h-7 w-7 text-white p-3 flex justify-center items-center'>
-                                    <FontAwesomeIcon icon={faPersonWalkingArrowRight} className="w-[18px] h-[18px]"></FontAwesomeIcon>
+                                    <FontAwesomeIcon
+                                        icon={faPersonWalkingArrowRight}
+                                        className="w-[18px] h-[18px]"
+                                    ></FontAwesomeIcon>
                                 </span>
                                 <span className='ml-3'>
                                     {genDetailInvoice() && genDetailInvoice().hireDate}
@@ -95,7 +139,10 @@ const Room = ({ room, dateChoose }) => {
                             </div>
                             <div className='flex items-center'>
                                 <span className='rounded-full bg-design-charcoalblack h-7 w-7 text-white p-3 flex justify-center items-center'>
-                                    <FontAwesomeIcon icon={faBuildingCircleCheck} className="w-[18px] h-[18px]"></FontAwesomeIcon>
+                                    <FontAwesomeIcon
+                                        icon={faBuildingCircleCheck}
+                                        className="w-[18px] h-[18px]"
+                                    ></FontAwesomeIcon>
                                 </span>
                                 <span className='ml-3'>
                                     {genDetailInvoice() && genDetailInvoice().checkOutDay}
@@ -111,11 +158,16 @@ const Room = ({ room, dateChoose }) => {
                             <span className={`px-3 py-1 rounded-full text-white bg-status-4`}>
                                 Khách đặt trước
                             </span>
-                            <span className='ml-3'>{genBooking() && genBooking().bills.customer.fullname}</span> 
+                            <span className='ml-3'>
+                                {genBooking() && genBooking().bills.customer.fullname}
+                            </span> 
                         </div>
                         <div className='flex items-center mt-3'>
                             <span className='rounded-full bg-design-charcoalblack h-7 w-7 text-white p-3 flex justify-center items-center'>
-                                <FontAwesomeIcon icon={faPersonWalkingLuggage} className="w-[18px] h-[18px]"></FontAwesomeIcon>
+                                <FontAwesomeIcon
+                                    icon={faPersonWalkingLuggage}
+                                    className="w-[18px] h-[18px]"
+                                ></FontAwesomeIcon>
                             </span>
                             <span className='ml-3'>
                                 {genBooking() && genBooking().hireDate}
@@ -124,7 +176,14 @@ const Room = ({ room, dateChoose }) => {
                     </>
                 )}
             </div>
-            <MonthlyCalendarRoom openCalendar={openCalendar} setOpenCalendar={setOpenCalendar} roomId={room.rooms.id} dateChoose={dateChoose} room={room} okBtn={booking}></MonthlyCalendarRoom>
+            <MonthlyCalendarRoom
+                openCalendar={openCalendar}
+                setOpenCalendar={setOpenCalendar}
+                roomId={room.rooms.id}
+                dateChoose={dateChoose}
+                room={room}
+                okBtn={booking}
+            ></MonthlyCalendarRoom>
         </>
     );
 }

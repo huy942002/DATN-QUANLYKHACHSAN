@@ -77,8 +77,8 @@ public class Bills implements Serializable {
 	@JoinColumn(name = "ID_CUSTOMER", nullable = false)
 	private Customer customer;
 
-	@ManyToOne(optional = false)
-	@JoinColumn(name = "ID_PAYMENT_TYPE", nullable = false)
+	@ManyToOne
+	@JoinColumn(name = "ID_PAYMENT_TYPE")
 	private PaymentType paymentType;
 
 	@ManyToOne(optional = false)

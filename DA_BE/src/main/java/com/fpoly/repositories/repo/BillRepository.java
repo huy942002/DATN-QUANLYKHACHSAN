@@ -24,4 +24,7 @@ public interface BillRepository extends JpaRepository<Bills, Integer>{
     @Query("select entity from Bills entity Where customer = :customer")
     public List<Bills> getBillByCustomer(@Param("customer") Optional<Customer> customer);
     List<Bills> findByStatus (Integer status);
+
+    @Query("select b from Bills b where b.booking.id = :idBooking")
+    Bills getBillByIdBooking(Integer idBooking);
 }

@@ -65,4 +65,9 @@ public class IDetailInvoiceServiceImp implements IDetailInvoiceService {
 	public List<DetailsInvoice> getAllDetailInvoiceByRoomAndStatus(Integer roomId) {
 		return voiceRepo.getAllDetailInvoiceByRoomAndStatus(roomId);
 	}
+
+	@Override
+	public List<DetailsInvoice> getDetailInvoiceByIdBill(Integer idBill) {
+		return voiceRepo.getDetailInvoiceByIdBill(idBill);
+	}
 }
