@@ -3,6 +3,7 @@
  */
 package com.fpoly.repositories.imp;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,4 +44,8 @@ public class IBookingServiceImp implements IBookingService {
 		bookingRepo.deleteById(id);
 	}
 
+	@Override
+	public List<Booking> findByStatusAndPaymentStatus(Integer status, Integer paymentStatus) {
+		return bookingRepo.findByStatusAndPaymentStatus(status, paymentStatus);
+	}
 }

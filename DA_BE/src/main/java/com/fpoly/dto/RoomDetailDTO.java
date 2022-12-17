@@ -13,8 +13,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RoomDetailDTO {
-    private Rooms rooms;
-    private DetailsInvoice detailsInvoice;
+    private RoomByDateDTO rooms;
+    private List<DetailsInvoice> detailInvoiceList;
     private List<FacilitiesDetails> facilitiesDetailsList;
     private List<ServiceAvailable> serviceAvailableList;
     private List<ServiceDetails> serviceDetailsList;

@@ -71,18 +71,14 @@ public class Bills implements Serializable {
 
 	@OneToMany(mappedBy = "bills")
 	@JsonIgnore
-	private Set<Booking> booking;
-
-	@OneToMany(mappedBy = "bills")
-	@JsonIgnore
 	private Set<DetailsInvoice> detailsInvoice;
 
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "ID_CUSTOMER", nullable = false)
 	private Customer customer;
 
-	@ManyToOne(optional = false)
-	@JoinColumn(name = "ID_PAYMENT_TYPE", nullable = false)
+	@ManyToOne
+	@JoinColumn(name = "ID_PAYMENT_TYPE")
 	private PaymentType paymentType;
 
 	@ManyToOne(optional = false)
@@ -92,6 +88,10 @@ public class Bills implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "ID_ROOM_REFUND_CONDITIONS")
 	private RoomRefundConditions roomRefundConditions;
+
+	@ManyToOne
+	@JoinColumn(name = "ID_BOOKING")
+	private Booking booking;
 
 	public static Bills toEntity(BillsDTO billsDTO){
 		if(billsDTO == null){
@@ -103,7 +103,7 @@ public class Bills implements Serializable {
 				.numberOfAdults(billsDTO.getNumberOfAdults())
 				.numberOfKids(billsDTO.getNumberOfKids())
 				.hireDate(LocalDateTime.parse(billsDTO.getHireDate(), formatter))
-				.checkOutDay(LocalDateTime.parse(billsDTO.getCheckOutDay(), formatter))
+				.checkOutDay(billsDTO.getCheckOutDay() == null ? null : LocalDateTime.parse(billsDTO.getCheckOutDay(), formatter))
 				.dateOfPayment(billsDTO.getDateOfPayment() != null ? LocalDateTime.parse(billsDTO.getDateOfPayment(), formatter): null)
 				.totalCash(billsDTO.getTotalCash())
 				.status(billsDTO.getStatus())
@@ -113,6 +113,7 @@ public class Bills implements Serializable {
 				.deposits(billsDTO.getDeposits())
 				.totalCard(billsDTO.getTotalCard())
 				.roomRefundConditions(billsDTO.getRoomRefundConditions())
+				.booking(billsDTO.getBooking())
 				.build();
 	}
 
@@ -121,7 +122,7 @@ public class Bills implements Serializable {
 		BillsDTO billsDTO = BillsDTO.builder()
 				.id(this.id)
 				.hireDate(formatter.format(this.hireDate))
-				.checkOutDay(formatter.format(this.checkOutDay))
+				.checkOutDay(this.checkOutDay == null ? null : formatter.format(this.checkOutDay))
 				.numberOfAdults(this.numberOfAdults)
 				.numberOfKids(this.numberOfKids)
 				.dateOfPayment(this.dateOfPayment == null ? null : formatter.format(this.dateOfPayment))
@@ -133,6 +134,7 @@ public class Bills implements Serializable {
 				.deposits(this.deposits)
 				.totalCard(this.totalCard)
 				.roomRefundConditions((this.roomRefundConditions))
+				.booking(this.booking)
 				.build();
 		return billsDTO;
 	}

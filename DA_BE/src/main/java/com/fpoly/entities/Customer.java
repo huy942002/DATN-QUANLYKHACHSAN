@@ -66,11 +66,11 @@ public class Customer implements Serializable {
 	@JsonIgnore
 	private Set<Bills> bills;
 
-	@ManyToOne(optional = false)
-	@JoinColumn(name = "ID_NATIONALITY", nullable = false)
+	@ManyToOne
+	@JoinColumn(name = "ID_NATIONALITY")
 	private Nationality nationality;
 
-	@ManyToOne(optional = false)
+	@ManyToOne
 	@JoinColumn(name = "ID_USER")
 	private Users users;
 

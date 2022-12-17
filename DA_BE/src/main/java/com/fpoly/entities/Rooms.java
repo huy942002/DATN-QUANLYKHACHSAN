@@ -1,6 +1,7 @@
 package com.fpoly.entities;
 
 import java.io.Serializable;
+import java.time.format.DateTimeFormatter;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -14,6 +15,8 @@ import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import com.fpoly.dto.BillsDTO;
+import com.fpoly.dto.RoomByDateDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -74,4 +77,20 @@ public class Rooms implements Serializable {
 	@JsonIgnore
 	private Set<ServiceAvailable> serviceAvailable;
 
+	public RoomByDateDTO toRoomByDate(Integer statusByDate) {
+		RoomByDateDTO roomByDateDTO = RoomByDateDTO.builder()
+				.id(this.id)
+				.name(this.name)
+				.note(this.note)
+				.img(this.img)
+				.img1(this.img1)
+				.img2(this.img2)
+				.img3(this.img3)
+				.status(this.status)
+				.kindOfRoom(this.kindOfRoom)
+				.numberOfFloors(this.numberOfFloors)
+				.statusByDate(statusByDate)
+				.build();
+		return roomByDateDTO;
+	}
 }

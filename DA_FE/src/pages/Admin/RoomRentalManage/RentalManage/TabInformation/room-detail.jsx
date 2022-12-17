@@ -55,6 +55,9 @@ function RoomDetail({ detailInvoice, detailInvoiceList, setDetailInvoices, showM
     };
     //End Util
 
+    // console.log(detailInvoice);
+
+
     return (
         <div className='text-base'>
             <Card

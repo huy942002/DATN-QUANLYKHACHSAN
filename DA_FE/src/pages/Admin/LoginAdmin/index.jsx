@@ -73,6 +73,15 @@ function LoginAdmin() {
                 window.localStorage.setItem('token', res.headers.token);
                 window.localStorage.setItem('username', res.headers.username);
                 window.localStorage.setItem('dateTimeStart', now);
+                
+                //Settime
+                axios
+                .get("http://localhost:8080/api/config-time")
+                .then((resTime) => {
+                    window.localStorage.setItem('time-in', resTime.data[0].timeIn);
+                    window.localStorage.setItem('time-out', resTime.data[0].timeOut);
+                })
+
                 navigate('/admin/room-plan');
                 if (histories.length === 0) {
                     dispatch(

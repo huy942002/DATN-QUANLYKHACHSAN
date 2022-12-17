@@ -100,8 +100,21 @@ const AdminLayout = ({ children }) => {
                         {
                             key: '1',
                             icon: <FontAwesomeIcon icon={faHotel}></FontAwesomeIcon>,
-                            label: 'Sơ đồ phòng',
-                            onClick: () => navigate('/admin/room-plan'),
+                            label: 'Phòng',
+                            children: [
+                                {
+                                    key: '17',
+                                    // icon: <UploadOutlined />,
+                                    label: 'Sơ đồ phòng',
+                                    onClick: () => navigate('/admin/room-plan'),
+                                },
+                                {
+                                    key: '18',
+                                    // icon: <UploadOutlined />,
+                                    label: 'Quản lý booking',
+                                    onClick: () => navigate('/admin/manage-booking'),
+                                },
+                            ],
                         },
                         {
                             key: '2',

@@ -27,6 +27,7 @@ import RoomPlan from '~/pages/Admin/RoomRentalManage/RoomPlan/room-plan';
 import RentalManage from '~/pages/Admin/RoomRentalManage/RentalManage/rental-manage';
 import Booking from '~/pages/Customer/Booking';
 import BookingManage from '~/pages/Admin/BookingManage';
+import ManageBooking from '~/pages/Admin/RoomRentalManage/Booking/ManageBooking/manageBooking';
 
 // Routes public
 
@@ -43,7 +44,9 @@ const publicRoutes = [
 const privateRoutes = [
     { path: config.routes.loginAdmin, component: LoginAdmin, layout: null },
     { path: config.routes.roomPlan, component: RoomPlan },
-    { path: config.routes.rentalManage, component: RentalManage },
+    { path: config.routes.rentalManageDetail, component: RentalManage },
+    { path: config.routes.rentalManageCheckIn, component: RentalManage },
+    { path: config.routes.historyAdmin, component: HistoryAdmin },
     { path: config.routes.personnelManage, component: PersonnelManage },
     { path: config.routes.serviceManage, component: ServiceManage },
     { path: config.routes.handOver, component: HandOver },
@@ -57,6 +60,7 @@ const privateRoutes = [
     { path: config.routes.rentalTypeManage, component: RentalTypes },
     { path: config.routes.authorization, component: Authorization },
     { path: config.routes.bookingmanage, component: BookingManage },
+    { path: config.routes.manageBooking, component: ManageBooking },
 ];
 
 const privateRoutesDirect = [

@@ -49,4 +49,8 @@ public class IBillServiceImp implements IBillService {
 		return billRepo.findByStatus(status);
 	}
 
+	@Override
+	public Bills getBillByIdBooking(Integer idBooking) {
+		return billRepo.getBillByIdBooking(idBooking);
+	}
 }

@@ -9,7 +9,21 @@ import axios from 'axios';
 import dayjs from 'dayjs';
 import { DatePicker } from 'antd';
 
-const RoomPlan = () => {
+const ListRoom = ({
+    optionType, 
+    openModalListRoom,
+    setOpenModalListRoom,
+    hireDate,
+    kindOfRoomBooking,
+    dataBooking,
+    setDataBooking,
+    dataBill,
+    setDataBill,
+    roomBookingList,
+    setRoomBookingList,
+    extraRoom,
+    listRoomChoose,
+}) => {
 
     //Data
     const [roomPlan, setRoomPlan] = useState();
@@ -18,7 +32,7 @@ const RoomPlan = () => {
     const [queryKindOfRoom, setQueryKindOfRoom] = useState("ALL");
     const [queryStatus, setQueryStatus] = useState("ALL");
     const [queryName, setQueryName] = useState("");
-    const [dateChoose, setDateChoose] = useState(dayjs(new Date()).format('YYYY-MM-DD'));
+    const [dateChoose, setDateChoose] = useState(dayjs(hireDate ? new Date(hireDate) : new Date()).format('YYYY-MM-DD'));
     //End Data
 
     //Created
@@ -27,6 +41,20 @@ const RoomPlan = () => {
         getRoomPlan(dateChoose);
         getAllKindOfRoom();
     }, []);
+    useEffect(
+        () => {
+            setDateChoose(dayjs(hireDate ? new Date(hireDate) : new Date()).format('YYYY-MM-DD'));
+            getRoomPlan(hireDate ? hireDate : dayjs(new Date()).format("YYYY-MM-DD"))
+        }, [hireDate]
+    )
+    useEffect(
+        () => {
+            setQueryFloor("ALL");
+            setQueryName("");
+            setQueryStatus("ALL");
+            setQueryKindOfRoom(kindOfRoomBooking ? kindOfRoomBooking : "ALL");
+        }, [kindOfRoomBooking]
+    )
     //End Created
 
     //Gen Data
@@ -114,12 +142,6 @@ const RoomPlan = () => {
     //End Gen Data
 
     //Function
-    const getAllNationality = async () => {
-        await axios.get('http://localhost:8080/api/kind-of-room')
-                .then(res => {
-                    setKindOfRoomList(res.data);
-                }).catch(err => {});
-    }
     const getRoomPlan = async (date) => {
         await axios.get('http://localhost:8080/api/room-rental-manage/get-room-plan/' + date)
                 .then(res => {
@@ -136,9 +158,10 @@ const RoomPlan = () => {
         setDateChoose(formatDateTime(dateString));
         await getRoomPlan(formatDateTime(dateString));
     };
+    const updateRoomPlan = () => {
+        getRoomPlan(dateChoose);
+    }
     //End Function
-
-    // console.log(roomPlan);
 
     //Util
     const formatDateTime = (value) => {
@@ -146,15 +169,14 @@ const RoomPlan = () => {
         return arrayDate[2] + '-' + arrayDate[1] + '-' + arrayDate[0];
     };
     //End Util
-    
+
     return (
-        <div>
-            <div className="text-lg font-semibold mb-6">Sơ đồ phòng</div>
+        <>
             <div className="text-base flex gap-6 mb-6">
                 <div className="flex items-center">
                     <div className="mr-2 font-semibold">Tầng: </div>
                     <Select
-                        defaultValue={genOptionsFloor()[0].value}
+                        value={queryFloor}
                         style={{
                             width: 120,
                         }}
@@ -167,7 +189,7 @@ const RoomPlan = () => {
                 <div className="flex items-center">
                     <div className="mr-2 font-semibold">Loại Phòng: </div>
                     <Select
-                        defaultValue={genOptionsKindOfRoom()[0].value}
+                        value={queryKindOfRoom}
                         style={{ width: 150 }}
                         options={genOptionsKindOfRoom()}
                         onChange={(value) => {
@@ -263,6 +285,7 @@ const RoomPlan = () => {
             <div className='text-base mb-6 font-semibold'>
                 Ngày
                 <DatePicker
+                    disabled
                     className="ml-3"
                     format="DD-MM-YYYY"
                     placeholder="Chọn ngày"
@@ -271,10 +294,26 @@ const RoomPlan = () => {
                 />
             </div>
             {filterRoomPlan() && filterRoomPlan().map((element, index) => {
-                return <Floor key={index} theRoomsOfTheFloor={element} roomPlan={roomPlan} setRoomPlan={setRoomPlan} dateChoose={dateChoose}></Floor>;
+                return (
+                    <Floor
+                        key={index}
+                        theRoomsOfTheFloor={element}
+                        optionType={optionType}
+                        setOpenModalListRoom={setOpenModalListRoom}
+                        dateChoose={dateChoose}
+                        dataBooking={dataBooking}
+                        setDataBooking={setDataBooking}
+                        dataBill={dataBill}
+                        setDataBill={setDataBill}
+                        roomBookingList={roomBookingList}
+                        setRoomBookingList={setRoomBookingList}
+                        updateRoomPlan={updateRoomPlan}
+                        extraRoom={extraRoom}
+                        listRoomChoose={listRoomChoose}
+                    ></Floor>
+                );
             })}
-        </div>
-    );
-};
-
-export default RoomPlan;
+        </>
+    )
+}
+export default ListRoom;

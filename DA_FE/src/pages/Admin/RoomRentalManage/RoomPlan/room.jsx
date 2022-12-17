@@ -1,35 +1,90 @@
- import { ExclamationCircleFilled } from '@ant-design/icons';
+ import { DownOutlined, ExclamationCircleFilled } from '@ant-design/icons';
 import {
-    faArrowUpFromBracket,
-    faBed,
-    faBroom,
-    faCircleExclamation,
-    faDollar,
-    faRotate,
+    faBuildingCircleCheck,
+    faMoneyCheckDollar,
+    faPersonWalkingArrowRight,
+    faPersonWalkingLuggage,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { ControlledMenu, MenuItem, useMenuState } from '@szhsin/react-menu';
-import { Divider, message, Modal, Tooltip } from 'antd';
+import { Divider, Dropdown, message, Modal, Tooltip, Space, Button } from 'antd';
 import axios from 'axios';
 import { useState, React, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import MonthlyCalendarRoom from '../Calendar/MonthlyCalendar';
 import './room.css';
+import dayjs from 'dayjs';
 
 const { confirm } = Modal;
 
-function Room({ room, roomPlan, setRoomPlan }) {
+
+function Room({ room, roomPlan, setRoomPlan, dateChoose }) {
 
     //Data
     const navigate = useNavigate();
-    const [menuProps, toggleMenu] = useMenuState();
-    const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
     const dateNow = new Date();
     const [dayRental, setDayRental] = useState();
     const [hourRental, setHourRental] = useState();
     const [open, setOpen] = useState(false);
+    const [openCalendar, setOpenCalendar] = useState(false);
     const [confirmLoading, setConfirmLoading] = useState(false);
     const key = 'messageApi';
     const [messageApi, contextHolder] = message.useMessage();
+    const [listDetailInvoice, setListDetailInvoice] = useState();
+    // const [status, getStatus] = useState(room.rooms.statusByDate);
+    // const [detailInvoice, setDetailInvoice] = useState(room.detailInvoiceList.find(element => element.status === 1));
+    // const [booking, setBooking] = useState(room.detailInvoiceList.find(element => element.status === 3));
+    const items = [
+        {
+          key: '1',
+          label: (
+            <div
+                className={`w-full`}
+                onClick={
+                    () => {
+                        if(room.rooms.statusByDate === 1 && dateChoose == dayjs(new Date()).format('YYYY-MM-DD') && !room.detailInvoiceList.find((x) => x.status === 3)) {
+                            getAllDetailInVoiceByRoom();
+                            setOpenCalendar(true);
+                        }
+                    }
+                }
+            >Check in</div>
+          ),
+          disabled: room.rooms.statusByDate === 2 || !(dateChoose == dayjs(new Date()).format('YYYY-MM-DD')) || room.detailInvoiceList.find((x) => x.status === 3),
+        },
+        {
+          key: '2',
+          label: (
+            <div
+                className='w-full'
+                onClick={
+                    () => {
+                        if(room.rooms.statusByDate === 2) {
+                            navigate('/admin/rental-manage' + '/details/' + room.rooms.id);
+                        }
+                    }
+                }
+            >Chi tiết hóa đơn</div>
+          ),
+          disabled: room.rooms.statusByDate !== 2,
+        },
+        {
+            key: '3',
+            label: (
+                <div
+                    className='w-full'
+                    onClick={
+                        () => {
+                            if(room.rooms.status === 3) {
+                                setOpen(true);
+                            }
+                        }
+                    }
+                >Dọn phòng</div>
+            ),
+            disabled: room.rooms.status !== 3,
+        },
+    ];
+    console.log();
     //End Data
 
     //Created
@@ -40,18 +95,35 @@ function Room({ room, roomPlan, setRoomPlan }) {
     //End Created
 
     //Gen Data
+    const genDetailInvoice = () => {
+        let data = null;
+        if(room.detailInvoiceList) {
+            data = room.detailInvoiceList.find(element => element.status === 1);
+        }
+        return data;
+    }
+    const genBooking = () => {
+        let data = null;
+        if(room.detailInvoiceList) {
+            data = room.detailInvoiceList;
+            data = data.filter((x) => x.status === 3);
+        }
+        return data;
+    }
     const genDayRental = () => {
-        if(room.detailsInvoice) {
+        let detailInvoice = room.detailInvoiceList.find((x) => x.status === 1);
+        if(detailInvoice) {
             let d1 = dateNow.getTime();
-            let d2 = new Date(room.detailsInvoice.hireDate).getTime();
+            let d2 = new Date(detailInvoice.hireDate).getTime();
             setDayRental(Math.ceil((d1 - d2) / (24 * 60 * 60 * 1000)));
         }
     };
 
     const genHourRental = () => {
-        if(room.detailsInvoice) {
+        let detailInvoice = room.detailInvoiceList.find((x) => x.status === 1);
+        if(detailInvoice) {
             let d1 = dateNow.getTime();
-            let d2 = new Date(room.detailsInvoice.hireDate).getTime();
+            let d2 = new Date(detailInvoice.hireDate).getTime();
             setHourRental(Math.ceil((d1 - d2) / (60 * 60 * 1000)));
         }
     };
@@ -78,14 +150,14 @@ function Room({ room, roomPlan, setRoomPlan }) {
     }
     const genAllMoneyDetail = () => {
         let allMoney = 0;
-        if(room.detailsInvoice && dayRental && hourRental){
-
-            let allMoneyRoom = room.detailsInvoice.rentalTypes.name === "Theo ngày" ? room.rooms.kindOfRoom.priceByDay * dayRental : room.rooms.kindOfRoom.hourlyPrice * hourRental;
+        let detailInvoice = room.detailInvoiceList.find((x) => x.status === 1);
+        if(detailInvoice && dayRental && hourRental){
+            let allMoneyRoom = detailInvoice.rentalTypes.name === "Theo ngày" ? room.rooms.kindOfRoom.priceByDay * dayRental : room.rooms.kindOfRoom.hourlyPrice * hourRental;
             
             let surcharge = 0;
             let d1 = dateNow.getTime();
-            let d2 = new Date(room.detailsInvoice.checkOutDay).getTime();
-            if(room.detailsInvoice.rentalTypes.name === "Theo ngày") {
+            let d2 = new Date(detailInvoice.checkOutDay).getTime();
+            if(detailInvoice.rentalTypes.name === "Theo ngày") {
                 if(d1 > d2) {
                     surcharge = allMoneyRoom * 10 / 100;
                 }
@@ -103,6 +175,17 @@ function Room({ room, roomPlan, setRoomPlan }) {
     //End Gen Data
 
     //Function
+    const getAllDetailInVoiceByRoom = async () => {
+        let data = null;
+        await axios
+            .get('http://localhost:8080/api/room-rental-manage/all-detail-invoice-by-room-and-status/' + room.rooms.id)
+            .then(res => {
+                data = res.data;
+                setListDetailInvoice(res.data);
+            }).catch(err => {});
+        return data;
+    }
+
     const showModal = () => {
         setOpen(true);
     };
@@ -121,8 +204,9 @@ function Room({ room, roomPlan, setRoomPlan }) {
             type: 'loading',
             content: 'Vui lòng chờ...',
         });
-        await axios.put('http://localhost:8080/api/room-rental-manage/clear-the-room/' + idRoom)
-                .then(res => { 
+        await axios
+            .put('http://localhost:8080/api/room-rental-manage/clear-the-room/' + idRoom)
+            .then(res => { 
                     if(res) {
                         setTimeout(() => {
                             setConfirmLoading(false);
@@ -136,7 +220,7 @@ function Room({ room, roomPlan, setRoomPlan }) {
                             setRoomPlan(roomPlan.map(element => {
                                 return {...element, listRoom: element.listRoom.map(element2 => {
                                     if(element2.rooms.id === idRoom){
-                                        return {...element2, rooms: {...element2.rooms, status: 1}};
+                                        return {...element2, rooms: {...element2.rooms, status: 1, statusByDate: 1}};
                                     } else {
                                         return element2;
                                     }
@@ -144,18 +228,25 @@ function Room({ room, roomPlan, setRoomPlan }) {
                             }))
                         }, 1000);
                     }
-                }).catch(err => {
-                    setTimeout(() => {
-                        setConfirmLoading(false);
-                        setOpen(false);
-                        messageApi.open({
-                            key,
-                            type: 'error',
-                            content: 'Lỗi, vui lòng kiểm tra lại!',
-                            duration: 2,
-                        });
-                    }, 1000);
-                });
+            })
+            .catch((err) => {
+                setTimeout(() => {
+                    setConfirmLoading(false);
+                    setOpen(false);
+                    messageApi.open({
+                        key,
+                        type: 'error',
+                        content: 'Lỗi, vui lòng kiểm tra lại!',
+                        duration: 2,
+                    });
+                }, 1000);
+            });
+    }
+
+    const checkIn = (data) => {
+        if(data.hireDate && data.checkOutDay) {
+            navigate('/admin/rental-manage' + '/check-in/' + room.rooms.id + "/" + data.hireDate + "/" + data.checkOutDay);
+        }
     }
     //End Function
 
@@ -168,8 +259,14 @@ function Room({ room, roomPlan, setRoomPlan }) {
     return (
         <> 
             {contextHolder}
+
             <Modal
-                title={<span><ExclamationCircleFilled className='text-yellow-400 mr-3'/>Xác nhận phòng đã được dọn!</span>}
+                title={
+                    <span>
+                        <ExclamationCircleFilled className='text-yellow-400 mr-3'/>
+                        Xác nhận phòng đã được dọn!
+                    </span>
+                }
                 open={open}
                 onOk={handleOk}
                 confirmLoading={confirmLoading}
@@ -179,149 +276,117 @@ function Room({ room, roomPlan, setRoomPlan }) {
             >
                 <p>Bạn chắc chắn phòng đã được dọn rồi chứ?</p>
             </Modal>
-            <div
-                className={`h-[230px] rounded-lg cursor-default grid grid-cols-3 grid-rows-5 items-center text-base text-white
-                ${room.rooms.status === 1 ? 'bg-status-1' : ''}
-                ${room.rooms.status === 2 ? 'bg-status-2' : ''}
-                ${room.rooms.status === 3 ? 'bg-status-3' : ''}`}
-                onContextMenu={(e) => {
-                    e.preventDefault();
-                    setAnchorPoint({ x: e.clientX, y: e.clientY });
-                    toggleMenu(true);
-                }}
-            >
-                {room.rooms && room.rooms.status === 2 ? (
+
+            <div className=' border border-1 text-base p-3 cursor-pointer hover:bg-default-2 hover:border-design-greenLight'>
+                <div className='flex justify-end font-semibold'>
+                    <Dropdown menu={{ items }}>
+                        <a onClick={(e) => e.preventDefault()}>
+                        <Space>
+                            <span className='text-base font-semibold'>
+                                {room.rooms.name}
+                            </span>
+                            <DownOutlined />
+                        </Space>
+                        </a>
+                    </Dropdown>
+                </div>
+                <div className='flex justify-end font-semibold'>
+                    {room.rooms.kindOfRoom.name}
+                </div>
+                <div className={`flex items-center pt-10`}>
+                    <span
+                        className={`px-3 py-1 rounded-full text-white
+                            ${room.rooms.statusByDate === 1 ? "bg-design-greenLight" : ""}
+                            ${room.rooms.statusByDate === 2 ? "bg-status-2" : ""}
+                            ${room.rooms.statusByDate === 3 ? "bg-status-3" : ""}
+                        `}
+                    >
+                        {room.rooms.statusByDate === 1 && "Sẵn sàng đón khách"}
+                        {room.rooms.statusByDate === 2 && "Đang có khách"}
+                        {room.rooms.statusByDate === 3 && "Đang dọn dẹp"}
+                    </span>
+                    <span className='ml-3'>
+                        {genDetailInvoice() && genDetailInvoice().bills.customer.fullname}
+                    </span>
+                </div>
+                {genDetailInvoice() && (
                     <>
-                        <div className='col-span-3 h-full grid grid-cols-3 font-semibold'>
-                            <div className='w-full h-full flex justify-center items-center text-white'>
-                                <div>
-                                    <div className='text-xl font-semibold w-full flex justify-center items-center'>{room.rooms.name}</div>
-                                    <div className='w-full flex justify-center items-center'>{room.rooms.kindOfRoom.name}</div>
-                                </div>
+                        <div className='grid grid-cols-2 pt-3'>
+                            <div className='flex items-center'>
+                                <span className='rounded-full bg-design-charcoalblack h-7 w-7 text-white p-3 flex justify-center items-center'>
+                                    <FontAwesomeIcon icon={faBuildingCircleCheck} className="w-[18px] h-[18px]"></FontAwesomeIcon>
+                                </span>
+                                <span className='ml-3'>
+                                    {genDetailInvoice() && genDetailInvoice().hireDate}
+                                </span>
                             </div>
-                            <div className='w-full h-full flex justify-center items-center text-white'>
-                                
-                            </div>
-                            <div className='w-full h-full flex justify-center items-center text-white'>
-                                <div>
-                                    <div className='w-full flex justify-center items-center text-xl h-[28px]'>
-                                        <FontAwesomeIcon icon={faBed}></FontAwesomeIcon>
-                                    </div>
-                                    <div className='w-full flex justify-center items-center'>
-                                        {room.rooms && room.rooms.status === 1 ? "Phòng trống" : room.rooms.status === 2 ? "Đã có khách" : "Dọn dẹp"}
-                                    </div>
-                                </div>
+                            <div className='flex items-center'>
+                                <span className='rounded-full bg-design-charcoalblack h-7 w-7 text-white p-3 flex justify-center items-center'>
+                                    <FontAwesomeIcon icon={faPersonWalkingArrowRight} className="w-[18px] h-[18px]"></FontAwesomeIcon>
+                                </span>
+                                <span className='ml-3'>
+                                    {genDetailInvoice() && genDetailInvoice().checkOutDay}
+                                </span>
                             </div>
                         </div>
-                        <div className='col-span-3 h-full flex justify-center items-center font-semibold text-xl'>
-                            {room.detailsInvoice && room.detailsInvoice.bills.customer.fullname}
-                        </div>
-                        <div className='col-span-3 h-full flex justify-center items-center row-span-2'>
-                            <div className='flex justify-center items-center mr-3'>
-                                {/* {room.detailsInvoice && room.detailsInvoice.hireDate} */}
-                                <div className='mr-2'>
-                                    <div className='border-b-[1px] font-semibold flex items-center justify-center'>{getDayHireDate() ? getDayHireDate().split("-")[2] : ""}</div>
-                                    <div className='border-t-[1px] font-semibold flex items-center justify-center'>{getDayHireDate() ? getDayHireDate().split("-")[1] : ""}</div>
-                                </div>
-                                <div className='text-2xl'>{getTimeHireDate()}</div>
-                            </div>
-                            <div className='bg-white h-[70px] w-[70px] rounded-full flex justify-center items-center text-black font-semibold'>
-                                {room.detailsInvoice && room.detailsInvoice.rentalTypes.id === 1 && (<span>{dayRental} (D)</span>) }
-                                {room.detailsInvoice && room.detailsInvoice.rentalTypes.id === 2 && (<span>{hourRental} (H)</span>)}
-                            </div>
-                            <div className='flex justify-center items-center ml-3'>
-                                {/* {room.detailsInvoice && room.detailsInvoice.hireDate} */}
-                                <div className='mr-2'>
-                                    <div className='border-b-[1px] font-semibold flex items-center justify-center'>{getDayCheckOutDay() ? getDayCheckOutDay().split("-")[2] : ""}</div>
-                                    <div className='border-t-[1px] font-semibold flex items-center justify-center'>{getDayCheckOutDay() ? getDayCheckOutDay().split("-")[1] : ""}</div>
-                                </div>
-                                <div className='text-2xl'>{getTimeCheckOutDay()}</div>
-                            </div>
-                        </div>
-                        <div className='col-span-3 h-full flex justify-center items-center text-xl font-semibold'>
-                            <FontAwesomeIcon icon={faDollar} className="mr-2"></FontAwesomeIcon> {formatCurrency(genAllMoneyDetail())}
-                        </div>
-                    </>
-                ) : (
-                    <>
-                        <div className='col-span-3 row-span-5 grid grid-cols-2 gap-10 font-semibold'>
-                            <div className='w-full h-full flex justify-end items-center text-white'>
-                                <div>
-                                    <div className='text-xl font-semibold w-full flex justify-center items-center'>{room.rooms.name}</div>
-                                    <div className='w-full flex justify-center items-center'>{room.rooms.kindOfRoom.name}</div>
-                                </div>
-                            </div>
-                            <div className='w-full h-full flex justify-start items-center text-white'>
-                                <div>
-                                    <div className='w-full flex justify-center items-center text-xl h-[28px]'>
-                                        <FontAwesomeIcon icon={faBed}></FontAwesomeIcon>
-                                    </div>
-                                    <div className='w-full flex justify-center items-center'>
-                                        {room.rooms && room.rooms.status === 1 ? "Phòng trống" : room.rooms.status === 2 ? "Đã có khách" : "Đang dọn dẹp"}
-                                    </div>
-                                </div>
-                            </div>
-                            <div className='col-span-2 w-full h-full flex justify-center items-center text-white font-semibold text-xl'>
-                                {room.rooms && room.rooms.status === 1 ? "Sẵn sàng đón khách" : "Đang được dọn dẹp"}
-                            </div>
+                        <div className='flex items-center mt-3'>
+                            <span className='rounded-full bg-design-charcoalblack h-7 w-7 text-white p-3 flex justify-center items-center'>
+                                <FontAwesomeIcon icon={faMoneyCheckDollar} className="w-[18px] h-[18px]"></FontAwesomeIcon>
+                            </span>
+                            <span className='ml-3 text-red-500 font-semibold'>
+                                {formatCurrency(genAllMoneyDetail())}
+                            </span>
                         </div>
                     </>
                 )}
-
-                {/** Menu list */}
-                <div className="rounded-[2px]">
-                    <ControlledMenu
-                        {...menuProps}
-                        anchorPoint={anchorPoint}
-                        onClose={() => toggleMenu(false)}
-                        menuClassName="my-menu"
-                    >
-                        <div className={`${room.rooms.status !== 1 ? 'hidden' : ''}`}>
-                            <MenuItem
-                                className={`rounded-lg`}
-                                onClick={() => {
-                                    navigate('/admin/rental-manage' + '/check-in/' + room.rooms.id);
-                                }}
-                            >
-                                <FontAwesomeIcon
-                                    icon={faArrowUpFromBracket}
-                                    className="rotate-[180deg] h-4 w-4 mr-2"
-                                ></FontAwesomeIcon>
-                                Check in
-                            </MenuItem>
+                {genBooking() && genBooking().map(
+                    (x) => (
+                        <div>
+                            <Divider style={{margin: 12}}/>
+                            <div className={`flex items-center w-full`}>
+                                <span className={`px-3 py-1 rounded-full text-white bg-status-4`}>
+                                    Khách đặt trước
+                                </span>
+                                <span className='ml-3'>
+                                    {x.bills.customer.fullname}
+                                </span> 
+                            </div>
+                            <div className='flex items-center mt-3'>
+                                <span className='rounded-full bg-design-charcoalblack h-7 w-7 text-white p-3 flex justify-center items-center'>
+                                    <FontAwesomeIcon
+                                        icon={faPersonWalkingLuggage}
+                                        className="w-[18px] h-[18px]"
+                                    ></FontAwesomeIcon>
+                                </span>
+                                <span className='ml-3'>
+                                    {x.hireDate}
+                                </span>
+                            </div>
+                            <div className='flex items-center mt-3'>
+                                <span className='rounded-full bg-design-charcoalblack h-7 w-7 text-white p-3 flex justify-center items-center'>
+                                    <FontAwesomeIcon
+                                        icon={faPersonWalkingArrowRight}
+                                        className="w-[18px] h-[18px]"
+                                    ></FontAwesomeIcon>
+                                </span>
+                                <span className='ml-3'>
+                                    {x.checkOutDay}
+                                </span>
+                            </div>
                         </div>
-                        <div className={`${room.rooms.status !== 2 ? 'hidden' : ''}`}>
-                            <MenuItem className={`rounded-lg`}>
-                                <FontAwesomeIcon
-                                    icon={faArrowUpFromBracket}
-                                    className="rotate-[90deg] h-4 w-4 mr-2"
-                                ></FontAwesomeIcon>
-                                Check out
-                            </MenuItem>
-                        </div>
-                        <div onClick={showModal} className={`${room.rooms.status !== 3 ? 'hidden' : ''}`}>
-                            <MenuItem className={`rounded-lg`}>
-                                <FontAwesomeIcon icon={faBroom} className="mr-2 h-4 w-4"></FontAwesomeIcon>
-                                Dọn phòng
-                            </MenuItem>
-                        </div>
-                        <div className={`${room.rooms.status !== 2 ? 'hidden' : ''}`}>
-                            <MenuItem
-                                onClick={() => {
-                                    navigate('/admin/rental-manage' + '/details/' + room.rooms.id );
-                                }}
-                                className={`rounded-lg`}
-                            >
-                                <FontAwesomeIcon icon={faCircleExclamation} className="mr-2 h-4 w-4"></FontAwesomeIcon>
-                                Chi tiết
-                            </MenuItem>
-                        </div>
-                        <MenuItem className={`rounded-lg`}>
-                            <FontAwesomeIcon icon={faRotate} className="mr-2 h-4 w-4"></FontAwesomeIcon>Đổi trạng thái
-                        </MenuItem>
-                    </ControlledMenu>
-                </div>
+                    )
+                )}
             </div>
+
+            <MonthlyCalendarRoom
+                openCalendar={openCalendar}
+                setOpenCalendar={setOpenCalendar}
+                roomId={room.rooms.id}
+                listDetailInvoice={listDetailInvoice}
+                dateChoose={dateChoose}
+                room={room}
+                okBtn={checkIn}
+            ></MonthlyCalendarRoom>
         </>
     );
 }

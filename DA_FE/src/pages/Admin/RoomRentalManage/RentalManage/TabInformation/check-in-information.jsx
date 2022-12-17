@@ -283,7 +283,7 @@ function CheckInInformation({ bill, setBill, detailInvoices, serviceDetails, typ
     };
     //End Util
 
-    console.log(bill);
+    // console.log(bill);
 
     return <>
         {contextHolder}
