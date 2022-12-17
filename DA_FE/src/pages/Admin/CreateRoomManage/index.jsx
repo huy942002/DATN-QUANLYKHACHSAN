@@ -12,8 +12,10 @@ import { Label, FileInput } from 'flowbite-react';
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllService } from '~/app/reducers/service';
-import { addRoom } from '~/app/reducers/room';
+import { getByRoomId } from '~/app/reducers/facilityDetail';
 import { Button, Modal } from 'flowbite-react';
+import { getByRoomIdSv } from '~/app/reducers/serviceAvailable';
+import { getAllRoom } from '~/app/reducers/room';
 
 import axios from 'axios';
 
@@ -42,11 +44,15 @@ const objRoom = {
 };
 
 function CreateRoomManager() {
+    const [visible, setVisible] = useState(false);
+    const [visible2, setVisible2] = useState(false);
+    const [visiblecopy1, setvisiblecopy1] = useState(false);
+    const [visiblecopy2, setvisiblecopy2] = useState(false);
     const [visibleAdd2, setVisibleAdd2] = useState(false);
     const [visibleAdd, setVisibleAdd] = useState(false);
     const [Room, setRoom] = useState(objRoom);
     const [roomAdd, setRoomAdd] = useState(objRoom);
-    const rooms = useSelector((state) => state.room.room);
+    const rooms = useSelector((state) => state.room.rooms);
     const KindOfRoom = useSelector((state) => state.kindOfRoom.kindOfRoom);
     const NumberOfFloors = useSelector((state) => state.numberOfFloor.numberOfFloors);
     const Facility = useSelector((state) => state.facility.facilities);
@@ -59,7 +65,61 @@ function CreateRoomManager() {
     const [image2, setImage2] = useState('');
     const [image3, setImage3] = useState('');
 
+    const [Err2, setErr2] = useState('');
+    const [Err3, setErr3] = useState('');
+    const [Err4, setErr4] = useState('');
+    const [Err5, setErr5] = useState('');
+    const [valueSearch, setValueSearch] = useState('2');
+    const [valueSearch1, setValueSearch1] = useState('');
+    const ServiceAva = useSelector((state) => state.serviceAvailable.ServiceAvailables);
+    const FacilityDetail = useSelector((state) => state.facilityDetail.facilityDetail);
+
+    function handleFormValidation(NameRoom) {
+        setErr2('');
+        setErr3('');
+        setErr4('');
+        setErr5('');
+        let formIsValid = true;
+        if (!NameRoom) {
+            formIsValid = false;
+            setErr2("Name is required.");
+        }
+        if (!image) {
+            formIsValid = false;
+            setErr3("Image is required.");
+        }
+        if (!image1) {
+            formIsValid = false;
+            setErr3("Image is required.");
+        }
+        if (!image2) {
+            formIsValid = false;
+            setErr3("Image is required.");
+        }
+        if (!image3) {
+            formIsValid = false;
+            setErr3("Image is required.");
+        }
+        if (FacilitieDetails.length === 0) {
+            formIsValid = false;
+            setErr4("Facilities Details is required.");
+        }
+        if (ServiceAvailable.length === 0) {
+            formIsValid = false;
+            setErr5("Service Available is required.");
+        }
+        return formIsValid;
+    }
+
+
+    function CopyServiceAvailable() {
+        setServiceAvailable([]);
+        setServiceAvailable(ServiceAva);
+    }
+
     const addServiceAvailable = (id, value, sl, services) => {
+        let array = [...ServiceAvailable];
+        let i = 0;
         let obj = {
             id: id,
             quantity: sl,
@@ -102,10 +162,35 @@ function CreateRoomManager() {
                 },
             },
         };
-        setServiceAvailable(() => [...ServiceAvailable, obj]);
+        if (array.length > 0) {
+            array.map((o) => {
+                if (o.servicess.id === services.id) {
+                    toast.error('Dịch Vụ Đã Tồn Tại!', { autoClose: 2000 });
+                    i++;
+                }
+            });
+            if (i === 0) {
+                setServiceAvailable(() => [...ServiceAvailable, obj]);
+            }
+
+        } else {
+            setServiceAvailable(() => [...ServiceAvailable, obj]);
+        }
     };
 
+    function getIdselect(id) {
+        dispatch(getByRoomId(id));
+        dispatch(getByRoomIdSv(id));
+    }
+
+    function CopyFacilitieDetails() {
+        setFacilitieDetails([]);
+        setFacilitieDetails(FacilityDetail);
+    }
+
     const addFacilitieDetails = (id, value) => {
+        let array = [...FacilitieDetails];
+        let i = 0;
         let obj = {
             id: id,
             status: '',
@@ -139,8 +224,20 @@ function CreateRoomManager() {
             },
         };
 
-        setFacilitieDetails(() => [...FacilitieDetails, obj]);
-        console.log(FacilitieDetails);
+        if (array.length > 0) {
+            array.map((o) => {
+                if (o.id === id) {
+                    toast.error('Tiện Ích Đã Tồn Tại!', { autoClose: 2000 });
+                    i++;
+                }
+            });
+            if (i === 0) {
+                setFacilitieDetails(() => [...FacilitieDetails, obj]);
+            }
+
+        } else {
+            setFacilitieDetails(() => [...FacilitieDetails, obj]);
+        }
     };
 
     const updateSL = (id1, value) => {
@@ -172,8 +269,8 @@ function CreateRoomManager() {
     }
 
     function uploadImage(data2) {
-        if (data2.name === '') {
-            toast.error('Bạn chưa điền tên phòng!', { autoClose: 2000 });
+        if (handleFormValidation(data2.name) === false) {
+
         } else {
             const data = new FormData();
             data.append('file', image);
@@ -194,6 +291,7 @@ function CreateRoomManager() {
     const dispatch = useDispatch();
 
     useEffect(() => {
+        dispatch(getAllRoom());
         dispatch(getAllNumberOfFloors());
         dispatch(getAllKindOfRoom());
         dispatch(getAllFacility());
@@ -226,19 +324,19 @@ function CreateRoomManager() {
                 }
             })
             .catch((err) => {
-                setTimeout(() => {}, 1000);
+                setTimeout(() => { }, 1000);
             })
-            .finally(() => {});
+            .finally(() => { });
 
         setVisibleAdd(false);
     };
 
     function getModal() {
-        setVisibleAdd(true);
+        setVisible(true)
     }
 
     function getModal2() {
-        setVisibleAdd2(true);
+        setVisible2(true)
     }
 
     return (
@@ -282,6 +380,9 @@ function CreateRoomManager() {
                                 onChange={(e) => setRoomAdd({ ...roomAdd, name: e.target.value })}
                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                             />
+                            {Err2 &&
+                                <div style={{ color: "red", paddingBottom: 10 }}>{Err2}</div>
+                            }
                         </div>
                         <div className="mt-4">
                             <span className="mr-3 mt-4 font-bold">Loại phòng :</span>
@@ -363,6 +464,7 @@ function CreateRoomManager() {
                                 defaultValue={Room?.kindOfRoom?.priceByDay || ''}
                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                 placeholder=""
+                                disabled={true}
                             />
                         </div>
                         <div className="mt-4">
@@ -377,6 +479,7 @@ function CreateRoomManager() {
                                 defaultValue={Room?.kindOfRoom?.hourlyPrice || ''}
                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                 placeholder=""
+                                disabled={true}
                             />
                         </div>
                         <div className="mt-4">
@@ -388,41 +491,31 @@ function CreateRoomManager() {
                             <div id="fileUpload">
                                 <div className="mb-2 block">
                                     <Label htmlFor="file" value="Upload file" />
+                                    {Err3 &&
+                                        <div style={{ color: "red", paddingBottom: 10 }}>{Err3}</div>
+                                    }
                                 </div>
                                 <FileInput
                                     id="file"
                                     onChange={(e) => setImage(e.target.files[0])}
-                                    helperText="A profile picture is useful to confirm your are logged into your account"
                                 />
                             </div>
-                            <div id="fileUpload">
-                                <div className="mb-2 block">
-                                    <Label htmlFor="file" value="Upload file" />
-                                </div>
+                            <div className="mt-4" id="fileUpload">
                                 <FileInput
                                     id="file"
                                     onChange={(e) => setImage1(e.target.files[0])}
-                                    helperText="A profile picture is useful to confirm your are logged into your account"
                                 />
                             </div>
-                            <div id="fileUpload">
-                                <div className="mb-2 block">
-                                    <Label htmlFor="file" value="Upload file" />
-                                </div>
+                            <div className="mt-4" id="fileUpload">
                                 <FileInput
                                     id="file"
                                     onChange={(e) => setImage2(e.target.files[0])}
-                                    helperText="A profile picture is useful to confirm your are logged into your account"
                                 />
                             </div>
-                            <div id="fileUpload">
-                                <div className="mb-2 block">
-                                    <Label htmlFor="file" value="Upload file" />
-                                </div>
+                            <div className="mt-4" id="fileUpload">
                                 <FileInput
                                     id="file"
                                     onChange={(e) => setImage3(e.target.files[0])}
-                                    helperText="A profile picture is useful to confirm your are logged into your account"
                                 />
                             </div>
                         </div>
@@ -448,6 +541,9 @@ function CreateRoomManager() {
                             <label htmlFor="" className="mb-2 mt-8 mr-9 text-gray-900 dark:text-gray-300 font-bold">
                                 Tiện Ích :
                             </label>
+                            {Err4 &&
+                                <div style={{ color: "red", paddingBottom: 10 }}>{Err4}</div>
+                            }
                             <div className="grid gap-x-8 gap-y-4 grid-cols-3 items-center pl-3">
                                 {FacilitieDetails.map((f) => (
                                     <div
@@ -513,6 +609,9 @@ function CreateRoomManager() {
                             <label htmlFor="" className="mb-2 mt-8 mr-9 text-gray-900 dark:text-gray-300 font-bold">
                                 Dịch Vụ :
                             </label>
+                            {Err5 &&
+                                <div style={{ color: "red", paddingBottom: 10 }}>{Err5}</div>
+                            }
                             <div className="grid gap-x-8 gap-y-4 grid-cols-3 items-center pl-3">
                                 {ServiceAvailable.map((s) => (
                                     <div
@@ -604,6 +703,55 @@ function CreateRoomManager() {
                         </div>
                     </div>
                 </form>
+                <Modal show={visible} size="md" popup={true} onClose={() => setVisible(false)}>
+                    <Modal.Header />
+                    <Modal.Body>
+                        <div className="text-center">
+                            <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+                                Chọn Phương thức muốn thêm
+                            </h3>
+                            <div className="flex justify-center gap-4">
+                                <Button color="gray" onClick={() => {
+                                    setVisibleAdd(true)
+                                    setVisible(false)
+                                }}>
+                                    Thêm Mới
+                                </Button>
+                                <Button color="gray" onClick={() => {
+                                    setvisiblecopy1(true)
+                                    setVisible(false)
+                                }}>
+                                    Copy tiện ích có sẵn
+                                </Button>
+                            </div>
+                        </div>
+                    </Modal.Body>
+                </Modal>
+
+                <Modal show={visible2} size="md" popup={true} onClose={() => setVisible2(false)}>
+                    <Modal.Header />
+                    <Modal.Body>
+                        <div className="text-center">
+                            <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+                                Chọn Phương thức muốn thêm
+                            </h3>
+                            <div className="flex justify-center gap-4">
+                                <Button color="gray" onClick={() => {
+                                    setVisibleAdd2(true);
+                                    setVisible2(false)
+                                }}>
+                                    Thêm Mới
+                                </Button>
+                                <Button color="gray" onClick={() => {
+                                    setvisiblecopy2(true)
+                                    setVisible2(false)
+                                }}>
+                                    Copy dịch vụ có sẵn
+                                </Button>
+                            </div>
+                        </div>
+                    </Modal.Body>
+                </Modal>
                 <Modal show={visibleAdd} size="md" popup={false} onClose={() => setVisibleAdd(false)}>
                     <Modal.Header>Tiện Ích</Modal.Header>
                     <Modal.Body>
@@ -660,7 +808,7 @@ function CreateRoomManager() {
                     </Modal.Body>
                 </Modal>
 
-                <Modal show={visibleAdd2} size="mx" popup={false} onClose={() => setVisibleAdd2(false)}>
+                <Modal show={visibleAdd2} size="xl" popup={false} onClose={() => setVisibleAdd2(false)}>
                     <Modal.Header>Dịch Vụ</Modal.Header>
                     <Modal.Body>
                         <div className="overflow-x-auto relative shadow-md md:rounded-lg">
@@ -723,6 +871,305 @@ function CreateRoomManager() {
                             </table>
                         </div>
                     </Modal.Body>
+                </Modal>
+
+                <Modal show={visiblecopy1} size="6xl" popup={false} onClose={() => setvisiblecopy1(false)}>
+                    <Modal.Header></Modal.Header>
+                    <Modal.Body>
+                        <div className="grid grid-rows-2 grid-flow-col gap-4">
+                            <div className="row-span-2 col-span-2">
+                                <div className="grid grid-cols-3 gap-3 mt-6 ml-8 text-black">
+                                    <div>
+                                        <span className="font-bold">Tầng :</span>
+                                        <select
+                                            name="numberOfFloors"
+                                            id="numberOfFloors"
+                                            className="mt-3 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                            onChange={(e) =>
+                                                setTimeout(
+                                                    () =>
+                                                        setValueSearch(
+                                                            NumberOfFloors[e.target.options[e.target.selectedIndex].id].numberOfFloors,
+                                                        ),
+                                                    1000,
+                                                )
+                                            }
+                                        >
+                                            {NumberOfFloors.map((n, index) => (
+                                                <option key={n.id} value={n.numberOfFloors} id={index}>
+                                                    {n.numberOfFloors}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <span className="font-bold">Loại phòng :</span>
+                                        <select
+                                            name="KindOfRoom"
+                                            id="KindOfRoom"
+                                            className="mt-3 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                            onChange={(e) => {
+                                                setTimeout(
+                                                    () => setValueSearch1(KindOfRoom[e.target.options[e.target.selectedIndex].id].id),
+                                                    1000,
+                                                );
+                                            }}
+                                        >
+                                            {KindOfRoom.map((x, index) => (
+                                                <option key={x.id} value={x.name} id={index}>
+                                                    {x.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+                                <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                                    <thead className="text-xs text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                        <tr>
+                                            <th scope="col" className="py-3 px-6">
+                                                Phòng
+                                            </th>
+                                            <th scope="col" className="py-3 px-6">
+                                                Tầng
+                                            </th>
+                                            <th scope="col" className="py-3 px-6">
+                                                Loại phòng
+                                            </th>
+                                            <th scope="col" className="py-3 px-6" colSpan={2}>
+                                                Hành động
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {rooms
+                                            .filter((x) => (x.kindOfRoom.id + '').toLowerCase().includes(valueSearch1))
+                                            .filter((x) =>
+                                                (x.numberOfFloors.numberOfFloors + '').toLowerCase().includes(valueSearch),
+                                            )
+                                            .map((x) => (
+                                                <tr
+                                                    key={x.id}
+                                                    className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+                                                >
+
+                                                    <th
+                                                        scope="row"
+                                                        className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                                                    >
+                                                        {x.name}
+                                                    </th>
+                                                    <td className="py-4 px-6">{x.numberOfFloors.numberOfFloors}</td>
+                                                    <td className="py-4 px-6">{x.kindOfRoom.name}</td>
+                                                    <td className="py-4 px-6 ">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                getIdselect(x.id)
+                                                            }}
+                                                            className="py-2 px-2 text-sm font-medium text-center text-white bg-blue-500 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
+                                                        >
+                                                            <span className="mx-2">Select</span>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div className="row-span-3">
+                                <label
+                                    htmlFor=""
+                                    className="mb-2 mt-8 mr-9 text-gray-900 dark:text-gray-300 font-bold"
+                                >
+                                    Tiện Ích :
+                                </label>
+                                <div className="grid gap-x-8 gap-y-4 grid-cols-3 items-center pl-3">
+                                    {FacilityDetail.map((f) => (
+                                        <div
+                                            key={f.id}
+                                            id="toast-default"
+                                            className="flex items-center p-4 w-full max-w-xs text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800"
+                                            role="alert"
+                                        >
+                                            <div className="ml-3 text-sm font-normal">
+                                                {f.facilities.name || ''}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button
+                            onClick={() => {
+                                CopyFacilitieDetails();
+                            }}
+                            className="py-2 px-2 text-sm font-medium text-center text-white bg-blue-500 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
+                        >
+                            Copy
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
+
+                <Modal show={visiblecopy2} size="3xl" popup={false} onClose={() => setvisiblecopy2(false)}>
+                    <Modal.Header></Modal.Header>
+                    <Modal.Body>
+                        <div className="grid grid-rows-2 grid-flow-col gap-4">
+                            <div className="row-span-2 col-span-2">
+                                <div className="grid grid-cols-3 gap-3 mt-6 ml-8 text-black">
+                                    <div>
+                                        <span className="font-bold">Tầng :</span>
+                                        <select
+                                            name="numberOfFloors"
+                                            id="numberOfFloors"
+                                            className="mt-3 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                            onChange={(e) =>
+                                                setTimeout(
+                                                    () =>
+                                                        setValueSearch(
+                                                            NumberOfFloors[e.target.options[e.target.selectedIndex].id].numberOfFloors,
+                                                        ),
+                                                    1000,
+                                                )
+                                            }
+                                        >
+                                            {NumberOfFloors.map((n, index) => (
+                                                <option key={n.id} value={n.numberOfFloors} id={index}>
+                                                    {n.numberOfFloors}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <span className="font-bold">Loại phòng :</span>
+                                        <select
+                                            name="KindOfRoom"
+                                            id="KindOfRoom"
+                                            className="mt-3 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                            onChange={(e) => {
+                                                setTimeout(
+                                                    () => setValueSearch1(KindOfRoom[e.target.options[e.target.selectedIndex].id].id),
+                                                    1000,
+                                                );
+                                            }}
+                                        >
+                                            {KindOfRoom.map((x, index) => (
+                                                <option key={x.id} value={x.name} id={index}>
+                                                    {x.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+                                <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                                    <thead className="text-xs text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                        <tr>
+                                            <th scope="col" className="py-3 px-6">
+                                                Phòng
+                                            </th>
+                                            <th scope="col" className="py-3 px-6">
+                                                Tầng
+                                            </th>
+                                            <th scope="col" className="py-3 px-6">
+                                                Loại phòng
+                                            </th>
+                                            <th scope="col" className="py-3 px-6" colSpan={2}>
+                                                Hành động
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {rooms
+                                            .filter((x) => (x.kindOfRoom.id + '').toLowerCase().includes(valueSearch1))
+                                            .filter((x) =>
+                                                (x.numberOfFloors.numberOfFloors + '').toLowerCase().includes(valueSearch),
+                                            )
+                                            .map((x) => (
+                                                <tr
+                                                    key={x.id}
+                                                    className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+                                                >
+
+                                                    <th
+                                                        scope="row"
+                                                        className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                                                    >
+                                                        {x.name}
+                                                    </th>
+                                                    <td className="py-4 px-6">{x.numberOfFloors.numberOfFloors}</td>
+                                                    <td className="py-4 px-6">{x.kindOfRoom.name}</td>
+                                                    <td className="py-4 px-6 ">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                getIdselect(x.id)
+                                                            }}
+                                                            className="py-2 px-2 text-sm font-medium text-center text-white bg-blue-500 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
+                                                        >
+                                                            <span className="mx-2">Select</span>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div className="row-span-3">
+                                <label
+                                    htmlFor=""
+                                    className="mb-2 mt-8 mr-9 text-gray-900 dark:text-gray-300 font-bold"
+                                >
+                                    Dịch Vụ :
+                                </label>
+                                <div className="grid gap-x-8 gap-y-4 items-center">
+                                    <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 md:h-auto">
+                                        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                            <tr>
+                                                <th scope="col" className="py-3 px-6">
+                                                    NAME
+                                                </th>
+                                                <th scope="col" className="py-3 px-6">
+                                                    QUANTITY
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {ServiceAva.map((s) => (
+                                                <tr
+                                                    key={s.id}
+                                                    className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+                                                >
+                                                    <td
+                                                        scope="row"
+                                                        className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                                                    >
+                                                        {s.servicess.name}
+                                                    </td>
+                                                    <td
+                                                        scope="row"
+                                                        className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                                                    >
+                                                        {s.quantity}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button
+                            onClick={() => {
+                                CopyServiceAvailable();
+                            }}
+                            className="py-2 px-2 text-sm font-medium text-center text-white bg-blue-500 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
+                        >
+                            Copy
+                        </Button>
+                    </Modal.Footer>
                 </Modal>
             </div>
         </div>

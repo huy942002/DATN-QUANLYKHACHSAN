@@ -190,7 +190,7 @@ function SearchRoom() {
                             <h5 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
                             {x.kindOfRoom.name}
                             </h5>
-                            <span className="text-blue-500">Giá phòng : {x.kindOfRoom.prices_by_day}</span>
+                            <span className="text-blue-500">Giá phòng : {x.kindOfRoom.priceByDay}</span>
                             <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
                                 Lối trang trí kiểu cổ điển của Pháp và kiến trúc Châu Âu là nét đặc trưng của Beryl
                                 Palace Hotel and Spa, một chỗ nghỉ boutique nằm trên Phố Cổ Hàng Bông nhộn nhịp.
