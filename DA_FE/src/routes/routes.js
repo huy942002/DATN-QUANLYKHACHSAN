@@ -44,7 +44,6 @@ const privateRoutes = [
     { path: config.routes.loginAdmin, component: LoginAdmin, layout: null },
     { path: config.routes.roomPlan, component: RoomPlan },
     { path: config.routes.rentalManage, component: RentalManage },
-    { path: config.routes.historyAdmin, component: HistoryAdmin },
     { path: config.routes.personnelManage, component: PersonnelManage },
     { path: config.routes.serviceManage, component: ServiceManage },
     { path: config.routes.handOver, component: HandOver },
@@ -53,13 +52,18 @@ const privateRoutes = [
     { path: config.routes.floorManage, component: FloorManage },
     { path: config.routes.createRoomManage, component: CreateRoomManage },
     { path: config.routes.createOptionRoomManage, component: CreateOptionRoomManage },
-    { path: config.routes.handOverManage, component: HandOverManage },
     { path: config.routes.kindOfRoom, component: KindOfRoomManage },
-    { path: config.routes.chart, component: Chart },
     { path: config.routes.nationality, component: Nationality },
     { path: config.routes.rentalTypeManage, component: RentalTypes },
     { path: config.routes.authorization, component: Authorization },
     { path: config.routes.bookingmanage, component: BookingManage },
 ];
 
-export { publicRoutes, privateRoutes };
+const privateRoutesDirect = [
+    { path: config.routes.chart, component: Chart },
+    { path: config.routes.authorization, component: Authorization },
+    { path: config.routes.handOverManage, component: HandOverManage },
+    { path: config.routes.historyAdmin, component: HistoryAdmin },
+];
+
+export { publicRoutes, privateRoutes, privateRoutesDirect };

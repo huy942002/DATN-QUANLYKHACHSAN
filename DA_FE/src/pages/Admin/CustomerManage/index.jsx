@@ -38,10 +38,7 @@ const CustomerSchema = Yup.object().shape({
     fullname: Yup.string().required('Tên khách hàng không được để trống'),
     email: Yup.string().email('Sai định dạng email').required('Email không được để trống'),
     gender: Yup.string().nullable(),
-    citizenIdCode: Yup.number()
-        .typeError('CCCD/CMNT phải là số')
-        .max(50, 'CCCD không quá 12 số')
-        .required('CMND/CCCD không được để trống'),
+    citizenIdCode: Yup.number().typeError('CCCD/CMNT phải là số').required('CMND/CCCD không được để trống'),
     dateOfBirth: Yup.string().required('Ngày sinh không được để trống'),
     phoneNumber: Yup.string().required('Số điện thoại không được để trống'),
     address: Yup.string().required('Địa chỉ không được để trống'),

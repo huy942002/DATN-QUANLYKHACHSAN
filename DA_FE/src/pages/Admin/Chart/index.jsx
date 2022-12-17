@@ -117,7 +117,9 @@ function Chart() {
                         </div>
                         <div className="bg-status-4.5 h-20 p-2 rounded">
                             <p className="font-bold">Doanh thu</p>
-                            <p className="text-white font-bold">5,500,000 VNĐ</p>
+                            <p className="text-white font-bold">
+                                {(totalRoomPrice + totalMoneyService).toLocaleString()} VNĐ
+                            </p>
                         </div>
                     </div>
                 </div>

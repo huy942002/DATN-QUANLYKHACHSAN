@@ -2,6 +2,8 @@ import { Link } from 'react-router-dom';
 import config from '~/config';
 import { toast } from 'react-toastify';
 
+import authorServices from '~/services/authorServices';
+
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { getAllRoom, getRoomById } from '~/app/reducers/room';
@@ -124,6 +126,7 @@ function RoomManage() {
     const [Room, setRoom] = useState(objRoom);
     const rooms = useSelector((state) => state.room.rooms);
     const room = useSelector((state) => state.room.room);
+    const [currentUser, setCurrentUser] = useState();
     const KindOfRoom = useSelector((state) => state.kindOfRoom.kindOfRoom);
     const NumberOfFloors = useSelector((state) => state.numberOfFloor.numberOfFloors);
     const FacilityDetail = useSelector((state) => state.facilityDetail.facilityDetail);
@@ -151,11 +154,11 @@ function RoomManage() {
         dispatch(getAllRoom());
         dispatch(getAllFacility());
         dispatch(getAllService());
+        authorServices.currentUser().then((res) => setCurrentUser(res));
     }, []);
 
     useEffect(() => {
         setRoom(room);
-
         setFacilitieDetails(FacilitieDetails);
     }, [room, FacilityDetail]);
 
@@ -169,7 +172,7 @@ function RoomManage() {
         let formIsValid = true;
         if (!NameRoom) {
             formIsValid = false;
-            setErr2("Name is required.");
+            setErr2('Name is required.');
         }
         return formIsValid;
     }
@@ -184,11 +187,21 @@ function RoomManage() {
                 }
             });
             if (i === 0) {
-                dispatch(addsv({ ...ServiceAvailable, quantity: sl, prices: pricess, rooms: room, servicess: data, status: 1 }));
+                dispatch(
+                    addsv({
+                        ...ServiceAvailable,
+                        quantity: sl,
+                        prices: pricess,
+                        rooms: room,
+                        servicess: data,
+                        status: 1,
+                    }),
+                );
             }
-
         } else {
-            dispatch(addsv({ ...ServiceAvailable, quantity: sl, prices: pricess, rooms: room, servicess: data, status: 1 }));
+            dispatch(
+                addsv({ ...ServiceAvailable, quantity: sl, prices: pricess, rooms: room, servicess: data, status: 1 }),
+            );
         }
         dispatch(getByRoomId(room.id));
     };
@@ -205,7 +218,6 @@ function RoomManage() {
             if (i === 0) {
                 dispatch(add({ ...FacilitieDetails, status: 1, rooms: room, facilities: data }));
             }
-
         } else {
             dispatch(add({ ...FacilitieDetails, status: 1, rooms: room, facilities: data }));
         }
@@ -254,7 +266,6 @@ function RoomManage() {
     }
     function uploadImage(data1) {
         if (handleFormValidation(data1.name) === false) {
-
         } else if (image === '') {
             handleUpdate(data1, room.img);
         } else {
@@ -275,9 +286,13 @@ function RoomManage() {
     }
 
     function handleDeleteById() {
-        dispatch(UpdateRoom({ ...Room, status: 0 }));
-        toast.success('Cập nhật thành công', { autoClose: 2000 });
-        dispatch(getAllRoom());
+        if (currentUser?.users.roles.some((x) => x.name === 'Quản lý')) {
+            dispatch(UpdateRoom({ ...Room, status: 0 }));
+            toast.success('Xóa phòng thành công', { autoClose: 2000 });
+            dispatch(getAllRoom());
+        } else {
+            toast.error('Không có quyền xóa', { autoClose: 2000 });
+        }
         setVisibleDelete(false);
     }
 
@@ -355,7 +370,7 @@ function RoomManage() {
                         </select>
                     </div>
                     <div className="grid justify-items-end">
-                    <span className="font-bold"></span>
+                        <span className="font-bold"></span>
                         <div>
                             <button
                                 type="button"
@@ -364,7 +379,7 @@ function RoomManage() {
                                 }}
                                 className="py-5 px-12 text-sm font-medium text-center text-white bg-blue-500 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                             >
-                                <span className="mx-2">THÊM</span>
+                                <span className="mx-2">Thêm</span>
                             </button>
                         </div>
                     </div>
@@ -462,7 +477,7 @@ function RoomManage() {
                                                 }}
                                                 className="py-2 px-2 text-sm font-medium text-center text-white bg-blue-500 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
                                             >
-                                                <span className="mx-2">SỬA</span>
+                                                <span className="mx-2">Sửa</span>
                                             </button>
                                         </td>
                                         <td className="py-4 px-6 ">
@@ -486,7 +501,7 @@ function RoomManage() {
                         <Modal.Body>
                             <div className="text-center">
                                 <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                                    Xác nhận xóa nhân viên ?
+                                    Xác nhận xóa phòng ?
                                 </h3>
                                 <div className="flex justify-center gap-4">
                                     <Button
@@ -511,7 +526,7 @@ function RoomManage() {
                         position="top-center"
                         popup={true}
                         onClose={() => {
-                            setVisibleUpdate(false)
+                            setVisibleUpdate(false);
                             setErr2('');
                         }}
                     >
@@ -536,9 +551,7 @@ function RoomManage() {
                                             onChange={(e) => setRoom({ ...Room, name: e.target.value })}
                                             className="w-96 p-1 rounded"
                                         />
-                                        {Err2 &&
-                                            <div style={{ color: "red", paddingBottom: 10 }}>{Err2}</div>
-                                        }
+                                        {Err2 && <div style={{ color: 'red', paddingBottom: 10 }}>{Err2}</div>}
                                     </div>
 
                                     <div className="grid grid-cols-2 mt-8 text-black">
@@ -811,11 +824,11 @@ function RoomManage() {
                                                                     }}
                                                                     className="py-2 mx-1 text-sm font-medium text-center text-white bg-violet-400 rounded-lg"
                                                                 >
-                                                                    <span className="mx-2">SỬA</span>
+                                                                    <span className="mx-2">Sửa</span>
                                                                 </button>
                                                                 <button
                                                                     type="button"
-                                                                    onClick={() => { }}
+                                                                    onClick={() => {}}
                                                                     className="py-2 px-2 text-sm font-medium text-center text-white bg-red-700 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
                                                                 >
                                                                     <span className="mx-2">Xóa</span>
@@ -862,7 +875,7 @@ function RoomManage() {
 
                                         <div className="flex items-center mb-4">
                                             <input
-                                                value='1'
+                                                value="1"
                                                 checked={Room.status === 1}
                                                 onChange={(e) => setRoom({ ...Room, status: parseInt(e.target.value) })}
                                                 id="disabled-radio-1"
@@ -879,7 +892,7 @@ function RoomManage() {
                                         </div>
                                         <div className="flex items-center">
                                             <input
-                                                value='0'
+                                                value="0"
                                                 checked={Room.status === 0}
                                                 onChange={(e) => setRoom({ ...Room, status: parseInt(e.target.value) })}
                                                 id="disabled-radio-2"
@@ -908,28 +921,16 @@ function RoomManage() {
                                                 <div className="mb-2 block">
                                                     <Label htmlFor="file" value="Upload file" />
                                                 </div>
-                                                <FileInput
-                                                    id="file"
-                                                    onChange={(e) => setImage(e.target.files[0])}
-                                                />
+                                                <FileInput id="file" onChange={(e) => setImage(e.target.files[0])} />
                                             </div>
                                             <div className="mt-4" id="fileUpload">
-                                                <FileInput
-                                                    id="file"
-                                                    onChange={(e) => setImage1(e.target.files[0])}
-                                                />
+                                                <FileInput id="file" onChange={(e) => setImage1(e.target.files[0])} />
                                             </div>
                                             <div className="mt-4" id="fileUpload">
-                                                <FileInput
-                                                    id="file"
-                                                    onChange={(e) => setImage2(e.target.files[0])}
-                                                />
+                                                <FileInput id="file" onChange={(e) => setImage2(e.target.files[0])} />
                                             </div>
                                             <div className="mt-4" id="fileUpload">
-                                                <FileInput
-                                                    id="file"
-                                                    onChange={(e) => setImage3(e.target.files[0])}
-                                                />
+                                                <FileInput id="file" onChange={(e) => setImage3(e.target.files[0])} />
                                             </div>
                                         </div>
                                     </div>

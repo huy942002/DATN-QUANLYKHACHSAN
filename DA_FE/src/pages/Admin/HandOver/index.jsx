@@ -194,25 +194,30 @@ function HandOver() {
                 x.users.roles.some((i) => i.name.includes('Quản lý')),
         )[0];
         if (resetHandOver.receiver === '') {
-            if (receiverDefault.users.password === passwordReset) {
-                if (userLogin.moneyFirst + totalDeposits - resetMoneyFromUserLogin > resetHandOver.handMoney) {
-                    dispatch(
-                        addReset({
-                            ...resetHandOver,
-                            totalMoney: handOver.moneyFirst + totalDeposits,
-                            dateTimeStart: userLogin.dateTimeStart,
-                            dateTimeEnd: formatDate(now),
-                            personnel: currentUser,
-                        }),
-                    );
-                    toast.success('Reset ca thành công', { autoClose: 2000 });
-                    setVisibleReset(false);
+            bcrypt.compare(passwordReset, receiverDefault.users.password, function (err, isMatch) {
+                if (err) {
+                    throw err;
+                } else if (!isMatch) {
+                    toast.error('Mật khẩu xác nhận sai', { autoClose: 2000 });
                 } else {
-                    toast.success('Số tiền không hợp lệ', { autoClose: 2000 });
+                    if (userLogin.moneyFirst + totalDeposits - resetMoneyFromUserLogin > resetHandOver.handMoney) {
+                        dispatch(
+                            addReset({
+                                ...resetHandOver,
+                                receiver: receiverDefault,
+                                totalMoney: userLogin.moneyFirst + totalDeposits,
+                                dateTimeStart: userLogin.dateTimeStart,
+                                dateTimeEnd: formatDate(now),
+                                personnel: currentUser,
+                            }),
+                        );
+                        toast.success('Reset ca thành công', { autoClose: 2000 });
+                        setVisibleReset(false);
+                    } else {
+                        toast.error('Số tiền không hợp lệ', { autoClose: 2000 });
+                    }
                 }
-            } else {
-                toast.error('Mật khẩu xác nhận sai', { autoClose: 2000 });
-            }
+            });
         } else {
             bcrypt.compare(passwordReset, receiverDefault.users.password, function (err, isMatch) {
                 if (err) {
@@ -220,15 +225,16 @@ function HandOver() {
                 } else if (!isMatch) {
                     toast.error('Mật khẩu xác nhận sai', { autoClose: 2000 });
                 } else {
-                    // dispatch(
-                    //     addReset({
-                    //         ...resetHandOver,
-                    //         totalMoney: handOver.moneyFirst + totalDeposits,
-                    //         dateTimeStart: userLogin.dateTimeStart,
-                    //         dateTimeEnd: formatDate(now),
-                    //         personnel: currentUser,
-                    //     }),
-                    // );
+                    dispatch(
+                        addReset({
+                            ...resetHandOver,
+                            receiver: receiverDefault,
+                            totalMoney: userLogin.moneyFirst + totalDeposits,
+                            dateTimeStart: userLogin.dateTimeStart,
+                            dateTimeEnd: formatDate(now),
+                            personnel: currentUser,
+                        }),
+                    );
                     toast.success('Reset ca thành công', { autoClose: 2000 });
                     setVisibleReset(false);
                 }

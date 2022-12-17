@@ -165,6 +165,7 @@ const AdminLayout = ({ children }) => {
                                 },
                                 {
                                     key: '12',
+                                    disabled: !currentUser?.users.roles.some((x) => x.name === 'Quản lý'),
                                     // icon: <UploadOutlined />,
                                     label: 'Lịch sử giao ca',
                                     onClick: () => navigate('/admin/hand-over-manage'),
@@ -174,18 +175,21 @@ const AdminLayout = ({ children }) => {
 
                         {
                             key: '14',
+                            disabled: !currentUser?.users.roles.some((x) => x.name === 'Quản lý'),
                             icon: <FontAwesomeIcon icon={faChartSimple} />,
                             label: 'Thống kê',
                             onClick: () => navigate('/admin/chart'),
                         },
                         {
                             key: '15',
+                            disabled: !currentUser?.users.roles.some((x) => x.name === 'Quản lý'),
                             icon: <FontAwesomeIcon icon={faShield} />,
                             label: 'Phân quyền',
                             onClick: () => navigate('/admin/authorization'),
                         },
                         {
                             key: '13',
+                            disabled: !currentUser?.users.roles.some((x) => x.name === 'Quản lý'),
                             icon: <FontAwesomeIcon icon={faPersonWalkingArrowLoopLeft} />,
                             label: 'Lịch sử truy cập',
                             onClick: () => navigate('/admin/history'),

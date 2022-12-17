@@ -2,6 +2,9 @@ import { Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import { Link } from 'react-router-dom';
 import config from '~/config';
+
+import authorServices from '~/services/authorServices';
+
 import { faChevronRight, faPlus, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Modal } from 'flowbite-react';
@@ -25,6 +28,7 @@ function NumberOfFloors() {
     const [visibleUpdateFloor, setVisibleUpdateFloor] = useState(false);
     const [visibleAddFloor, setVisibleAddFloor] = useState(false);
     const [valueSearchFloor, setValueSearchFloor] = useState('');
+    const [currentUser, setCurrentUser] = useState();
     const [numberOfFloors, setNumberOfFloors] = useState(objNumberOfFloor);
     const numberOfFloorss = useSelector((state) => state.numberOfFloor.numberOfFloors);
     const numberOfFloor = useSelector((state) => state.numberOfFloor.NumberOfFloor);
@@ -33,6 +37,7 @@ function NumberOfFloors() {
     useEffect(() => {
         dispatch(getAllNumberOfFloors());
         setNumberOfFloors(numberOfFloor);
+        authorServices.currentUser().then((res) => setCurrentUser(res));
         // eslint-disable-next-line
     }, [numberOfFloor]);
 
@@ -51,9 +56,13 @@ function NumberOfFloors() {
     }
 
     function handleDeleteByIdFloor() {
-        setNumberOfFloors(numberOfFloors);
-        dispatch(update({ ...numberOfFloors, status: '0' }));
-        toast.success('Xóa thành công', { autoClose: 2000 });
+        if (currentUser?.users.roles.some((x) => x.name === 'Quản lý')) {
+            setNumberOfFloors(numberOfFloors);
+            dispatch(update({ ...numberOfFloors, status: '0' }));
+            toast.success('Xóa thành công', { autoClose: 2000 });
+        } else {
+            toast.error('Không có quyền xóa', { autoClose: 2000 });
+        }
         setVisibleDeleteFloor(false);
     }
 
