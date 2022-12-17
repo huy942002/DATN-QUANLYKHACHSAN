@@ -121,16 +121,12 @@ public class RoomRentalManageController {
 
         //Create all details invoice
         List<DetailsInvoice> detailsInvoiceList = new ArrayList<>();
-        List<Rooms> roomsList = new ArrayList<>();
         for (DetailsInvoiceDTO d : checkInDTO.getDetailInvoices()){
             DetailsInvoice detailsInvoice = DetailsInvoice.toEntity(d);
             detailsInvoice.setBills(bill);
             detailsInvoiceList.add(detailsInvoice);
-            d.getRooms().setStatus(2);
-            roomsList.add(d.getRooms());
         }
         List<DetailsInvoice> detailsInvoiceListSave = detailInvoiceRepository.saveAll(detailsInvoiceList);
-        List<Rooms> roomsListSave = roomRepository.saveAll(roomsList);
 
         //Create all service
         List<ServiceDetails> serviceDetailsList = new ArrayList<>();
@@ -150,7 +146,6 @@ public class RoomRentalManageController {
         CheckInResponseDTO checkInResponseDTO = new CheckInResponseDTO();
         checkInResponseDTO.setCustomer(customer);
         checkInResponseDTO.setBill(bill);
-        checkInResponseDTO.setRoomsList(roomsListSave);
         checkInResponseDTO.setDetailsInvoiceList(detailsInvoiceListSave);
         checkInResponseDTO.setServiceDetailsList(serviceDetailsListSave);
         return new ResponseEntity<>(checkInResponseDTO, HttpStatus.OK);
@@ -263,5 +258,10 @@ public class RoomRentalManageController {
     @GetMapping("/all-detail-invoice-by-room-and-status/{id}")
     public ResponseEntity<?> getAllDetailInvoieByRoomAndStatus(@PathVariable Integer id){
         return new ResponseEntity<>(iDetailInvoiceService.getAllDetailInvoiceByRoomAndStatus(id), HttpStatus.OK);
+    }
+
+    @GetMapping("/all-detail-invoice-by-room-and-status-and-date/{idRoom}/{date}")
+    public ResponseEntity<?> getAllDetailInvoieByRoomAndStatusAndDate(@PathVariable Integer idRoom, @PathVariable String date){
+        return new ResponseEntity<>(iDetailInvoiceService.getListDetailInvoiceByDate(idRoom, date), HttpStatus.OK);
     }
 }

@@ -1,17 +1,15 @@
 import { PlusOutlined } from '@ant-design/icons';
 import { Divider, Modal, message } from 'antd';
 import { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
 import RoomDetail from './room-detail';
-// import ContentModalAddRoom from './content-modal-add-room';
 import DetailInvoice from '~/models/DetailInvoice/DetailInvoice';
-// import ModalDetailInvoice from './modal-detail-invoice';
-// import ModalRoomDetail from './modal-room-detail';
 import dayjs from 'dayjs';
 import axios from 'axios';
 import ModalDetailInvoice from './modal-detail-invoice';
 import ModalRoomDetail from './modal-room-detail';
 import ContentModalAddRoom from './content-modal-add-room';
+import ListRoomModal from "../../ListRoom/listRoom";
+import { date } from 'yup';
 
 function ListRoom({ detailInvoices, setDetailInvoices, serviceDetails, setServiceDetails, bill, rentalTypeList, dateNow, dateTomorrow }) {
 
@@ -22,6 +20,8 @@ function ListRoom({ detailInvoices, setDetailInvoices, serviceDetails, setServic
     const [openModalRoom, setOpenModalRoom] = useState(false);
     const [openModalDetailInvoice, setOpenModalDetailInvoice] = useState(false);
     const [openModalRoomDetail, setOpenModalRoomDetail] = useState(false);
+    const [openModalListRoom, setOpenModalListRoom] = useState(false);
+
 
     const [roomChoose, setRoomChoose] = useState([]);
     const [roomPlanDefault, setRoomPlanDefault] = useState();
@@ -50,31 +50,49 @@ function ListRoom({ detailInvoices, setDetailInvoices, serviceDetails, setServic
                     setRoomPlanDefault(res.data);
                 }).catch(err => {});
     }
-    const addRoom = () => {
-        const array = [];
-        roomChoose.forEach((element) => {
-            console.log(bill);
-            const newDetailInvoice = new DetailInvoice();
-            newDetailInvoice.rooms = element;
-            newDetailInvoice.bills = bill;
-            newDetailInvoice.facilitiesDetailsList = genDetail(element).facilitiesDetailsList;
-            newDetailInvoice.serviceAvailableList = genDetail(element).serviceAvailableList;
-            newDetailInvoice.rentalTypes = rentalTypeList[0];
-            newDetailInvoice.hireDate = dayjs(dateNow).format('YYYY-MM-DD') + " 12:00";
-            newDetailInvoice.checkOutDay = dayjs(dateTomorrow).format('YYYY-MM-DD') + " 12:00";
-            newDetailInvoice.key = element.id;
-            array.push(newDetailInvoice);
-        });
-        detailInvoices.map((element) => {
-            array.push(element);
-        });
-        setDetailInvoices(array);
-        setRoomChoose([]);
-        setOpenModalRoom(false);
-    };
+
+    const extraRoom = (data) => {
+        const newDetailInvoice = new DetailInvoice();
+        newDetailInvoice.rooms = data.room;
+        newDetailInvoice.bills = bill;
+        newDetailInvoice.facilitiesDetailsList = genDetail(data.room).facilitiesDetailsList;
+        newDetailInvoice.serviceAvailableList = genDetail(data.room).serviceAvailableList;
+        newDetailInvoice.rentalTypes = rentalTypeList[0];
+        newDetailInvoice.hireDate = dayjs(data.hireDate).format('YYYY-MM-DD') + " " + window.sessionStorage.getItem("time-in");
+        newDetailInvoice.checkOutDay = dayjs(data.checkOutDay).format('YYYY-MM-DD') + " " + window.sessionStorage.getItem("time-out");
+        setDetailInvoices([
+            ...detailInvoices,
+            newDetailInvoice,
+        ])
+    }
+
+    // const addRoom = () => {
+    //     const array = [];
+    //     roomChoose.forEach((element) => {
+    //         console.log(bill);
+    //         const newDetailInvoice = new DetailInvoice();
+    //         newDetailInvoice.rooms = element;
+    //         newDetailInvoice.bills = bill;
+    //         newDetailInvoice.facilitiesDetailsList = genDetail(element).facilitiesDetailsList;
+    //         newDetailInvoice.serviceAvailableList = genDetail(element).serviceAvailableList;
+    //         newDetailInvoice.rentalTypes = rentalTypeList[0];
+    //         newDetailInvoice.hireDate = dayjs(dateNow).format('YYYY-MM-DD') + " 12:00";
+    //         newDetailInvoice.checkOutDay = dayjs(dateTomorrow).format('YYYY-MM-DD') + " 12:00";
+    //         newDetailInvoice.key = element.id;
+    //         array.push(newDetailInvoice);
+    //     });
+    //     detailInvoices.map((element) => {
+    //         array.push(element);
+    //     });
+    //     setDetailInvoices(array);
+    //     setRoomChoose([]);
+    //     setOpenModalRoom(false);
+    // };
+
     const showModalDetailInvoice = () => {
         setOpenModalDetailInvoice(true);
     };
+
     const changeDetailInvoice = () => {
         setConfirmLoading(true);
         if(detailModalDetailInvoice) {
@@ -130,35 +148,46 @@ function ListRoom({ detailInvoices, setDetailInvoices, serviceDetails, setServic
 
     return (
         <div className="col-span-2">
+
             { contextHolder }
+
             <Divider orientation="left">
                 <div className="text-base font-semibold flex items-center">
                     Phòng
                     <div
-                        onClick={() => setOpenModalRoom(true)}
+                        onClick={() => setOpenModalListRoom(true)}
                         className="h-full cursor-pointer rounded-lg p-1.5 w-8 ml-2 bg-design-greenLight text-white flex justify-center items-center"
                     >
                         <PlusOutlined />
                     </div>
-                    <Modal
-                        title="Thêm phòng"
-                        centered
-                        open={openModalRoom}
-                        onOk={() => addRoom()}
-                        onCancel={() => setOpenModalRoom(false)}
+                    <Modal 
                         width={1800}
-                        okText="Thêm"
-                        cancelText="Hủy"
-                        style={{ marginTop: 20, marginBottom: 20 }}
+                        title={"Sơ đồ phòng"}
+                        open={openModalListRoom}
+                        onCancel={() => setOpenModalListRoom(false)}
+                        okButtonProps={{ style: { display: 'none' } }}
+                        cancelButtonProps={{ style: { display: 'none' } }}
+                        style={{ top: 20 }}
                     >
-                        <ContentModalAddRoom
-                            detailInvoices={detailInvoices}
-                            roomChoose={roomChoose}
-                            setRoomChoose={setRoomChoose}
-                        ></ContentModalAddRoom>
+                        <ListRoomModal
+                            optionType={"CHECK-IN/EXTRA-ROOM"}
+                            openModalListRoom={openModalListRoom}
+                            setOpenModalListRoom={setOpenModalListRoom}
+                            // hireDate={dataBooking && dataBooking.hireDate}
+                            // kindOfRoomBooking={dataBooking && dataBooking.kindOfRoom.id}
+                            // dataBooking={dataBooking}
+                            // setDataBooking={setDataBooking}
+                            // dataBill={dataBill}
+                            // setDataBill={setDataBill}
+                            // roomBookingList={roomBookingList}
+                            // setRoomBookingList={setRoomBookingList}
+                            extraRoom={extraRoom}
+                            listRoomChoose={detailInvoices}
+                        ></ListRoomModal>
                     </Modal>
                 </div>
             </Divider>
+
             <Modal
                 title={detailModalDetailInvoice ? detailModalDetailInvoice.rooms.name : ""}
                 open={openModalDetailInvoice}
@@ -175,6 +204,7 @@ function ListRoom({ detailInvoices, setDetailInvoices, serviceDetails, setServic
                     rentalTypeList={rentalTypeList}
                 ></ModalDetailInvoice>
             </Modal>
+
             <Modal
                 title={ detailModalDetailInvoice ? detailModalDetailInvoice.rooms.name : "" }
                 open={ openModalRoomDetail }
@@ -191,6 +221,7 @@ function ListRoom({ detailInvoices, setDetailInvoices, serviceDetails, setServic
                     setServiceDetails={setServiceDetails}
                 ></ModalRoomDetail>
             </Modal>
+
             <div className="grid grid-cols-3 gap-12">
                 {detailInvoices.map((element, index) => {
                     return (
@@ -208,6 +239,7 @@ function ListRoom({ detailInvoices, setDetailInvoices, serviceDetails, setServic
                     );
                 })}
             </div>
+
         </div>
     );
 }

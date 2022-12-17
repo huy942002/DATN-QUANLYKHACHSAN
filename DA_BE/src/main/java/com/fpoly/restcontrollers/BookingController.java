@@ -9,10 +9,12 @@ import java.util.*;
 
 import com.fpoly.dto.BookingRoomDTO;
 import com.fpoly.dto.BookingRoomResponseDTO;
+import com.fpoly.dto.CheckInBookingDTO;
 import com.fpoly.entities.*;
 import com.fpoly.repositories.irepo.*;
 import com.fpoly.repositories.repo.BillRepository;
 import com.fpoly.repositories.repo.BookingRepository;
+import com.fpoly.repositories.repo.DetailInvoiceRepository;
 import com.fpoly.repositories.repo.RoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -48,6 +50,9 @@ public class BookingController {
 	@Autowired IPersonnelService iPersonnelService;
 
 	@Autowired IRentalTypeService iRentalTypeService;
+
+	@Autowired
+	DetailInvoiceRepository detailInvoiceRepository;
 
 	@Autowired
 	BillRepository repositoryBill2;
@@ -197,13 +202,7 @@ public class BookingController {
 			Customer newCustomer = new Customer();
 			newCustomer.setFullname(bookingRoomDTO.getBooking().getCustomerName());
 			newCustomer.setEmail(bookingRoomDTO.getBooking().getCustomerEmail());
-//			newCustomer.setCitizenIdCode(null);
-//			newCustomer.setGender(null);
-//			newCustomer.setDateOfBirth(null);
 			newCustomer.setPhoneNumber(bookingRoomDTO.getBooking().getCustomerPhoneNumber());
-//			newCustomer.setAddress(null);
-//			newCustomer.setImg(null);
-//			newCustomer.setNationality(null);
 			newCustomer.setStatus(1);
 
 			Customer customer = iCustomerService.save(newCustomer);
@@ -213,16 +212,10 @@ public class BookingController {
 			Bills newBill = new Bills();
 			newBill.setCustomer(customer);
 			newBill.setPersonnel(personnel);
-//			newBill.setRoomRefundConditions(null);
-//			newBill.setPaymentType(null);
 			newBill.setNumberOfAdults(bookingRoomDTO.getBooking().getNumberOfAdults());
 			newBill.setNumberOfKids(bookingRoomDTO.getBooking().getNumberOfKids());
 			newBill.setHireDate(LocalDateTime.now());
-//			newBill.setCheckOutDay(null);
 			newBill.setDeposits(bookingRoomDTO.getBooking().getDeposits());
-//			newBill.setDateOfPayment(null);
-//			newBill.setTotalCard(0);
-//			newBill.setTotalCash(0);
 			newBill.setStatus(3);
 			newBill.setBooking(bookingRoomDTO.getBooking());
 
@@ -242,7 +235,26 @@ public class BookingController {
 		DetailsInvoice detailsInvoice = iDetailInvoiceService.save(newDetailInvoice);
 
 		BookingRoomResponseDTO bookingRoomResponseDTO = new BookingRoomResponseDTO(bills, detailsInvoice);
+
 		return new ResponseEntity<>(bookingRoomResponseDTO, HttpStatus.OK);
 	}
 
+	@Transactional
+	@PostMapping("/check-in-booking")
+	public ResponseEntity<?> checkInBooking(@RequestBody CheckInBookingDTO checkInBookingDTO) {
+
+		checkInBookingDTO
+				.getDataBill()
+				.setCustomer(iCustomerService.save(checkInBookingDTO.getDataBill().getCustomer()));
+
+		checkInBookingDTO
+				.getDataBill()
+				.setBooking(iBookingService.save(checkInBookingDTO.getDataBill().getBooking()));
+
+		iBillService.save(checkInBookingDTO.getDataBill());
+
+		detailInvoiceRepository.saveAll(checkInBookingDTO.getRoomBookingList());
+
+		return new ResponseEntity<>("Success", HttpStatus.OK);
+	}
 }

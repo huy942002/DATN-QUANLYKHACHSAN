@@ -55,7 +55,7 @@ function RoomDetail({ detailInvoice, detailInvoiceList, setDetailInvoices, showM
     };
     //End Util
 
-    console.log(detailInvoice);
+    // console.log(detailInvoice);
 
 
     return (

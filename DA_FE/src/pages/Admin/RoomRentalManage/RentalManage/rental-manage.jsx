@@ -1,5 +1,4 @@
-import { DatePicker, Tabs, Button, message, Space, Drawer, Radio, Input } from 'antd';
-import { useSelector } from 'react-redux';
+import { DatePicker, Tabs, Button, message } from 'antd';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Personnel from '~/models/Personnel/Personnel';
@@ -9,9 +8,6 @@ import RoomServices from './TabService/room-services';
 import Services from './TabService/services';
 import Bill from '~/models/Bill/Bill';
 import axios from 'axios';
-import { StepBackwardOutlined } from '@ant-design/icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMoneyCheckDollar } from '@fortawesome/free-solid-svg-icons';
 import CustomerInformation from './TabInformation/customer-information';
 import ListRoom from './TabInformation/list-room';
 import dayjs  from 'dayjs';
@@ -19,12 +15,6 @@ import CheckInInformation from './TabInformation/check-in-information';
 
 const { TabPane } = Tabs;
 const { RangePicker } = DatePicker;
-
-const timeCheckInOut = {
-    id: 1,
-    timeCheckIn: '12:00',
-    timeCheckOut: '12:00',
-};
 
 const RentalManage = () => {
 
@@ -103,9 +93,6 @@ const RentalManage = () => {
 
     //Util
     //End Util
-    // const roomPlan = useSelector((state) => state.roomPlan.roomPlan);
-    // const rentalTypes = useSelector((state) => state.rentalType.rentalTypes);
-    
     
     const addRoomDetail = () => {
         //Add room
@@ -115,8 +102,8 @@ const RentalManage = () => {
             newDetailInvoice.facilitiesDetailsList = getRoomChoose().facilitiesDetailsList;
             newDetailInvoice.serviceAvailableList = getRoomChoose().serviceAvailableList;
             newDetailInvoice.key = getRoomChoose().rooms.id;
-            newDetailInvoice.hireDate = dayjs(dateCheckIn).format('YYYY-MM-DD') + " 12:00";
-            newDetailInvoice.checkOutDay = dayjs(dateCheckOut).format('YYYY-MM-DD') + " 12:00";
+            newDetailInvoice.hireDate = dayjs(dateCheckIn).format('YYYY-MM-DD') + " " + window.sessionStorage.getItem("time-in");
+            newDetailInvoice.checkOutDay = dayjs(dateCheckOut).format('YYYY-MM-DD') + " " + window.sessionStorage.getItem("time-out");
             newDetailInvoice.rentalTypes = rentalTypes[0];
             setDetailInvoices([...detailInvoices, newDetailInvoice]);
         }
@@ -224,7 +211,7 @@ const RentalManage = () => {
             const response = await axios.post('http://localhost:8080/api/room-rental-manage/update-detail', {
                 detailInvoices: detailInvoices,
                 serviceDetails: serviceDetails,
-            }).then(res => {
+            }).then((res) => {
                 if(res) {
                     setTimeout(() => {
                         setConfirmLoading(false);
@@ -236,7 +223,8 @@ const RentalManage = () => {
                         });
                     }, 1000);
                 }
-            }).catch(err => {
+            })
+            .catch((err) => {
                 setTimeout(() => {
                     setConfirmLoading(false);
                     messageApi.open({
@@ -246,9 +234,8 @@ const RentalManage = () => {
                         duration: 2,
                     });
                 }, 1000);
-            }).finally(() => {
-                
-            });
+            })
+            .finally(() => {});
         }
     };
 
@@ -256,6 +243,7 @@ const RentalManage = () => {
     return (
         <>
             { contextHolder }
+
             <div>
                 <div className="text-lg font-semibold mb-3">
                     { type === "check-in" && <span>Check in - { getRoomChoose() && getRoomChoose().rooms.name }</span> }
@@ -316,11 +304,17 @@ const RentalManage = () => {
                 </Tabs>
                 <div className="mt-6 flex justify-end">
                     {type === "details" && (
-                        <Button onClick={() => setOpen(true)} className="mr-3">
+                        <Button
+                            onClick={() => setOpen(true)}
+                            className="mr-3"
+                        >
                             Thanh toán
                         </Button>
                     )}
-                    <Button onClick={() => triggerAction()} loading={confirmLoading}>
+                    <Button
+                        onClick={() => triggerAction()}
+                        loading={confirmLoading}
+                    >
                         {type === "check-in" && <span>Check in</span>}
                         {type === "details" && <span>Lưu</span>}
                     </Button>

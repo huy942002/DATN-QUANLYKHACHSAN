@@ -9,7 +9,8 @@ import axios from 'axios';
 import dayjs from 'dayjs';
 import { DatePicker } from 'antd';
 
-const ListRoom = ({ 
+const ListRoom = ({
+    optionType, 
     openModalListRoom,
     setOpenModalListRoom,
     hireDate,
@@ -20,6 +21,8 @@ const ListRoom = ({
     setDataBill,
     roomBookingList,
     setRoomBookingList,
+    extraRoom,
+    listRoomChoose,
 }) => {
 
     //Data
@@ -37,10 +40,21 @@ const ListRoom = ({
         window.scrollTo(0, 0);
         getRoomPlan(dateChoose);
         getAllKindOfRoom();
-        if(kindOfRoomBooking) {
-            setQueryKindOfRoom(kindOfRoomBooking);
-        }
     }, []);
+    useEffect(
+        () => {
+            setDateChoose(dayjs(hireDate ? new Date(hireDate) : new Date()).format('YYYY-MM-DD'));
+            getRoomPlan(hireDate ? hireDate : dayjs(new Date()).format("YYYY-MM-DD"))
+        }, [hireDate]
+    )
+    useEffect(
+        () => {
+            setQueryFloor("ALL");
+            setQueryName("");
+            setQueryStatus("ALL");
+            setQueryKindOfRoom(kindOfRoomBooking ? kindOfRoomBooking : "ALL");
+        }, [kindOfRoomBooking]
+    )
     //End Created
 
     //Gen Data
@@ -284,6 +298,7 @@ const ListRoom = ({
                     <Floor
                         key={index}
                         theRoomsOfTheFloor={element}
+                        optionType={optionType}
                         setOpenModalListRoom={setOpenModalListRoom}
                         dateChoose={dateChoose}
                         dataBooking={dataBooking}
@@ -293,6 +308,8 @@ const ListRoom = ({
                         roomBookingList={roomBookingList}
                         setRoomBookingList={setRoomBookingList}
                         updateRoomPlan={updateRoomPlan}
+                        extraRoom={extraRoom}
+                        listRoomChoose={listRoomChoose}
                     ></Floor>
                 );
             })}

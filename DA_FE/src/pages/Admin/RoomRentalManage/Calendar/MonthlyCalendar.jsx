@@ -8,25 +8,50 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import { MonthlyCalendar } from 'react-rainbow-components';
 
-function MonthlyCalendarRoom({openCalendar, setOpenCalendar, roomId, setInOut, dateChoose, room, okBtn}) {
+const MonthlyCalendarRoom = ({
+    openCalendar,
+    setOpenCalendar,
+    roomId,
+    listDetailInvoice,
+    setInOut,
+    dateChoose,
+    room,
+    okBtn,
+}) => {
 
     //Data
-    const [listDetailInvoice, setListDetailInvoice] = useState();
     const [initialState, setInitialState] = useState({
         currentMonth: new Date(),
         selectedDate: undefined,
     });
     const [inOutCalendar, setInOutCalendar] = useState({
-        hireDate: "",
+        hireDate: dateChoose,
         checkOutDay: "",
     });
     const [openModalComfirm, setOpenModalComfirm] = useState(false);
+    // const [listDetailInvoice, setListDetailInvoice] = useState();
     //End Data
 
     //Created
-    useEffect(() => {
-        getAllDetailInVoiceByRoom();
-    }, [])
+    // useEffect(() => {
+    //     getAllDetailInVoiceByRoom();
+    // }, [])
+    useEffect(
+        () => {
+            setInOutCalendar(
+                {
+                    ...inOutCalendar,
+                    hireDate: dateChoose,
+                }
+            )
+            setInitialState(
+                {
+                    ...initialState,
+                    currentMonth: new Date(),
+                }
+            )
+        }, [dateChoose]
+    )
     //End Created
 
     //Gen Data
@@ -44,9 +69,8 @@ function MonthlyCalendarRoom({openCalendar, setOpenCalendar, roomId, setInOut, d
         let date = moment(value).format("YYYY-MM-DD");
         let booking = null;
         if(listDetailInvoice) {
-            if(listDetailInvoice.find(element => element.hireDate.split(" ")[0] <= date && date <= element.checkOutDay.split(" ")[0] && element.status === 3)){
-                booking = listDetailInvoice.find(element => element.hireDate.split(" ")[0] <= date && date <= element.checkOutDay.split(" ")[0] && element.status === 3);
-            }
+            booking = listDetailInvoice;
+            booking = booking.filter((x) => x.hireDate.split(" ")[0] <= date && date <= x.checkOutDay.split(" ")[0] && x.status === 3);
         }
         return booking;
     }
@@ -75,32 +99,59 @@ function MonthlyCalendarRoom({openCalendar, setOpenCalendar, roomId, setInOut, d
     //End Gen Data
 
     //Function
-    const getAllDetailInVoiceByRoom = async () => {
-        await axios
-            .get('http://localhost:8080/api/room-rental-manage/all-detail-invoice-by-room-and-status/' + roomId)
-            .then(res => {
-                setListDetailInvoice(res.data);
-            }).catch(err => {});
-    }
+    // const getAllDetailInVoiceByRoom = async () => {
+    //     await axios
+    //         .get('http://localhost:8080/api/room-rental-manage/all-detail-invoice-by-room-and-status/' + room.rooms.id)
+    //         .then(res => {
+    //             setListDetailInvoice(res.data);
+    //         }).catch(err => {});
+    // }
+
     const changeInOut = (value) => {
         let date = moment(value).format("YYYY-MM-DD");
-        if(!inOutCalendar.hireDate) {
-            setInOutCalendar({...inOutCalendar, hireDate: date})
-        }
-        if(inOutCalendar.hireDate && !inOutCalendar.checkOutDay) {
+        // if(!inOutCalendar.hireDate) {
+        //     setInOutCalendar({...inOutCalendar, hireDate: date})
+        // }
+        // if(inOutCalendar.hireDate && !inOutCalendar.checkOutDay) {
+        //     setInOutCalendar({...inOutCalendar, checkOutDay: date})
+        // }
+        // if(inOutCalendar.hireDate && inOutCalendar.checkOutDay) {
+        //     if(date > inOutCalendar.hireDate) {
+        //         setInOutCalendar({...inOutCalendar, checkOutDay: date})
+        //     }
+        //     if(date < inOutCalendar.hireDate) {
+        //         setInOutCalendar({ hireDate: date, checkOutDay: ""})
+        //     }
+        //     if(date == inOutCalendar.hireDate) {
+        //         setInOutCalendar({ hireDate: "", checkOutDay: ""})
+        //     }
+        // }
+        if(inOutCalendar.hireDate < date) {
             setInOutCalendar({...inOutCalendar, checkOutDay: date})
         }
-        if(inOutCalendar.hireDate && inOutCalendar.checkOutDay) {
-            if(date > inOutCalendar.hireDate) {
-                setInOutCalendar({...inOutCalendar, checkOutDay: date})
-            }
-            if(date < inOutCalendar.hireDate) {
-                setInOutCalendar({ hireDate: date, checkOutDay: ""})
-            }
-            if(date == inOutCalendar.hireDate) {
-                setInOutCalendar({ hireDate: "", checkOutDay: ""})
+    }
+    
+    const checkDate = (data) => {
+        let check = true;
+        let date = moment(data).format("YYYY-MM-DD");
+        let listDetailInvoiceFilter = listDetailInvoice;
+        if(listDetailInvoiceFilter) {
+            listDetailInvoiceFilter = listDetailInvoiceFilter.filter((x) => x.hireDate.split(" ")[0] >= inOutCalendar.hireDate);
+            if(listDetailInvoiceFilter.length > 0) {
+                let minDateToList = listDetailInvoiceFilter[0].hireDate.split(" ")[0];
+                listDetailInvoiceFilter.forEach(
+                    (x) => {
+                        if(minDateToList > x.hireDate.split(" ")[0]){
+                            minDateToList = x.hireDate;
+                        }
+                    }
+                )
+                if(date >= minDateToList.split(" ")[0]) {
+                    check = false;
+                }
             }
         }
+        return check;
     }
     //End Function
 
@@ -112,8 +163,22 @@ function MonthlyCalendarRoom({openCalendar, setOpenCalendar, roomId, setInOut, d
             <Modal
                 title={room.rooms.name}
                 open={openCalendar}
-                onOk={() => okBtn({room: room.rooms, hireDate: inOutCalendar.hireDate, checkOutDay: inOutCalendar.checkOutDay})}
-                onCancel={() => setOpenCalendar(false)}
+                onOk={
+                    () => okBtn({
+                        room: room.rooms,
+                        hireDate: inOutCalendar.hireDate,
+                        checkOutDay: inOutCalendar.checkOutDay
+                    })
+                }
+                onCancel={
+                    () => {
+                        setInOutCalendar({
+                            hireDate: dateChoose,
+                            checkOutDay: "",
+                        })
+                        setOpenCalendar(false);
+                    }
+                }
                 okText="Xác nhận"
                 cancelText="Hủy"
                 width={1800}
@@ -123,47 +188,56 @@ function MonthlyCalendarRoom({openCalendar, setOpenCalendar, roomId, setInOut, d
                     id="monthly-calendar-1"
                     currentMonth={initialState.currentMonth}
                     onMonthChange={({ month }) => setInitialState({ currentMonth: month })}
-                    onSelectDate={({ date }) => {
-                        changeInOut(date);
-                    }}
-                    minDate={dateChoose ? new Date(dateChoose) : new Date()}
+                    onSelectDate={
+                        ({ date }) => {
+                            if(checkDate(date)) {
+                                changeInOut(date);
+                            }
+                        }
+                    }
+                    // minDate={dateChoose ? new Date(dateChoose) : new Date()}
                     dateComponent={date => (
-                        <div className='ml-3 mr-1 w-full content-end'>
-                            {genDetailInvoice(date) &&(
-                                <div>
-                                    <span className='bg-status-2 px-3 rounded-full text-white'>
-                                        {/* Đã có khách */}
-                                        {genDetailInvoice(date).bills.customer.fullname}
+                        <div className='px-3 pb-2 w-full h-full flex items-end'>
+                            <div>
+                                {genSelected(date) && (
+                                    <span className='bg-design-greenLight h-5 w-5 flex justify-center items-center text-white rounded-full mb-1'>
+                                        <FontAwesomeIcon icon={faCheck}></FontAwesomeIcon>
                                     </span>
-                                    <span className='bg-status-2 px-3 rounded-full text-white ml-1'>
-                                        {genInOut(date, genDetailInvoice(date).hireDate, genDetailInvoice(date).checkOutDay)}
-                                    </span>
-                                </div>
-                            )}
-                            {/* <div>
-                                <span className='bg-design-charcoalblack px-3 rounded-full text-white'>
-                                    {genDetailInvoice(date) && genDetailInvoice(date).hireDate + " - " + genDetailInvoice(date).checkOutDay}
-                                </span>
-                            </div> */}
-                            {genBooking(date) && (
-                                <div>
-                                    <span className='bg-status-4 px-3 rounded-full text-white'>
-                                        {/* Khách đặt trước */}
-                                        {genBooking(date).bills.customer.fullname}
-                                    </span>
-                                    {genInOut(date, genBooking(date).hireDate, genBooking(date).checkOutDay) && (
-                                        <span className='bg-status-4 px-3 rounded-full text-white ml-1'>
-                                            {genInOut(date, genBooking(date).hireDate, genBooking(date).checkOutDay)}
+                                )}
+                                {genDetailInvoice(date) &&(
+                                    <div className='mb-1'>
+                                        <span className='bg-status-2 px-3 rounded-full text-white'>
+                                            {/* Đã có khách */}
+                                            {genDetailInvoice(date).bills.customer.fullname}
                                         </span>
-                                    )}
-                                </div>
-                            )}
-                            {genSelected(date) && (
-                                <span className='bg-design-greenLight float-right h-5 w-5 flex justify-center items-center text-white rounded-full'>
-                                    <FontAwesomeIcon icon={faCheck}></FontAwesomeIcon>
-                                </span>
-                            )} 
-                            
+                                        {genInOut(date, genDetailInvoice(date).hireDate, genDetailInvoice(date).checkOutDay) && (
+                                            <span className='bg-status-2 px-3 rounded-full text-white ml-1'>
+                                                {genInOut(date, genDetailInvoice(date).hireDate, genDetailInvoice(date).checkOutDay)}
+                                            </span>
+                                        )}
+                                    </div>
+                                )}
+                                {/* <div>
+                                    <span className='bg-design-charcoalblack px-3 rounded-full text-white'>
+                                        {genDetailInvoice(date) && genDetailInvoice(date).hireDate + " - " + genDetailInvoice(date).checkOutDay}
+                                    </span>
+                                </div> */}
+                                {genBooking(date) && genBooking(date).map(
+                                    (x) => (
+                                        <div className='mb-1'>
+                                            <span className='bg-status-4 px-3 rounded-full text-white'>
+                                                {/* Khách đặt trước */}
+                                                {x.bills.customer.fullname}
+                                            </span>
+                                            {genInOut(date, x.hireDate, x.checkOutDay) && (
+                                                <span className='bg-status-4 px-3 rounded-full text-white ml-1'>
+                                                    {genInOut(date, x.hireDate, x.checkOutDay)}
+                                                </span>
+                                            )}
+                                        </div>
+                                    )
+                                )}
+                            </div>
                         </div>
                     )}
                 />

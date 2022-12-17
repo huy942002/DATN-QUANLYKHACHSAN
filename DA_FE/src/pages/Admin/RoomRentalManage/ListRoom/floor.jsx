@@ -2,6 +2,7 @@ import Room from './room';
 
 const Floor = ({ 
     theRoomsOfTheFloor,
+    optionType,
     setOpenModalListRoom,
     dateChoose,
     dataBooking,
@@ -11,6 +12,8 @@ const Floor = ({
     roomBookingList,
     setRoomBookingList,
     updateRoomPlan,
+    extraRoom,
+    listRoomChoose,
 }) => {
 
     //Data
@@ -43,6 +46,7 @@ const Floor = ({
                                 <Room
                                     key={index}
                                     room={element}
+                                    optionType={optionType}
                                     setOpenModalListRoom={setOpenModalListRoom}
                                     dateChoose={dateChoose}
                                     dataBooking={dataBooking}
@@ -52,6 +56,8 @@ const Floor = ({
                                     roomBookingList={roomBookingList}
                                     setRoomBookingList={setRoomBookingList}
                                     updateRoomPlan={updateRoomPlan}
+                                    extraRoom={extraRoom}
+                                    listRoomChoose={listRoomChoose}
                                 ></Room>
                             );
                         }

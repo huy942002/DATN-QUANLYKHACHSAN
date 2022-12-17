@@ -14,6 +14,7 @@ const { confirm } = Modal;
 
 const Room = ({ 
     room,
+    optionType,
     setOpenModalListRoom,
     dateChoose,
     dataBooking,
@@ -23,6 +24,8 @@ const Room = ({
     roomBookingList,
     setRoomBookingList,
     updateRoomPlan,
+    extraRoom,
+    listRoomChoose,
 }) => {
 
     //Data
@@ -30,10 +33,7 @@ const Room = ({
     const [confirmLoading, setConfirmLoading] = useState(false);
     const key = 'messageApi';
     const [messageApi, contextHolder] = message.useMessage();
-    // const [inOut, setInOut] = useState({
-    //     hireDate: "",
-    //     checkOutDay: "",
-    // });
+    const [listDetailInvoice, setListDetailInvoice] = useState();
     //End Data
 
     //Created
@@ -50,7 +50,8 @@ const Room = ({
     const genBooking = () => {
         let data = null;
         if(room.detailInvoiceList) {
-            data = room.detailInvoiceList.find(element => element.status === 3);
+            data = room.detailInvoiceList;
+            data = data.filter((x) => x.status === 3);
         }
         return data;
     }
@@ -58,31 +59,106 @@ const Room = ({
     //End Gen Data
 
     //Function
-    const booking = async (data) => {
-        const params = {
-            rooms: data.room,
-            bills: dataBill || null,
-            booking: dataBooking,
-            hireDate: data.hireDate + " " + window.sessionStorage.getItem("time-in"),
-            checkOutDay: data.checkOutDay + " " + window.sessionStorage.getItem("time-out"),
-            userNamePersonnel: window.sessionStorage.getItem("username"),
-        }
+    const getAllDetailInVoiceByRoom = async () => {
+        let data = null;
         await axios
-            .post('http://localhost:8080/api/booking/booking-room', params)
-            .then((res) => {
-                setDataBill(res.data.bills);
-                setRoomBookingList([...roomBookingList, res.data.detailsInvoice])
-                setOpenCalendar(false);
-                setOpenModalListRoom(false);
-                updateRoomPlan();
-            })
-            .catch((err) => {});
+            .get('http://localhost:8080/api/room-rental-manage/all-detail-invoice-by-room-and-status/' + room.rooms.id)
+            .then(res => {
+                data = res.data;
+                setListDetailInvoice(res.data);
+            }).catch(err => {});
+        return data;
+    }
+
+    const getAllDetailInVoiceByRoomAndDate = async () => {
+        let data = null;
+        await axios
+            .get('http://localhost:8080/api/room-rental-manage/all-detail-invoice-by-room-and-status-and-date/' + room.rooms.id + "/" + dateChoose)
+            .then(res => {
+                data = res.data;
+                setListDetailInvoice(res.data);
+            }).catch(err => {});
+        return data;
+    }
+
+    const confirm = async (data) => {
+        if(optionType === "BOOKING") {
+            const params = {
+                rooms: data.room,
+                bills: dataBill || null,
+                booking: dataBooking,
+                hireDate: data.hireDate + " " + window.sessionStorage.getItem("time-in"),
+                checkOutDay: data.checkOutDay + " " + window.sessionStorage.getItem("time-out"),
+                userNamePersonnel: window.sessionStorage.getItem("username"),
+            }
+            await axios
+                .post('http://localhost:8080/api/booking/booking-room', params)
+                .then((res) => {
+                    setDataBill(res.data.bills);
+                    setRoomBookingList([
+                        ...roomBookingList,
+                        res.data.detailsInvoice
+                    ])
+                    setOpenCalendar(false);
+                    setOpenModalListRoom(false);
+                    updateRoomPlan();
+                })
+                .catch((err) => {});
+        }
+        if(optionType === "CHECK-IN/EXTRA-ROOM") {
+            extraRoom(data);
+            setOpenCalendar(false);
+            setOpenModalListRoom(false);
+        }
+        
+    }
+
+    const checkRoom = async () => {
+        let check = true;
+        let listDetailInvoiceCheck = await getAllDetailInVoiceByRoomAndDate();
+        // let listDetailInvoiceBookingCheck = listDetailInvoiceCheck.filter((x) => x.status === 3);
+        if(listDetailInvoiceCheck.length > 1) {
+            check = false;
+        } else {
+            let detailInvoiceBookingCheck = listDetailInvoiceCheck.find((x) => x.status === 3);
+            let detailInvoiceCheck = listDetailInvoiceCheck.find((x) => x.status === 1);
+            if(detailInvoiceBookingCheck) {
+                check = false;
+                if(detailInvoiceBookingCheck.checkOutDay.split(" ")[0] === dateChoose) {
+                    console.log("có");
+                    check = true;
+                }
+            }
+            if(detailInvoiceCheck) {
+                check = false;
+                if(detailInvoiceCheck.checkOutDay.split(" ")[0] === dateChoose) {
+                    check = true;
+                }
+            }
+        }
+        return check;
+    }
+
+    const checkListRoomChoose = () => {
+        let check = true;
+        if(listRoomChoose) {
+            if(listRoomChoose.find((x) => x.rooms.id === room.rooms.id)) {
+                check = false;
+            }
+        }
+        return check;
     }
     //End Function
 
     //Util
     const formatCurrency = (value) => {
-        return value.toLocaleString('it-IT', {style : 'currency', currency : 'VND'});
+        return value.toLocaleString(
+            'it-IT', 
+            {
+                style : 'currency',
+                currency : 'VND'
+            }
+        );
     };
     //End Util
 
@@ -91,12 +167,27 @@ const Room = ({
             {contextHolder}
 
             <div
-                onClick={() => {setOpenCalendar(true)}}
+                onClick={
+                    () => {
+                        if(checkListRoomChoose()) {
+                            checkRoom().then(
+                                (res) => {
+                                    if(res) {
+                                        getAllDetailInVoiceByRoom();
+                                        setOpenCalendar(true);
+                                    }
+                                }
+                            )
+                        }
+                    }
+                }
                 className=' border border-1 text-base p-3 cursor-pointer hover:bg-default-2 hover:border-design-greenLight'
             >
 
                 <div className='flex justify-end font-semibold'>
-                    <span className='text-base font-semibold'>{room.rooms.name}</span>
+                    <span className='text-base font-semibold'>
+                        {room.rooms.name}
+                    </span>
                 </div>
 
                 <div className='flex justify-end font-semibold'>
@@ -151,38 +242,52 @@ const Room = ({
                         </div>
                     </>
                 )}
-                {genBooking() && (
-                    <>
-                        <Divider style={{margin: 12}}/>
-                        <div className={`flex items-center w-full`}>
-                            <span className={`px-3 py-1 rounded-full text-white bg-status-4`}>
-                                Khách đặt trước
-                            </span>
-                            <span className='ml-3'>
-                                {genBooking() && genBooking().bills.customer.fullname}
-                            </span> 
+                {genBooking() && genBooking().map(
+                    (x) => (
+                        <div>
+                            <Divider style={{margin: 12}}/>
+                            <div className={`flex items-center w-full`}>
+                                <span className={`px-3 py-1 rounded-full text-white bg-status-4`}>
+                                    Khách đặt trước
+                                </span>
+                                <span className='ml-3'>
+                                    {x.bills.customer.fullname}
+                                </span> 
+                            </div>
+                            <div className='flex items-center mt-3'>
+                                <span className='rounded-full bg-design-charcoalblack h-7 w-7 text-white p-3 flex justify-center items-center'>
+                                    <FontAwesomeIcon
+                                        icon={faPersonWalkingLuggage}
+                                        className="w-[18px] h-[18px]"
+                                    ></FontAwesomeIcon>
+                                </span>
+                                <span className='ml-3'>
+                                    {x.hireDate}
+                                </span>
+                            </div>
+                            <div className='flex items-center mt-3'>
+                                <span className='rounded-full bg-design-charcoalblack h-7 w-7 text-white p-3 flex justify-center items-center'>
+                                    <FontAwesomeIcon
+                                        icon={faPersonWalkingArrowRight}
+                                        className="w-[18px] h-[18px]"
+                                    ></FontAwesomeIcon>
+                                </span>
+                                <span className='ml-3'>
+                                    {x.checkOutDay}
+                                </span>
+                            </div>
                         </div>
-                        <div className='flex items-center mt-3'>
-                            <span className='rounded-full bg-design-charcoalblack h-7 w-7 text-white p-3 flex justify-center items-center'>
-                                <FontAwesomeIcon
-                                    icon={faPersonWalkingLuggage}
-                                    className="w-[18px] h-[18px]"
-                                ></FontAwesomeIcon>
-                            </span>
-                            <span className='ml-3'>
-                                {genBooking() && genBooking().hireDate}
-                            </span>
-                        </div>
-                    </>
+                    )
                 )}
             </div>
             <MonthlyCalendarRoom
                 openCalendar={openCalendar}
                 setOpenCalendar={setOpenCalendar}
                 roomId={room.rooms.id}
+                listDetailInvoice={listDetailInvoice}
                 dateChoose={dateChoose}
                 room={room}
-                okBtn={booking}
+                okBtn={confirm}
             ></MonthlyCalendarRoom>
         </>
     );
