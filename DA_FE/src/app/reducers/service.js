@@ -20,9 +20,7 @@ export const add = createAsyncThunk('service/add', (data) => {
     return http.httpPost('service', data);
 });
 
-export const addsv = createAsyncThunk('service-available/addsv', (data) => {
-    return http.httpPost('service-available', data);
-});
+
 
 // Slice
 const slice = createSlice({
@@ -83,7 +81,7 @@ const slice = createSlice({
             state.error = action.error.message;
         });
 
-        // add personnel
+
         builder.addCase(add.pending, (state) => {
             state.loading = true;
         });

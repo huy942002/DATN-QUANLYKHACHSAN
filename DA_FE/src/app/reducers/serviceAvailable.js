@@ -18,6 +18,10 @@ export const UpdateServiceAvailables = createAsyncThunk('room/UpdateRoom', (data
     return http.httpPut(`service-available/${data.id}`, data);
 });
 
+export const addsv = createAsyncThunk('service-available/addsv', (data) => {
+    return http.httpPost('service-available', data);
+});
+
 // Slice
 const slice = createSlice({
     name: 'serviceAvailable',
@@ -55,6 +59,18 @@ const slice = createSlice({
             state.ServiceAvailables = state.ServiceAvailables.filter((x) => x.status === 1);
         });
         builder.addCase(UpdateServiceAvailables.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.error.message;
+        });
+
+        builder.addCase(addsv.pending, (state) => {
+            state.loading = true;
+        });
+        builder.addCase(addsv.fulfilled, (state, action) => {
+            state.loading = false;
+            state.ServiceAvailables.push(action.payload);
+        });
+        builder.addCase(addsv.rejected, (state, action) => {
             state.loading = false;
             state.error = action.error.message;
         });

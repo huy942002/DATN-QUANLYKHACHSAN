@@ -4,17 +4,17 @@ import { toast } from 'react-toastify';
 
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { getAllRoom, deleteById, getRoomById } from '~/app/reducers/room';
+import { getAllRoom, getRoomById } from '~/app/reducers/room';
 import { getAllKindOfRoom } from '~/app/reducers/kindOfRoom';
 import { getAllNumberOfFloors } from '~/app/reducers/numberOfFloor';
 import { getAllFacility } from '~/app/reducers/facilities';
 import { UpdateRoom } from '~/app/reducers/room';
-import { getByRoomIdSv, UpdateServiceAvailables } from '~/app/reducers/serviceAvailable';
+import { getByRoomIdSv, UpdateServiceAvailables, addsv } from '~/app/reducers/serviceAvailable';
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button, Modal } from 'flowbite-react';
+import { Button, Modal, Label, FileInput } from 'flowbite-react';
 import { getByRoomId, fddeleteById, add } from '~/app/reducers/facilityDetail';
-import { getAllService, addsv } from '~/app/reducers/service';
+import { getAllService } from '~/app/reducers/service';
 
 const objRoom = {
     id: '',
@@ -24,7 +24,7 @@ const objRoom = {
     img1: '',
     img2: '',
     img3: '',
-    status: '',
+    status: 0,
     kindOfRoom: {
         id: '',
         name: '',
@@ -72,6 +72,48 @@ const fdobj = {
         status: '',
     },
 };
+const objSVA = {
+    id: '',
+    quantity: '',
+    prices: '',
+    status: 1,
+    rooms: {
+        id: '',
+        name: '',
+        note: '',
+        img: '',
+        img1: '',
+        img2: '',
+        img3: '',
+        status: '',
+        kindOfRoom: {
+            id: '',
+            name: '',
+            note: '',
+            priceByDay: '',
+            hourlyPrice: '',
+            status: '',
+        },
+        numberOfFloors: {
+            id: '',
+            numberOfFloors: '',
+            status: '',
+        },
+    },
+    servicess: {
+        id: '',
+        name: '',
+        prices: '',
+        note: '',
+        status: '',
+        serviceType: {
+            id: '',
+            name: '',
+            note: '',
+            status: '',
+        },
+    },
+};
 
 function RoomManage() {
     const [visible, setVisible] = useState(false);
@@ -88,12 +130,18 @@ function RoomManage() {
     const Facility = useSelector((state) => state.facility.facilities);
     const services = useSelector((state) => state.service.services);
     const [FacilitieDetails, setFacilitieDetails] = useState(fdobj);
-    const [ServiceAvailable, setServiceAvailable] = useState([]);
+    const [ServiceAvailable, setServiceAvailable] = useState(objSVA);
     const [ServiceAvailableUpdate, setServiceAvailableUpdate] = useState();
     const [idcheck, setId] = useState(-1);
     const [valueSearch, setValueSearch] = useState('2');
     const [valueSearch1, setValueSearch1] = useState('');
     const ServiceAva = useSelector((state) => state.serviceAvailable.ServiceAvailables);
+    const [image, setImage] = useState('');
+    const [image1, setImage1] = useState('');
+    const [image2, setImage2] = useState('');
+    const [image3, setImage3] = useState('');
+    const [Err2, setErr2] = useState('');
+    const [Err3, setErr3] = useState('');
 
     const dispatch = useDispatch();
 
@@ -115,15 +163,52 @@ function RoomManage() {
         setValueSearch(valueSearch);
     }, [valueSearch]);
 
-    const addServiceAvailable = () => {
-        dispatch(addsv());
+    function handleFormValidation(NameRoom) {
+        setErr2('');
+        setErr3('');
+        let formIsValid = true;
+        if (!NameRoom) {
+            formIsValid = false;
+            setErr2("Name is required.");
+        }
+        return formIsValid;
+    }
+
+    const addServiceAvailable = (data, sl, pricess) => {
+        let i = 0;
+        if (ServiceAva.length > 0) {
+            ServiceAva.map((o) => {
+                if (o.servicess.id === data.id) {
+                    toast.error('Dịch Vụ Đã Tồn Tại!', { autoClose: 2000 });
+                    i++;
+                }
+            });
+            if (i === 0) {
+                dispatch(addsv({ ...ServiceAvailable, quantity: sl, prices: pricess, rooms: room, servicess: data, status: 1 }));
+            }
+
+        } else {
+            dispatch(addsv({ ...ServiceAvailable, quantity: sl, prices: pricess, rooms: room, servicess: data, status: 1 }));
+        }
+        dispatch(getByRoomId(room.id));
     };
 
     const addFacilitieDetails = (data) => {
-        setFacilitieDetails({ ...FacilitieDetails, room: room, facilities: data, status: 1 });
+        let i = 0;
+        if (FacilityDetail.length > 0) {
+            FacilityDetail.map((o) => {
+                if (o.facilities.id === data.id) {
+                    toast.error('Dịch Vụ Đã Tồn Tại!', { autoClose: 2000 });
+                    i++;
+                }
+            });
+            if (i === 0) {
+                dispatch(add({ ...FacilitieDetails, status: 1, rooms: room, facilities: data }));
+            }
 
-        console.log(FacilitieDetails.facilities.id);
-        dispatch(add({ ...FacilitieDetails, id: '', status: 1, rooms: room, facilities: data }));
+        } else {
+            dispatch(add({ ...FacilitieDetails, status: 1, rooms: room, facilities: data }));
+        }
         dispatch(getByRoomId(room.id));
     };
 
@@ -167,10 +252,10 @@ function RoomManage() {
     function getModal2() {
         setVisibleAdd2(true);
     }
-
-    const [image, setImage] = useState('');
     function uploadImage(data1) {
-        if (image === '') {
+        if (handleFormValidation(data1.name) === false) {
+
+        } else if (image === '') {
             handleUpdate(data1, room.img);
         } else {
             const data = new FormData();
@@ -269,14 +354,15 @@ function RoomManage() {
                             ))}
                         </select>
                     </div>
-                    <div className="">
+                    <div className="grid justify-items-end">
+                    <span className="font-bold"></span>
                         <div>
                             <button
                                 type="button"
                                 onClick={() => {
                                     setVisible(true);
                                 }}
-                                className="py-3 px-4 text-sm font-medium text-center text-white bg-blue-500 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                                className="py-5 px-12 text-sm font-medium text-center text-white bg-blue-500 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                             >
                                 <span className="mx-2">THÊM</span>
                             </button>
@@ -308,18 +394,6 @@ function RoomManage() {
                     <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                         <thead className="text-xs text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                             <tr>
-                                <th scope="col" className="p-4">
-                                    <div className="flex items-center">
-                                        <input
-                                            id="checkbox-all-search"
-                                            type="checkbox"
-                                            className="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                                        />
-                                        <label htmlFor="checkbox-all-search" className="sr-only">
-                                            checkbox
-                                        </label>
-                                    </div>
-                                </th>
                                 <th scope="col" className="py-3 px-6">
                                     Phòng
                                 </th>
@@ -357,18 +431,6 @@ function RoomManage() {
                                         key={x.id}
                                         className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
                                     >
-                                        <td className="p-4 w-4">
-                                            <div className="flex items-center">
-                                                <input
-                                                    id="checkbox-table-search-1"
-                                                    type="checkbox"
-                                                    className="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                                                />
-                                                <label htmlFor="checkbox-table-search-1" className="sr-only">
-                                                    checkbox
-                                                </label>
-                                            </div>
-                                        </td>
                                         <th
                                             scope="row"
                                             className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white"
@@ -448,7 +510,10 @@ function RoomManage() {
                         size="4xl"
                         position="top-center"
                         popup={true}
-                        onClose={() => setVisibleUpdate(false)}
+                        onClose={() => {
+                            setVisibleUpdate(false)
+                            setErr2('');
+                        }}
                     >
                         <Modal.Header>
                             <p className="mb-2 mr-3 text-gray-900 dark:text-gray-300 font-bold">Update Room</p>
@@ -471,6 +536,9 @@ function RoomManage() {
                                             onChange={(e) => setRoom({ ...Room, name: e.target.value })}
                                             className="w-96 p-1 rounded"
                                         />
+                                        {Err2 &&
+                                            <div style={{ color: "red", paddingBottom: 10 }}>{Err2}</div>
+                                        }
                                     </div>
 
                                     <div className="grid grid-cols-2 mt-8 text-black">
@@ -577,6 +645,7 @@ function RoomManage() {
                                                 defaultValue={Room?.kindOfRoom?.priceByDay || ''}
                                                 className="w-64 p-1 rounded"
                                                 placeholder=""
+                                                disabled={true}
                                             />
                                         </div>
                                         <div>
@@ -592,6 +661,7 @@ function RoomManage() {
                                                 defaultValue={Room?.kindOfRoom?.hourlyPrice || ''}
                                                 className="w-64 p-1 rounded"
                                                 placeholder=""
+                                                disabled={true}
                                             />
                                         </div>
                                     </div>
@@ -745,7 +815,7 @@ function RoomManage() {
                                                                 </button>
                                                                 <button
                                                                     type="button"
-                                                                    onClick={() => {}}
+                                                                    onClick={() => { }}
                                                                     className="py-2 px-2 text-sm font-medium text-center text-white bg-red-700 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
                                                                 >
                                                                     <span className="mx-2">Xóa</span>
@@ -792,9 +862,9 @@ function RoomManage() {
 
                                         <div className="flex items-center mb-4">
                                             <input
-                                                value={'1'}
+                                                value='1'
                                                 checked={Room.status === 1}
-                                                onChange={(e) => setRoom({ ...Room, status: e.target.value })}
+                                                onChange={(e) => setRoom({ ...Room, status: parseInt(e.target.value) })}
                                                 id="disabled-radio-1"
                                                 type="radio"
                                                 name="disabled-radio"
@@ -809,9 +879,9 @@ function RoomManage() {
                                         </div>
                                         <div className="flex items-center">
                                             <input
-                                                value={'0'}
+                                                value='0'
                                                 checked={Room.status === 0}
-                                                onChange={(e) => setRoom({ ...Room, status: e.target.value })}
+                                                onChange={(e) => setRoom({ ...Room, status: parseInt(e.target.value) })}
                                                 id="disabled-radio-2"
                                                 type="radio"
                                                 name="disabled-radio"
@@ -833,42 +903,34 @@ function RoomManage() {
                                         >
                                             Ảnh :
                                         </label>
-                                        <div className="flex justify-center items-center w-full mt-8">
-                                            <label
-                                                htmlFor="dropzone-file"
-                                                className="flex flex-col justify-center items-center w-full h-64 bg-gray-50 rounded-lg border-2 border-gray-300 border-dashed cursor-pointer dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
-                                            >
-                                                <div className="flex flex-col justify-center items-center pt-5 pb-6">
-                                                    <svg
-                                                        aria-hidden="true"
-                                                        className="mb-3 w-10 h-10 text-gray-400"
-                                                        fill="none"
-                                                        stroke="currentColor"
-                                                        viewBox="0 0 24 24"
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                    >
-                                                        <path
-                                                            strokeLinecap="round"
-                                                            strokeLinejoin="round"
-                                                            strokeWidth="2"
-                                                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                                                        ></path>
-                                                    </svg>
-                                                    <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                                                        <span className="font-semibold">Click to upload</span> or drag
-                                                        and drop
-                                                    </p>
-                                                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                                                        SVG, PNG, JPG or GIF (MAX. 800x400px)
-                                                    </p>
+                                        <div className="col-span-4 mt-4">
+                                            <div id="fileUpload">
+                                                <div className="mb-2 block">
+                                                    <Label htmlFor="file" value="Upload file" />
                                                 </div>
-                                                <input
-                                                    id="dropzone-file"
-                                                    type="file"
-                                                    className="hidden"
+                                                <FileInput
+                                                    id="file"
                                                     onChange={(e) => setImage(e.target.files[0])}
                                                 />
-                                            </label>
+                                            </div>
+                                            <div className="mt-4" id="fileUpload">
+                                                <FileInput
+                                                    id="file"
+                                                    onChange={(e) => setImage1(e.target.files[0])}
+                                                />
+                                            </div>
+                                            <div className="mt-4" id="fileUpload">
+                                                <FileInput
+                                                    id="file"
+                                                    onChange={(e) => setImage2(e.target.files[0])}
+                                                />
+                                            </div>
+                                            <div className="mt-4" id="fileUpload">
+                                                <FileInput
+                                                    id="file"
+                                                    onChange={(e) => setImage3(e.target.files[0])}
+                                                />
+                                            </div>
                                         </div>
                                     </div>
 
@@ -937,19 +999,15 @@ function RoomManage() {
                                                     {fs.name}
                                                 </td>
                                                 <td className="py-4 px-6 ">
-                                                    <label
-                                                        htmlFor=""
-                                                        className="rounded-full dark:text-gpy-2 px-3 text-sm font-medium text-white bg-lime-500"
-                                                    ></label>
+                                                    {fs.status === 1 ? 'Hoạt động' : 'Không tồn tại'}
                                                 </td>
                                                 <td className="py-4 px-6">
                                                     <button
-                                                        value={fs}
                                                         type="button"
                                                         onClick={() => {
                                                             addFacilitieDetails(fs);
                                                         }}
-                                                        className="py-2 px-3 text-sm font-medium text-center text-white bg-lime-500 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                                                        className="py-2 px-3 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                                                     >
                                                         <span className="mx-2">Add</span>
                                                     </button>
@@ -1011,19 +1069,15 @@ function RoomManage() {
                                                     {s.prices}
                                                 </td>
                                                 <td className="py-4 px-6 ">
-                                                    <label
-                                                        htmlFor=""
-                                                        className="rounded-full dark:text-gpy-2 px-3 text-sm font-medium text-white bg-lime-500"
-                                                    ></label>
+                                                    {s.status === 1 ? 'Hoạt động' : 'Không tồn tại'}
                                                 </td>
                                                 <td className="py-4 px-6">
                                                     <button
-                                                        value={s}
                                                         type="button"
                                                         onClick={() => {
-                                                            addServiceAvailable(s.id, s.name, 1);
+                                                            addServiceAvailable(s, 1, s.prices);
                                                         }}
-                                                        className="py-2 px-3 text-sm font-medium text-center text-white bg-lime-500 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                                                        className="py-2 px-3 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                                                     >
                                                         <span className="mx-2">Add</span>
                                                     </button>
