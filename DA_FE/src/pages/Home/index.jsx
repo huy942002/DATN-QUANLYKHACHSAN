@@ -2,10 +2,11 @@ import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { useState, useEffect } from 'react';
-import { Button, Carousel, DatePicker, Divider, Select } from 'antd';
+import { Button, Carousel, DatePicker, Divider, Select, Spin } from 'antd';
 import dayjs from 'dayjs';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import Loading from '../Loading/loading';
 
 
 const contentStyle = {
@@ -38,13 +39,17 @@ function Home() {
     const [openOption, setOpenOption] = useState(false);
     const [timeInOut, setTimeInOut] = useState();
     const navigate = new useNavigate();
-
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(
         () => {
-           genCheckOutDay(hireDate, day);
-           getAllKindOfRoom();
-           getTimeInOut();
+            setIsLoading(true);
+            genCheckOutDay(hireDate, day);
+            getAllKindOfRoom();
+            getTimeInOut();
+            setTimeout(() => {
+                setIsLoading(false)
+            }, 500);
         }, []
     )
 
@@ -97,7 +102,8 @@ function Home() {
     };
 
     return (
-        <>
+        <>  
+            {isLoading && (<Loading></Loading>)}
             <div 
                 className='w-full'
                 // style={{boxShadow: '#1b1b1b 0px 1px 3px 0px'}}
@@ -133,7 +139,7 @@ function Home() {
                 </Carousel>
             </div>
 
-            <div className='py-5 text-base absolute top-[330px] right-[440px] left-[440px]'>
+            <div className='py-5 text-base absolute top-[330px] right-[280px] left-[280px]'>
                 <div
                     className='rounded-lg p-6 grid grid-cols-3 gap-12 shadow-lg bg-white'
                     // style={{boxShadow: '#1b1b1b 0px 1px 3px 0px'}}
@@ -342,7 +348,7 @@ function Home() {
                 </div>
             </div>
 
-            <div className='py-5 pt-[280px] px-[440px] text-base'>
+            <div className='py-5 pt-[280px] px-[280px] text-base'>
                 <div className='font-bold text-xl'>
                     Các loại phòng
                 </div>
@@ -391,7 +397,7 @@ function Home() {
                 </div>
             </div>
 
-            <div className='py-5 px-[440px]'>
+            <div className='py-5 px-[280px]'>
                 <Divider></Divider>
                 <div className='grid grid-cols-12'>
                     <div className='col-span-7 pr-10 flex items-center'>
@@ -410,7 +416,7 @@ function Home() {
                 </div>
             </div>
 
-            <div className='py-5 px-[440px]'>
+            <div className='py-5 px-[280px]'>
                 <Divider></Divider>
                 <div className='font-bold text-xl w-full flex justify-center items-center'>
                     Tại sao lên sử dụng dịch vụ của chúng tôi?
@@ -463,7 +469,7 @@ function Home() {
                 </div>
             </div>
 
-            <div className='py-5 px-[440px]'>
+            <div className='py-5 px-[280px]'>
                 <Divider></Divider>
                 <div className='grid grid-cols-12'>
                     <div className='col-span-4 pr-10 flex items-center'>
@@ -491,7 +497,7 @@ function Home() {
                 </div>
             </div>
             
-            <div className='py-5 pb-10 px-[440px]'>
+            <div className='py-5 pb-10 px-[280px]'>
                 <Divider></Divider>
                 <div className='w-full flex justify-center items-center'>
                     <div className='text-lg font-bold'>

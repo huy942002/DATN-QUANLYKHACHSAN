@@ -3,6 +3,7 @@ import { Breadcrumb, Button, Layout, Menu, theme } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { BsFacebook, BsInstagram, BsYoutube, BsTwitter } from "react-icons/bs";
 import { faUser, faTag, faCircleQuestion, faPhone, faHandshake } from '@fortawesome/free-solid-svg-icons';
+import { useNavigate } from 'react-router-dom';
 const { Header, Content, Footer } = Layout;
 
 const CustomerLayout = ({children}) => {
@@ -10,6 +11,8 @@ const CustomerLayout = ({children}) => {
     const {
         token: { colorBgContainer },
     } = theme.useToken();
+
+    const navigate = new useNavigate();
 
     return (
         <Layout style={{ minHeight: '100vh' }}>
@@ -19,12 +22,19 @@ const CustomerLayout = ({children}) => {
                     top: 0,
                     zIndex: 1,
                     width: '100%',
-                    padding: '0 360px',
+                    padding: '0 144px',
                 }}
-                className="flex items-center"
+                className="flex items-center text-base"
             >
-                <div className='font-bold text-4xl text-white'>POLYTEL</div>
-                <div className=' w-full flex items-center justify-end text-white text-base font-normal'>
+                <div
+                    className='font-bold text-3xl text-white cursor-pointer hover:text-design-greenLight'
+                    onClick={
+                        () => navigate("/")
+                    }
+                >
+                    POLYTEL
+                </div>
+                <div className=' w-full flex items-center justify-end text-white'>
                     <div className='mr-4'>
                         <FontAwesomeIcon className='mr-2' icon={faTag} />
                         Khuyến mãi
@@ -47,31 +57,17 @@ const CustomerLayout = ({children}) => {
                         </span>
                         Đăng nhập
                     </div>
-                    <Button className='text-base font-semibold' type="primary">Đăng ký</Button>
+                    <Button className='text-base h-auto' type="primary">Đăng ký</Button>
                 </div>
             </Header>
             <Content
                 className="site-layout"
-                style={{
-                // padding: '20px 440px 20px 440px',
-                }}
             >
-                {/* <Breadcrumb
-                style={{
-                    margin: '16px 0',
-                }}
-                >
-                <Breadcrumb.Item>Home</Breadcrumb.Item>
-                <Breadcrumb.Item>List</Breadcrumb.Item>
-                <Breadcrumb.Item>App</Breadcrumb.Item>
-                </Breadcrumb> */}
                 <div
                     style={{
-                        // padding: 24,
                         minHeight: "100hv",
-                        // background: colorBgContainer,
                     }}
-                    // className="bg-white"
+                    className="bg-white"
                 >
                     {children}
                 </div>
@@ -81,13 +77,15 @@ const CustomerLayout = ({children}) => {
                     padding: 0,
                 }}
             >
-                <div className='py-10 px-[440px] bg-design-charcoalblack'>
+                <div className='py-5 px-[280px] bg-design-charcoalblack text-base'>
                     <div className='grid grid-cols-4 gap-12'>
                         <div>
-                            <div className='font-bold text-4xl text-white'>POLYTEL</div>
+                            <div className='font-bold text-3xl text-white'>
+                                POLYTEL
+                            </div>
                         </div>
-                        <div className='text-gray-500 font-semibold text-base'>
-                            <div className='font-bold text-lg text-white'>
+                        <div className='text-gray-500 text-base'>
+                            <div className='font-semibold text-lg text-white'>
                                 Về Polytel
                             </div>
                             <div className='mt-2'>
@@ -103,7 +101,7 @@ const CustomerLayout = ({children}) => {
                                 Tuyển dụng
                             </div>
 
-                            <div className='font-bold text-lg text-white mt-6'>
+                            <div className='font-semibold text-lg text-white mt-6'>
                                 Theo dõi chúng tôi
                             </div>
                             <div className='mt-2 flex items-center'>
@@ -119,8 +117,8 @@ const CustomerLayout = ({children}) => {
                                 <BsYoutube className='mr-2'></BsYoutube> Youtube
                             </div>
                         </div>
-                        <div className='text-gray-500 font-semibold text-base'>
-                            <div className='font-bold text-lg text-white'>
+                        <div className='text-gray-500'>
+                            <div className='font-semibold text-lg text-white'>
                                 Sản phẩm
                             </div>
                             <div className='mt-2'>
@@ -130,9 +128,9 @@ const CustomerLayout = ({children}) => {
                                 Khách sạn
                             </div>
                         </div>
-                        <div className='text-gray-500 font-semibold text-base'>
-                            <div className='font-bold text-lg text-white'>
-                                Khách
+                        <div className='text-gray-500'>
+                            <div className='font-semibold text-lg text-white'>
+                                Khác
                             </div>
                             <div className='mt-2'>
                                 Chính sách quyền riêng tư

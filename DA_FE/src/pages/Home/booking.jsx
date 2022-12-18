@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
 import { Button, DatePicker, Divider, Input, Select } from "antd";
 import { UserOutlined } from "@ant-design/icons";
+import Loading from "../Loading/loading";
 
 const Booking = () => {
 
@@ -40,6 +41,7 @@ const Booking = () => {
         paymentStatus: 1,
         status: 1,
     });
+    const [isLoading, setIsLoading] = useState(false);
 
     const getAllKindOfRoom = async () => {
         await axios.get('http://localhost:8080/api/kind-of-room')
@@ -104,8 +106,15 @@ const Booking = () => {
 
     useEffect(
         () => {
+            setIsLoading(true);
+            window.scrollTo(0, 0);
             getAllKindOfRoom();
             getTimeInOut();
+            setTimeout(
+                () => {
+                    setIsLoading(false);
+                }, 500
+            );
         }, []
     )
 
@@ -129,7 +138,8 @@ const Booking = () => {
 
     return (
         <>
-            <div className="py-10 px-[440px] text-base">
+            {isLoading && (<Loading></Loading>)}
+            <div className="py-10 px-[280px] text-base">
                 <div className='font-bold text-xl'>
                     Đặt phòng khách sạn
                 </div>
@@ -138,7 +148,7 @@ const Booking = () => {
                 </div>
                 <div className="grid grid-cols-12 gap-6 mt-3">
                     <div className="col-span-8">
-                        <div className='rounded-lg p-3 grid grid-cols-3 gap-12 shadow-md bg-white'>
+                        <div className='rounded-lg p-3 grid grid-cols-3 gap-6 shadow-md bg-white'>
                             <div>
                                 <div className='font-medium'>
                                     Nhận phòng:
@@ -496,7 +506,7 @@ const Booking = () => {
                             <Button
                                 size="large"
                                 type="primary"
-                                className="w-full font-bold text-xl"
+                                className="w-full h-auto text-xl"
                                 onClick={
                                     () => {
                                         comfirmBooking();
