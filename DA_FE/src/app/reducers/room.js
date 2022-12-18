@@ -39,7 +39,7 @@ const slice = createSlice({
         loading: false,
     },
     extraReducers: (builder) => {
-        // getAllPersonnel
+
         builder.addCase(getAllRoom.pending, (state) => {
             state.loading = true;
         });
@@ -79,7 +79,7 @@ const slice = createSlice({
                     item.id === action.payload.id ? action.payload : item,
                 );
             }
-            // state.rooms = state.rooms.filter((x) => x.status === 1);
+            state.rooms = state.rooms.filter((x) => x.status === 1);
         });
         builder.addCase(UpdateRoom.rejected, (state, action) => {
             state.loading = false;

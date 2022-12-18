@@ -64,6 +64,10 @@ function CreateRoomManager() {
     const [image1, setImage1] = useState('');
     const [image2, setImage2] = useState('');
     const [image3, setImage3] = useState('');
+    const [url, setUrl] = useState('');
+    const [url1, setUrl1] = useState('');
+    const [url2, setUrl2] = useState('');
+    const [url3, setUrl3] = useState('');
 
     const [Err2, setErr2] = useState('');
     const [Err3, setErr3] = useState('');
@@ -282,7 +286,43 @@ function CreateRoomManager() {
             })
                 .then((resp) => resp.json())
                 .then((data) => {
-                    handleAdd(data2, data.url);
+                    const data1 = new FormData();
+                    data1.append('file', image1);
+                    data1.append('upload_preset', 'datnqlks');
+                    data1.append('cloud_name', 'dbjvfbdix');
+                    fetch('https://api.cloudinary.com/v1_1/dbjvfbdix/image/upload', {
+                        method: 'post',
+                        body: data1,
+                    })
+                        .then((resp) => resp.json())
+                        .then((data11) => {
+                            const data2 = new FormData();
+                            data2.append('file', image2);
+                            data2.append('upload_preset', 'datnqlks');
+                            data2.append('cloud_name', 'dbjvfbdix');
+                            fetch('https://api.cloudinary.com/v1_1/dbjvfbdix/image/upload', {
+                                method: 'post',
+                                body: data2,
+                            })
+                                .then((resp) => resp.json())
+                                .then((data21) => {
+                                    const data3 = new FormData();
+                                    data3.append('file', image3);
+                                    data3.append('upload_preset', 'datnqlks');
+                                    data3.append('cloud_name', 'dbjvfbdix');
+                                    fetch('https://api.cloudinary.com/v1_1/dbjvfbdix/image/upload', {
+                                        method: 'post',
+                                        body: data3,
+                                    })
+                                        .then((resp) => resp.json())
+                                        .then((data31) => {
+                                            handleAdd(data2,data.url,data11.url,data21.url,data31.url);
+                                        })
+                                        .catch((err3) => console.log(err3));
+                                })
+                                .catch((err2) => console.log(err2));
+                        })
+                        .catch((err1) => console.log(err1));
                 })
                 .catch((err) => console.log(err));
         }
@@ -300,16 +340,16 @@ function CreateRoomManager() {
         setFacilitieDetails(FacilitieDetails);
     }, [FacilitieDetails]);
 
-    const handleAdd = async (data, url2) => {
+    const handleAdd = async (data,url,url1,url2,url3) => {
         setRoomAdd(data);
         if (roomAdd.kindOfRoom.id === '') {
-            setRoomAdd({ ...roomAdd, kindOfRoom: KindOfRoom[0], img: url2, status: 1 });
+            setRoomAdd({ ...roomAdd, kindOfRoom: KindOfRoom[0], img: url, img1: url1, img2: url2, img3: url3, status: 1 });
         } else if (roomAdd.numberOfFloors.id === '') {
-            setRoomAdd({ ...roomAdd, numberOfFloors: NumberOfFloors[0], img: url2, status: 1 });
+            setRoomAdd({ ...roomAdd, numberOfFloors: NumberOfFloors[0], img: url, img1: url1, img2: url2, img3: url3, status: 1 });
         } else if (roomAdd.note === '') {
-            setRoomAdd({ ...roomAdd, note: '', img: url2, status: 1 });
+            setRoomAdd({ ...roomAdd, note: '', img: url, img1: url1, img2: url2, img3: url3, status: 1 });
         } else {
-            setRoomAdd({ ...roomAdd, img: url2, status: 1 });
+            setRoomAdd({ ...roomAdd, img: url, img1: url1, img2: url2, img3: url3, status: 1 });
         }
 
         const response = await axios

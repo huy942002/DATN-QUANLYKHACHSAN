@@ -9,8 +9,7 @@ import java.util.Optional;
 
 import com.fpoly.dto.RoomManageDTO;
 import com.fpoly.entities.*;
-import com.fpoly.repositories.repo.FacilityDetailRepository;
-import com.fpoly.repositories.repo.ServiceAvailableRepository;
+import com.fpoly.repositories.repo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,8 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fpoly.repositories.irepo.INumberOfFloorService;
 import com.fpoly.repositories.irepo.IRoomService;
-import com.fpoly.repositories.repo.NumberOfFloorRepository;
-import com.fpoly.repositories.repo.RoomRepository;
 
 /**
  *
@@ -55,6 +52,9 @@ public class RoomController {
 	@Autowired
 	ServiceAvailableRepository serviceAvailableRepository;
 
+	@Autowired
+	DetailInvoiceRepository detailInvoiceRepository;
+
 	// getAll
 	@GetMapping
 	public ResponseEntity<Iterable<Rooms>> getAllRoom() {
@@ -67,10 +67,10 @@ public class RoomController {
 		Rooms r = new Rooms();
 		r.setKindOfRoom(room.getRooms().getKindOfRoom());
 		r.setNote(room.getRooms().getNote());
-		r.setImg("https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg");
-		r.setImg1("https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg");
-		r.setImg2("https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg");
-		r.setImg3("https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg");
+		r.setImg(room.getRooms().getImg());
+		r.setImg1(room.getRooms().getImg1());
+		r.setImg2(room.getRooms().getImg2());
+		r.setImg3(room.getRooms().getImg3());
 		r.setStatus(1);
 		r.setName(room.getRooms().getName());
 		r.setNumberOfFloors(room.getRooms().getNumberOfFloors());
@@ -119,10 +119,10 @@ public class RoomController {
 			Rooms r = new Rooms();
 				r.setKindOfRoom(room.getRooms().getKindOfRoom());
 				r.setNote(room.getRooms().getNote());
-				r.setImg("https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg");
-				r.setImg1("https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg");
-				r.setImg2("https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg");
-				r.setImg3("https://res.cloudinary.com/dwbx0ov8v/image/upload/v1669303613/can_ho_dich_vu_trksik.jpg");
+				r.setImg(room.getRooms().getImg());
+				r.setImg1(room.getRooms().getImg1());
+				r.setImg2(room.getRooms().getImg2());
+				r.setImg3(room.getRooms().getImg3());
 				r.setStatus(1);
 				r.setName(room.getRooms().getName() + n.get(n.size() - 1).getNumberOfFloors() + "0" + i);
 				r.setNumberOfFloors(n.get(n.size() - 1));
@@ -175,6 +175,16 @@ public class RoomController {
 		Optional<Rooms> roomOptional = repository.findById(id);
 		return roomOptional.map(room -> new ResponseEntity<>(room, HttpStatus.OK))
 				.orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+	}
+
+	@GetMapping("/status/{id}")
+	public ResponseEntity<Rooms> getRoomUdatestatus(@PathVariable Integer id) {
+		List<DetailsInvoice> list = detailInvoiceRepository.getAllDetailInvoiceByRoomAndStatus(id);
+		if (list.size()>0){
+			return new ResponseEntity<>(HttpStatus.OK);
+		}else{
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 	}
 
 	// update

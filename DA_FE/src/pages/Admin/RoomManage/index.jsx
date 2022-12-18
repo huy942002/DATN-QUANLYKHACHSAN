@@ -18,6 +18,8 @@ import { Button, Modal, Label, FileInput } from 'flowbite-react';
 import { getByRoomId, fddeleteById, add } from '~/app/reducers/facilityDetail';
 import { getAllService } from '~/app/reducers/service';
 
+import axios from 'axios';
+
 const objRoom = {
     id: '',
     name: '',
@@ -123,6 +125,7 @@ function RoomManage() {
     const [visibleAdd, setVisibleAdd] = useState(false);
     const [visibleUpdate, setVisibleUpdate] = useState(false);
     const [visibleDelete, setVisibleDelete] = useState(false);
+    const [visibleRestore, setVisibleRestore] = useState(false);
     const [Room, setRoom] = useState(objRoom);
     const rooms = useSelector((state) => state.room.rooms);
     const room = useSelector((state) => state.room.room);
@@ -138,13 +141,13 @@ function RoomManage() {
     const [idcheck, setId] = useState(-1);
     const [valueSearch, setValueSearch] = useState('2');
     const [valueSearch1, setValueSearch1] = useState('');
+    const [valueSearch2, setValueSearch2] = useState('1');
     const ServiceAva = useSelector((state) => state.serviceAvailable.ServiceAvailables);
     const [image, setImage] = useState('');
     const [image1, setImage1] = useState('');
     const [image2, setImage2] = useState('');
     const [image3, setImage3] = useState('');
     const [Err2, setErr2] = useState('');
-    const [Err3, setErr3] = useState('');
 
     const dispatch = useDispatch();
 
@@ -168,7 +171,6 @@ function RoomManage() {
 
     function handleFormValidation(NameRoom) {
         setErr2('');
-        setErr3('');
         let formIsValid = true;
         if (!NameRoom) {
             formIsValid = false;
@@ -206,6 +208,21 @@ function RoomManage() {
         dispatch(getByRoomId(room.id));
     };
 
+    const checkRoom = async (id) => {
+        dispatch(getRoomById(id));
+        dispatch(getByRoomId(id));
+        dispatch(getByRoomIdSv(id));
+        setId(id);
+        const response = await axios
+            .get('http://localhost:8080/api/room/status/' + id)
+            .then((res) => {
+                toast.error('Phòng đang được sử dụng không được xóa!', { autoClose: 2000 });
+            })
+            .catch((err) => {
+                setVisibleDelete(true);
+            })
+    };
+
     const addFacilitieDetails = (data) => {
         let i = 0;
         if (FacilityDetail.length > 0) {
@@ -239,11 +256,14 @@ function RoomManage() {
     }
 
     function getIdDelete(id) {
+        checkRoom(id);
+    }
+    function getIdRestore(id) {
         dispatch(getRoomById(id));
         dispatch(getByRoomId(id));
         dispatch(getByRoomIdSv(id));
         setId(id);
-        setVisibleDelete(true);
+        setVisibleRestore(true);
     }
 
     function deleteItem(id) {
@@ -259,6 +279,13 @@ function RoomManage() {
 
     function getModal() {
         setVisibleAdd(true);
+    }
+
+    function getAll() {
+        setValueSearch('')
+        setValueSearch1('')
+        setValueSearch2('')
+        dispatch(getAllRoom());
     }
 
     function getModal2() {
@@ -279,7 +306,47 @@ function RoomManage() {
             })
                 .then((resp) => resp.json())
                 .then((data) => {
-                    handleUpdate(data1, data.url);
+                    console.log(data.url);
+                    const data1 = new FormData();
+                    data1.append('file', image1);
+                    data1.append('upload_preset', 'datnqlks');
+                    data1.append('cloud_name', 'dbjvfbdix');
+                    fetch('https://api.cloudinary.com/v1_1/dbjvfbdix/image/upload', {
+                        method: 'post',
+                        body: data1,
+                    })
+                        .then((resp) => resp.json())
+                        .then((data11) => {
+                            console.log(data11.url);
+                            const data2 = new FormData();
+                            data2.append('file', image2);
+                            data2.append('upload_preset', 'datnqlks');
+                            data2.append('cloud_name', 'dbjvfbdix');
+                            fetch('https://api.cloudinary.com/v1_1/dbjvfbdix/image/upload', {
+                                method: 'post',
+                                body: data2,
+                            })
+                                .then((resp) => resp.json())
+                                .then((data21) => {
+                                    console.log(data21.url);
+                                    const data3 = new FormData();
+                                    data3.append('file', image3);
+                                    data3.append('upload_preset', 'datnqlks');
+                                    data3.append('cloud_name', 'dbjvfbdix');
+                                    fetch('https://api.cloudinary.com/v1_1/dbjvfbdix/image/upload', {
+                                        method: 'post',
+                                        body: data3,
+                                    })
+                                        .then((resp) => resp.json())
+                                        .then((data31) => {
+                                            console.log(data21.url);
+                                            handleUpdate(data1, data.url, data11.url, data21.url, data31.url);
+                                        })
+                                        .catch((err3) => console.log(err3));
+                                })
+                                .catch((err2) => console.log(err2));
+                        })
+                        .catch((err1) => console.log(err1));
                 })
                 .catch((err) => console.log(err));
         }
@@ -289,19 +356,29 @@ function RoomManage() {
         if (currentUser?.users.roles.some((x) => x.name === 'Quản lý')) {
             dispatch(UpdateRoom({ ...Room, status: 0 }));
             toast.success('Xóa phòng thành công', { autoClose: 2000 });
-            dispatch(getAllRoom());
         } else {
             toast.error('Không có quyền xóa', { autoClose: 2000 });
         }
         setVisibleDelete(false);
     }
+    function handleRestore() {
+        if (currentUser?.users.roles.some((x) => x.name === 'Quản lý')) {
+            dispatch(UpdateRoom({ ...Room, status: 1 }));
+            toast.success('Khôi phục phòng thành công', { autoClose: 2000 });
+        } else {
+            toast.error('Không có quyền khôi phục', { autoClose: 2000 });
+        }
+        setVisibleRestore(false);
+    }
 
-    function handleUpdate(data, url) {
+    function handleUpdate(data, url, url1, url2, url3) {
         setRoom(data);
-        dispatch(UpdateRoom({ ...Room, img: url }));
+        dispatch(UpdateRoom({ ...Room, img: url, img1: url1, img2: url2, img3: url3 }));
         toast.success('Cập nhật thành công', { autoClose: 2000 });
         setVisibleUpdate(false);
     }
+
+
 
     return (
         <div className="text-black pt-6 px-1 pb-5">
@@ -325,7 +402,29 @@ function RoomManage() {
             </nav>
 
             <div className="grid mt-2  rounded-full text-white">
-                <div className="grid grid-cols-3 gap-3 mt-6 ml-8 text-black">
+                <div className="grid grid-cols-4 gap-4 mt-6 ml-8 text-black">
+
+                    <div className="">
+                        <label
+                            htmlFor=""
+                            className="mb-2 mt-8 mr-9 text-gray-900 dark:text-gray-300 font-bold"
+                        >
+                            Hiển thị tất cả
+                        </label>
+                        <div>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    getAll()
+                                }}
+                                className=" mt-3 py-3 px-12 text-sm font-medium text-center text-white bg-blue-500 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                            >
+                                <span className="mx-2">All</span>
+                            </button>
+                        </div>
+
+                    </div>
+
                     <div>
                         <span className="font-bold">Tầng :</span>
                         <select
@@ -369,6 +468,7 @@ function RoomManage() {
                             ))}
                         </select>
                     </div>
+
                     <div className="grid justify-items-end">
                         <span className="font-bold"></span>
                         <div>
@@ -441,6 +541,9 @@ function RoomManage() {
                                 .filter((x) =>
                                     (x.numberOfFloors.numberOfFloors + '').toLowerCase().includes(valueSearch),
                                 )
+                                .filter((x) =>
+                                    (x.status + '').toLowerCase().includes(valueSearch2),
+                                )
                                 .map((x) => (
                                     <tr
                                         key={x.id}
@@ -466,10 +569,10 @@ function RoomManage() {
                                         <td className="py-4 px-6">{x.kindOfRoom.hourlyPrice}</td>
                                         <td className="py-4 px-6 ">
                                             <p className="py-4 px-6">
-                                                {x.status === 1 ? 'Hoạt động' : 'Không tồn tại'}
+                                                {x.status === 1 ? 'Hoạt động' : 'Không hoạt đông'}
                                             </p>
                                         </td>
-                                        <td className="py-4 px-6 ">
+                                        {x.status === 1 ? <td className="py-4 px-6 ">
                                             <button
                                                 type="button"
                                                 onClick={() => {
@@ -479,9 +582,10 @@ function RoomManage() {
                                             >
                                                 <span className="mx-2">Sửa</span>
                                             </button>
-                                        </td>
+                                        </td> : ''}
+
                                         <td className="py-4 px-6 ">
-                                            <button
+                                            {x.status >= 1 ? <button
                                                 type="button"
                                                 onClick={() => {
                                                     getIdDelete(x.id);
@@ -489,7 +593,17 @@ function RoomManage() {
                                                 className="py-2 px-2 text-sm font-medium text-center text-white bg-red-700 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
                                             >
                                                 <span className="mx-2">Xóa</span>
-                                            </button>
+                                            </button> :
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        getIdRestore(x.id);
+                                                    }}
+                                                    className="py-2 px-2 text-sm font-medium text-center text-white bg-red-700 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
+                                                >
+                                                    <span className="mx-2">Khôi phục</span>
+                                                </button>}
+
                                         </td>
                                     </tr>
                                 ))}
@@ -519,6 +633,31 @@ function RoomManage() {
                             </div>
                         </Modal.Body>
                     </Modal>
+
+                    <Modal show={visibleRestore} size="md" popup={true} onClose={() => setVisibleRestore(false)}>
+                        <Modal.Header />
+                        <Modal.Body>
+                            <div className="text-center">
+                                <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+                                    Xác nhận khôi phục phòng ?
+                                </h3>
+                                <div className="flex justify-center gap-4">
+                                    <Button
+                                        color="failure"
+                                        onClick={() => {
+                                            handleRestore();
+                                        }}
+                                    >
+                                        Đồng ý
+                                    </Button>
+                                    <Button color="gray" onClick={() => setVisibleDelete(false)}>
+                                        Không, đóng
+                                    </Button>
+                                </div>
+                            </div>
+                        </Modal.Body>
+                    </Modal>
+
                     {/* Modal update */}
                     <Modal
                         show={visibleUpdate}
@@ -797,7 +936,7 @@ function RoomManage() {
                                                                 scope="row"
                                                                 className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white"
                                                             >
-                                                                {s.servicess.name}
+                                                                {s.servicess?.name}
                                                             </td>
                                                             <td
                                                                 scope="row"
@@ -828,7 +967,7 @@ function RoomManage() {
                                                                 </button>
                                                                 <button
                                                                     type="button"
-                                                                    onClick={() => {}}
+                                                                    onClick={() => { }}
                                                                     className="py-2 px-2 text-sm font-medium text-center text-white bg-red-700 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
                                                                 >
                                                                     <span className="mx-2">Xóa</span>
@@ -863,50 +1002,6 @@ function RoomManage() {
                                             </svg>
                                             Add
                                         </button>
-                                    </div>
-
-                                    <div className="mt-8">
-                                        <label
-                                            htmlFor=""
-                                            className="mb-2 mt-8 mr-9 text-gray-900 dark:text-gray-300 font-bold"
-                                        >
-                                            Trạng Thái :
-                                        </label>
-
-                                        <div className="flex items-center mb-4">
-                                            <input
-                                                value="1"
-                                                checked={Room.status === 1}
-                                                onChange={(e) => setRoom({ ...Room, status: parseInt(e.target.value) })}
-                                                id="disabled-radio-1"
-                                                type="radio"
-                                                name="disabled-radio"
-                                                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                                            />
-                                            <label
-                                                htmlFor="disabled-radio-1"
-                                                className="ml-2 text-sm font-medium text-gray-400 dark:text-gray-500"
-                                            >
-                                                Hoạt Động
-                                            </label>
-                                        </div>
-                                        <div className="flex items-center">
-                                            <input
-                                                value="0"
-                                                checked={Room.status === 0}
-                                                onChange={(e) => setRoom({ ...Room, status: parseInt(e.target.value) })}
-                                                id="disabled-radio-2"
-                                                type="radio"
-                                                name="disabled-radio"
-                                                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                                            />
-                                            <label
-                                                htmlFor="disabled-radio-2"
-                                                className="ml-2 text-sm font-medium text-gray-400 dark:text-gray-500"
-                                            >
-                                                Không Hoạt Động
-                                            </label>
-                                        </div>
                                     </div>
 
                                     <div className="mt-8">

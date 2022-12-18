@@ -30,4 +30,5 @@ public interface DetailInvoiceRepository extends JpaRepository<DetailsInvoice, I
 
     @Query("select d from DetailsInvoice d where d.bills.id = :idBill")
     List<DetailsInvoice> getDetailInvoiceByIdBill(Integer idBill);
+
 }

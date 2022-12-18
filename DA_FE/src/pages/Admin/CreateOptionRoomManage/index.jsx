@@ -120,10 +120,6 @@ function CreateOptionRoomManager() {
     const [image1, setImage1] = useState('');
     const [image2, setImage2] = useState('');
     const [image3, setImage3] = useState('');
-    const [url, setUrl] = useState('');
-    const [url1, setUrl1] = useState('');
-    const [url2, setUrl2] = useState('');
-    const [url3, setUrl3] = useState('');
     const [Err, setErr] = useState('');
     const [Err2, setErr2] = useState('');
     const [Err3, setErr3] = useState('');
@@ -336,9 +332,6 @@ function CreateOptionRoomManager() {
             })
                 .then((resp) => resp.json())
                 .then((data) => {
-                    setUrl(data.url);
-                    console.log(data.url);
-                    console.log(data);
                     const data1 = new FormData();
                     data1.append('file', image1);
                     data1.append('upload_preset', 'datnqlks');
@@ -349,9 +342,6 @@ function CreateOptionRoomManager() {
                     })
                         .then((resp) => resp.json())
                         .then((data11) => {
-                            setUrl1(data11.url);
-                            console.log(url1);
-                            console.log(data11);
                             const data2 = new FormData();
                             data2.append('file', image2);
                             data2.append('upload_preset', 'datnqlks');
@@ -362,9 +352,6 @@ function CreateOptionRoomManager() {
                             })
                                 .then((resp) => resp.json())
                                 .then((data21) => {
-                                    setUrl2(data21.url);
-                                    console.log(url2);
-                                    console.log(data21);
                                     const data3 = new FormData();
                                     data3.append('file', image3);
                                     data3.append('upload_preset', 'datnqlks');
@@ -375,10 +362,7 @@ function CreateOptionRoomManager() {
                                     })
                                         .then((resp) => resp.json())
                                         .then((data31) => {
-                                            setUrl3(data31.url);
-                                            console.log(url3);
-                                            console.log(data31);
-                                            addRoom(dataRoom, datasl);
+                                            addRoom(dataRoom, datasl,data.url,data11.url,data21.url,data31.url);
                                         })
                                         .catch((err3) => console.log(err3));
                                 })
@@ -414,7 +398,7 @@ function CreateOptionRoomManager() {
     //     dispatch(getAllNumberOfFloors());
     // };
 
-    const addRoom = async (data, datasl) => {
+    const addRoom = async (data, datasl,url,url1,url2,url3) => {
         setRoomAdd(data);
         if (roomAdd.kindOfRoom.id === '') {
             // default no change gender and nationality
