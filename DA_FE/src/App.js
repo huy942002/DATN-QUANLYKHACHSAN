@@ -24,7 +24,15 @@ function App() {
                 <Routes>
                     {publicRoutes.map((route, index) => {
                         const Page = route.component;
-                        return <Route key={index} path={route.path} element={<Page />} />;
+                        let Layout = Fragment;
+                        if(route.layout) {
+                            Layout = route.layout;
+                        }
+                        return <Route key={index} path={route.path} element={
+                            <Layout>
+                                <Page />
+                            </Layout>
+                        } />;
                     })}
                     {privateRoutes.map((route, index) => {
                         const Page = route.component;

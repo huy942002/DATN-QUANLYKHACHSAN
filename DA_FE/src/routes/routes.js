@@ -25,20 +25,22 @@ import CreateRoomManage from '~/pages/Admin/CreateRoomManage';
 import CreateOptionRoomManage from '~/pages/Admin/CreateOptionRoomManage';
 import RoomPlan from '~/pages/Admin/RoomRentalManage/RoomPlan/room-plan';
 import RentalManage from '~/pages/Admin/RoomRentalManage/RentalManage/rental-manage';
-import Booking from '~/pages/Customer/Booking';
 import BookingManage from '~/pages/Admin/BookingManage';
 import ManageBooking from '~/pages/Admin/RoomRentalManage/Booking/ManageBooking/manageBooking';
+import CustomerLayout from './../layouts/CustomerVer2/customer-layout';
+import Booking from '~/pages/Home/booking';
 
 // Routes public
 
 const publicRoutes = [
-    { path: config.routes.home, component: Home, layout: null },
+    { path: config.routes.home, component: Home, layout: CustomerLayout },
     { path: config.routes.login, component: Login, layout: null },
     { path: config.routes.room, component: RoomDetail, layout: null },
     { path: config.routes.searchRoom, component: SearchRoom, layout: null },
     { path: config.routes.signup, component: Signup, layout: null },
     { path: config.routes.notfound, component: Notfound, layout: null },
-    { path: config.routes.booking, component: Booking, layout: null },
+    { path: config.routes.bookingData, component: Booking, layout: CustomerLayout },
+    { path: config.routes.bookingNoData, component: Booking, layout: CustomerLayout },
 ];
 
 const privateRoutes = [

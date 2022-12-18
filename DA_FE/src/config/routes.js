@@ -24,7 +24,8 @@ const routes = {
     kindOfRoom: '/admin/kind-of-room',
     rentalManageDetail: '/admin/rental-manage/:type/:idRoomChoose',
     rentalManageCheckIn: '/admin/rental-manage/:type/:idRoomChoose/:dateCheckIn/:dateCheckOut',
-    booking: '/booking',
+    bookingData: '/booking/:hireDate/:checkOutDay/:idKindOfRoom/:numberOfAdults/:numberOfKids/:quantityRoom/:quantityDay',
+    bookingNoData: '/booking/:idKindOfRoom',
     bookingmanage: '/admin/booking-manage',
     manageBooking: '/admin/manage-booking',
 };

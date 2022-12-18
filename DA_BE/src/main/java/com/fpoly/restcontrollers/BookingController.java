@@ -257,4 +257,10 @@ public class BookingController {
 
 		return new ResponseEntity<>("Success", HttpStatus.OK);
 	}
+
+	@Transactional
+	@PostMapping
+	public ResponseEntity<?> saveBooking(@RequestBody Booking booking) {
+		return new ResponseEntity<>(iBookingService.save(booking), HttpStatus.OK);
+	}
 }
