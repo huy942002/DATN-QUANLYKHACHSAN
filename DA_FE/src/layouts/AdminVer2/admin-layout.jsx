@@ -163,6 +163,12 @@ const AdminLayout = ({ children }) => {
                                     label: 'Hóa đơn',
                                     // onClick: () => setCollapsed(!collapsed),
                                 },
+                                {
+                                    key: '19',
+                                    // icon: <UploadOutlined />,
+                                    label: 'Quản lý cơ sở vật chất',
+                                    onClick: () => navigate('/admin/facility-manage'),
+                                },
                             ],
                         },
                         {
