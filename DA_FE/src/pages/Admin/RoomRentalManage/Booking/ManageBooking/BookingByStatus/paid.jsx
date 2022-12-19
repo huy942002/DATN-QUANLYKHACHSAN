@@ -170,7 +170,8 @@ function Paid() {
                 booking: {
                     ...dataBill.booking,
                     status: 2,
-                }
+                },
+                status : 1,
             },
             roomBookingList: roomBookingList.map(
                 (x) => ({
@@ -622,6 +623,7 @@ function Paid() {
                 pagination={false}
                 columns={columns}
                 dataSource={genListBookingPaidFilter()}
+                pagination
             />
         </>
     );

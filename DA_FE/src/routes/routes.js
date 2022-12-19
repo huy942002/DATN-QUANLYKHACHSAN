@@ -30,6 +30,8 @@ import ManageBooking from '~/pages/Admin/RoomRentalManage/Booking/ManageBooking/
 import CustomerLayout from './../layouts/CustomerVer2/customer-layout';
 import Booking from '~/pages/Home/booking';
 import Facilities from '~/pages/Admin/FacilityManage';
+import KindOfRoomManageVer2 from '~/pages/Admin/KindOfRoomManageVer2/kindOfRoomManage';
+import CreateKindOfRoom from '~/pages/Admin/KindOfRoomManageVer2/createKindOfRoom';
 
 // Routes public
 
@@ -66,6 +68,8 @@ const privateRoutes = [
     { path: config.routes.bookingmanage, component: BookingManage },
     { path: config.routes.manageBooking, component: ManageBooking },
     { path: config.routes.facilityManage, component: Facilities },
+    { path: config.routes.kindOfRoomVer2, component: KindOfRoomManageVer2 },
+    { path: config.routes.createKindOfRoom, component: CreateKindOfRoom },
 ];
 
 const privateRoutesDirect = [

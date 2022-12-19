@@ -67,7 +67,7 @@ const CustomerLayout = ({children}) => {
                     style={{
                         minHeight: "100hv",
                     }}
-                    className="bg-white"
+                    // className="bg-white"
                 >
                     {children}
                 </div>

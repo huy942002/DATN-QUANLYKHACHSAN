@@ -29,6 +29,8 @@ const routes = {
     bookingmanage: '/admin/booking-manage',
     manageBooking: '/admin/manage-booking',
     facilityManage: '/admin/facility-manage',
-    bookingSuccess: '/:idBooking'
+    bookingSuccess: '/:idBooking',
+    kindOfRoomVer2: '/admin/kind-of-room-ver2',
+    createKindOfRoom: '/admin/create-kind-of-room'
 };
 export default routes;

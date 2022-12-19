@@ -102,8 +102,8 @@ const RentalManage = () => {
             newDetailInvoice.facilitiesDetailsList = getRoomChoose().facilitiesDetailsList;
             newDetailInvoice.serviceAvailableList = getRoomChoose().serviceAvailableList;
             newDetailInvoice.key = getRoomChoose().rooms.id;
-            newDetailInvoice.hireDate = dayjs(dateCheckIn).format('YYYY-MM-DD') + " " + window.sessionStorage.getItem("time-in");
-            newDetailInvoice.checkOutDay = dayjs(dateCheckOut).format('YYYY-MM-DD') + " " + window.sessionStorage.getItem("time-out");
+            newDetailInvoice.hireDate = dayjs(dateCheckIn).format('YYYY-MM-DD') + " " + window.localStorage.getItem("time-in");
+            newDetailInvoice.checkOutDay = dayjs(dateCheckOut).format('YYYY-MM-DD') + " " + window.localStorage.getItem("time-out");
             newDetailInvoice.rentalTypes = rentalTypes[0];
             setDetailInvoices([...detailInvoices, newDetailInvoice]);
         }

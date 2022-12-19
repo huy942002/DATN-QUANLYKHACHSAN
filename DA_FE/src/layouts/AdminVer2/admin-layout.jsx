@@ -114,6 +114,12 @@ const AdminLayout = ({ children }) => {
                                     label: 'Quản lý booking',
                                     onClick: () => navigate('/admin/manage-booking'),
                                 },
+                                {
+                                    key: '20',
+                                    // icon: <UploadOutlined />,
+                                    label: 'Quản loại phòng Ver2',
+                                    onClick: () => navigate('/admin/kind-of-room-ver2'),
+                                },
                             ],
                         },
                         {

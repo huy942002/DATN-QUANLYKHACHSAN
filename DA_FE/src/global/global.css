@@ -17,6 +17,14 @@
 .ant-btn-primary {
     background-color: #00b96b;
 }
+.ant-switch {
+    background-color: #57606f;
+}
+.ant-upload-list-item-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
 /* .ehAzla:hover {
     cursor: pointer;

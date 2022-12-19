@@ -155,7 +155,7 @@ const Home = () => {
     };
 
     return (
-        <>  
+        <div className='bg-white'>  
             {isLoading && (<Loading content={idBooking ? "Đang check thanh toán!" : ""}></Loading>)}
             <ToastContainer></ToastContainer>
             <div 
@@ -566,7 +566,7 @@ const Home = () => {
                 </div>
             </div>
 
-        </>
+        </div>
     );
 }
 

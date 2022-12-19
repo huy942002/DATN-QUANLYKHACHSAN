@@ -54,4 +54,7 @@ public class KindOfRoom implements Serializable {
 	@JsonIgnore
 	private Set<Booking> booking;
 
+	@OneToMany(mappedBy = "kindOfRoom")
+	@JsonIgnore
+	private Set<ImageKindOfRoom> imageKindOfRooms;
 }

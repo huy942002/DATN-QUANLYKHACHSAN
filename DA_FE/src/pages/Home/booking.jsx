@@ -580,7 +580,7 @@ const Booking = () => {
                                     Phí phục vụ
                                 </div>
                                 <div className="flex justify-end items-center mt-3">
-                                    MIẾN PHÍ
+                                    MIỄN PHÍ
                                 </div>
                             </div>
                         </div>
