@@ -17,9 +17,11 @@ const objServiceType = {
     status: '',
 };
 
+const regexSpace = /^(\S+$)/;
+
 const ServiceTypeSchema = Yup.object().shape({
-    name: Yup.string().required('Loại dịch vụ không được để trống'),
-    note: Yup.string().required('Ghi chú không được để trống'),
+    name: Yup.string().matches(regexSpace, 'Không chỉ để khoảng trắng').required('Loại dịch vụ không được để trống'),
+    note: Yup.string().matches(regexSpace, 'Không chỉ để khoảng trắng').required('Ghi chú không được để trống'),
     status: Yup.string(),
 });
 

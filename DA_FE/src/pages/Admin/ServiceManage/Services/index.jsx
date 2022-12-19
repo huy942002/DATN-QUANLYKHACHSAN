@@ -20,10 +20,12 @@ const objService = {
     serviceType: '',
 };
 
+const regexSpace = /^(\S+$)/;
+
 const ServiceSchema = Yup.object().shape({
-    name: Yup.string().required('Dịch vụ không được để trống'),
+    name: Yup.string().matches(regexSpace, 'Không chỉ để khoảng trắng').required('Dịch vụ không được để trống'),
     prices: Yup.number().required('Giá không được để trống').positive().integer(),
-    note: Yup.string().required('Ghi chú không được để trống'),
+    note: Yup.string().matches(regexSpace, 'Không chỉ để khoảng trắng').required('Ghi chú không được để trống'),
     status: Yup.string(),
     serviceType: Yup.number().nullable(),
 });

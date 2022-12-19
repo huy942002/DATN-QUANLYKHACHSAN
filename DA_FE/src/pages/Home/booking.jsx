@@ -4,9 +4,11 @@ import axios from 'axios';
 import dayjs from "dayjs";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
-import { Button, DatePicker, Divider, Form, Input, Select } from "antd";
-import { UserOutlined } from "@ant-design/icons";
+import { Button, DatePicker, Divider, Form, Input, Modal, Radio, Select } from "antd";
+import { ExclamationCircleFilled, UserOutlined } from "@ant-design/icons";
 import Loading from "../Loading/loading";
+import { toast } from 'react-toastify';
+const { confirm } = Modal;
 
 const Booking = () => {
 
@@ -36,12 +38,15 @@ const Booking = () => {
         numberOfAdults: 1,
         numberOfKids: 0,
         quantityRoom: 1,
+        moneyToPay: 0,
         deposits: "",
         note: "",
         paymentStatus: 1,
+        bookingStatus: 1,
         status: 1,
     });
     const [isLoading, setIsLoading] = useState(false);
+    const [chooseOption, setChooseOption] = useState("PAY_NOW");
 
     const validateMessages = {
         required: 'Vui lòng nhập ${label}!',
@@ -89,10 +94,6 @@ const Booking = () => {
     };
     const [form] = Form.useForm();
 
-    const onFinish = (values) => {
-        console.log(values);
-    };
-
     const getAllKindOfRoom = async () => {
         await axios.get('http://localhost:8080/api/kind-of-room')
                 .then(res => {
@@ -112,7 +113,9 @@ const Booking = () => {
                         quantityRoom: quantityRoom ? quantityRoom : 1,
                         deposits: "",
                         note: "",
+                        moneyToPay: 0,
                         paymentStatus: 1,
+                        bookingStatus: 1,
                         status: 1,
                     })
                 }).catch(err => {});
@@ -173,34 +176,43 @@ const Booking = () => {
     };
 
     const comfirmBooking = async () => {
+        setIsLoading(true);
         const params = {
             ...booking,
-            deposits: ((booking.kindOfRoom.priceByDay * booking.quantityRoom) + (booking.kindOfRoom.priceByDay * booking.quantityRoom * 10 / 100) ) * day,
+            moneyToPay: ((booking.kindOfRoom.priceByDay * booking.quantityRoom) + (booking.kindOfRoom.priceByDay * booking.quantityRoom * 10 / 100) ) * day,
             paymentStatus: 1,
             status: 1,
         }
         await axios
             .post("http://localhost:8080/api/booking", params)
             .then((res) => {
-                const paramsBanking = {
-                    deposits: (booking.kindOfRoom.priceByDay * booking.quantityRoom * 10 / 100) + (booking.kindOfRoom.priceByDay * booking.quantityRoom),
-                    bankCode: "",
-                    billMobile: booking.customerPhoneNumber,
-                    billEmail: booking.customerEmail,
-                    billingFullName: booking.customerName,
-                    billAddress: "",
-                    billCity: "",
-                    billCountry: "",
-                    billState: "",
-                    idBooking: res.data.id
-                }
-                axios
-                .post("http://localhost:8080/api/payment", paramsBanking)
-                .then((res) => {
-                    if(res.data.code === "00") {
-                        window.location.replace(res.data.paymentUrl);
+                if(chooseOption === "PAY_NOW") {
+                    const paramsBanking = {
+                        deposits: ((booking.kindOfRoom.priceByDay * booking.quantityRoom) + (booking.kindOfRoom.priceByDay * booking.quantityRoom * 10 / 100) ) * day,
+                        bankCode: "",
+                        billMobile: booking.customerPhoneNumber,
+                        billEmail: booking.customerEmail,
+                        billingFullName: booking.customerName,
+                        billAddress: "",
+                        billCity: "",
+                        billCountry: "",
+                        billState: "",
+                        idBooking: res.data.id
                     }
-                })
+                    axios
+                        .post("http://localhost:8080/api/payment", paramsBanking)
+                        .then((res) => {
+                            if(res.data.code === "00") {
+                                window.location.replace(res.data.paymentUrl);
+                            }
+                        })
+                }
+                if(chooseOption === "TRANSFER") {
+                    setTimeout(() => {
+                        setIsLoading(false);
+                        toast.success('Đặt phòng thành công! Nhân viên chúng tôi sẽ sớm liên hệ với bạn để xác nhận!', { autoClose: 2000 });
+                    }, 500);
+                }
             })
     }
 
@@ -636,10 +648,24 @@ const Booking = () => {
                                 </div>
                             </div>
                             <div className="mt-3">
+                            <Radio.Group onChange={(e) => setChooseOption(e.target.value)} value={chooseOption} size="large">
+                                <Radio value={"PAY_NOW"}>
+                                    <span className="text-base">
+                                        Thanh toán ngay
+                                    </span>
+                                </Radio>
+                                <Radio value={"TRANSFER"}>
+                                    <span className="text-base">
+                                        Liên hệ chuyển khoản
+                                    </span>
+                                </Radio>
+                            </Radio.Group>
+                            </div>
+                            <div className="mt-3">
                                 <Button
                                     size="large"
                                     type="primary"
-                                    className="w-full h-auto text-xl"
+                                    className="w-full"
                                     htmlType="submit"
                                     // onClick={
                                     //     () => {

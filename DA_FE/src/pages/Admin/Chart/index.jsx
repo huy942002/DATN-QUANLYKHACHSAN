@@ -17,11 +17,11 @@ const objDate = {
 function Chart() {
     const [date, setDate] = useState(objDate);
     const [totalDeposits, setTotalDeposits] = useState(0);
-    const [totalRoomPrice, setTotalRoomPrice] = useState(0);
     const byRangeHourse = useSelector((state) => state.chart.byRangeHourseData);
     const bills = useSelector((state) => state.chart.bills);
     const rooms = useSelector((state) => state.chart.rooms);
-    const totalMoneyService = useSelector((state) => state.service.totalMoneyService);
+    const totalMoneyService = useSelector((state) => state.serviceDetail.totalMoneyService);
+    const totalRoomPrice = useSelector((state) => state.detailsInvoice.totalRoomPrice);
     const dispatch = useDispatch();
 
     const [byRangeHourseData, setByRangeHourseData] = useState({
@@ -52,13 +52,6 @@ function Chart() {
         setTotalDeposits(totalDep);
         // eslint-disable-next-line
     }, [bills, date]);
-    useEffect(() => {
-        let totalRoom = 0;
-        rooms
-            .filter((x) => x.status === 2)
-            .map((x) => (totalRoom += x.kindOfRoom.hourlyPrice + x.kindOfRoom.priceByDay));
-        setTotalRoomPrice(totalRoom);
-    }, [rooms]);
 
     useEffect(() => {
         setByRangeHourseData({

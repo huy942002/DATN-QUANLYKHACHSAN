@@ -3,13 +3,19 @@
  */
 package com.fpoly.restcontrollers;
 
+import java.lang.reflect.Array;
 import java.util.Optional;
 
+import com.fpoly.repositories.repo.AuthorityRepository;
 import com.fpoly.repositories.repo.CustomerRepository;
+import com.fpoly.repositories.repo.RoleRepository;
+import com.fpoly.repositories.repo.UserRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +26,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fpoly.dto.CustomerDTO;
+import com.fpoly.entities.Authority;
 import com.fpoly.entities.Customer;
+import com.fpoly.entities.Roles;
+import com.fpoly.entities.Users;
 import com.fpoly.repositories.irepo.ICustomerService;
 
 /**
@@ -35,6 +45,15 @@ public class CustomerController {
 
 	@Autowired
 	ICustomerService repository;
+	
+	@Autowired
+	UserRepository userRepo;
+	
+	@Autowired
+	AuthorityRepository authRepo;
+	
+	@Autowired
+	RoleRepository roleRepo;
 
 	@Autowired
 	CustomerRepository repository2;
@@ -46,13 +65,35 @@ public class CustomerController {
 	}
 
 	// add new
+	@Transactional
 	@PostMapping
-	public ResponseEntity<Customer> createNewCustomer(@RequestBody Customer customer) {
-		Customer c = customer;
-		c.getUsers().setPassword(BCrypt.hashpw(customer.getUsers().getPassword(), BCrypt.gensalt()));;
+	public ResponseEntity<Customer> createNewCustomer(@RequestBody CustomerDTO customer) {
+		Customer c = new Customer();
+		Users u = new Users();
+		Roles role = new Roles();
+		Authority auth = new Authority();
+		c.setFullname(customer.getCustomer().getFullname());
+		c.setEmail(customer.getCustomer().getEmail());
+		c.setGender(customer.getCustomer().getGender());
+		c.setCitizenIdCode(customer.getCustomer().getCitizenIdCode());
+		c.setDateOfBirth(customer.getCustomer().getDateOfBirth());
+		c.setPhoneNumber(customer.getCustomer().getPhoneNumber());
+		c.setAddress(customer.getCustomer().getAddress());
+		c.setImg(customer.getCustomer().getImg());
+		c.setNationality(customer.getCustomer().getNationality());
+		c.setStatus(customer.getCustomer().getStatus());
+		u.setPassword(BCrypt.hashpw(customer.getUser().getPassword(), BCrypt.gensalt()));;
+		u.setUsername(customer.getUser().getUsername());
+		u.setStatus(customer.getUser().getStatus());
+		u.setRoles(customer.getUser().getRoles());
+		role.setName("Khách hàng");
+		role.setStatus(1);
+		roleRepo.save(role);
+		userRepo.save(u);
+		c.setUsers(u);
 		return new ResponseEntity<>(repository.save(c), HttpStatus.OK);
 	}
-
+	
 	@GetMapping("/nameUser/{username}")
 	public ResponseEntity<Customer> getCustomerBynameUser(@PathVariable String username) {
 		Optional<Customer> c = repository2.getCutomer(username);

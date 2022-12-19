@@ -19,12 +19,14 @@ const objKindOfRoom = {
     status: '',
 };
 
+const regexSpace = /^(\S+$)/;
+
 const KindOfRoomSchema = Yup.object().shape({
-    name: Yup.string().required('Loại phòng không được để trống'),
+    name: Yup.string().matches(regexSpace, 'Không chỉ để khoảng trắng').required('Loại phòng không được để trống'),
     priceByDay: Yup.number().typeError('Giá theo ngày phải là số').required('Giá theo ngày không được để trống'),
     hourlyPrice: Yup.number().typeError('Giá theo giờ phải là số').required('Giá theo giờ không được để trống'),
-    note: Yup.string().required('Ghi chú không được để trống'),
-    status: Yup.string(),
+    note: Yup.string().matches(regexSpace, 'Không chỉ để khoảng trắng').required('Ghi chú không được để trống'),
+    status: Yup.string().matches(regexSpace, 'Không chỉ để khoảng trắng'),
 });
 
 function KindOfRoomManage() {

@@ -15,8 +15,12 @@ const objFacilities = {
     status: '',
 };
 
+const regexSpace = /^(\S+$)/;
+
 const FacilitySchema = Yup.object().shape({
-    name: Yup.string().required('Tên CS-VC không được để trống'),
+    name: Yup.string()
+        .matches(regexSpace, 'Không chỉ để khoảng trắng')
+        .required('Tên cơ sở vật chất không được để trống'),
     status: Yup.string().nullable(),
 });
 
@@ -95,7 +99,7 @@ function Facilities() {
                     <hr />
                 </div>
                 <div className="col-start-1 flex justify-center items-center">
-                    <p>Tìm kiếm CS-VC</p>
+                    <p>Tìm kiếm</p>
                 </div>
                 <div className="col-start-2 col-end-6">
                     <div className="relative">

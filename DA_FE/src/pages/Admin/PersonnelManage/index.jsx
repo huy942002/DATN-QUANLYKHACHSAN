@@ -17,6 +17,11 @@ import { update as updateHandOver } from '~/app/reducers/handOver';
 import { Button, Modal } from 'flowbite-react';
 import { getAllHandOver } from '~/app/reducers/handOver';
 
+const now = new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000)
+    .toISOString()
+    .replace('T', ' ')
+    .slice(0, 10);
+
 const objPersonnel = {
     fullname: '',
     email: '',
@@ -36,20 +41,35 @@ const objPersonnel = {
     },
 };
 
+const regexSpace = /^(\S+$)/;
+
 const PersonnelSchema = Yup.object().shape({
-    fullname: Yup.string().required('Tên nhân viên không được để trống'),
-    email: Yup.string().email('Sai định dạng email').required('Email không được để trống'),
+    fullname: Yup.string()
+        .matches(regexSpace, 'Không chỉ để khoảng trắng')
+        .required('Tên nhân viên không được để trống'),
+    email: Yup.string()
+        .email('Sai định dạng email')
+        .matches(regexSpace, 'Không chỉ để khoảng trắng')
+        .required('Email không được để trống'),
     gender: Yup.string().nullable(),
     citizenIdCode: Yup.number().typeError('CCCD/CMNT phải là số').required('CMND/CCCD không được để trống'),
-    dateOfBirth: Yup.string().required('Ngày sinh không được để trống'),
-    phoneNumber: Yup.string().required('Số điện thoại không được để trống'),
+    dateOfBirth: Yup.string()
+        .matches(regexSpace, 'Không chỉ để khoảng trắng')
+        .required('Ngày sinh không được để trống'),
+    phoneNumber: Yup.string()
+        .matches(regexSpace, 'Không chỉ để khoảng trắng')
+        .required('Số điện thoại không được để trống'),
     address: Yup.string().required('Địa chỉ không được để trống'),
     img: Yup.string().required('Ảnh không được để trống'),
     status: Yup.string().nullable(),
     nationality: Yup.number().nullable(),
     users: Yup.object({
-        username: Yup.string().required('Username không được để trống'),
-        password: Yup.string().required('Mật khẩu không được để trống'),
+        username: Yup.string()
+            .matches(regexSpace, 'Không chỉ để khoảng trắng')
+            .required('Username không được để trống'),
+        password: Yup.string()
+            .matches(regexSpace, 'Không chỉ để khoảng trắng')
+            .required('Mật khẩu không được để trống'),
         status: Yup.string().nullable(),
         roles: Yup.array().nullable(),
     }),
@@ -433,6 +453,7 @@ function PersonnelManage() {
                                                 <Field
                                                     type="date"
                                                     name="dateOfBirth"
+                                                    max={now}
                                                     className={`
                                                     bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
                                                     ${
@@ -727,6 +748,7 @@ function PersonnelManage() {
                                                 </label>
                                                 <Field
                                                     type="date"
+                                                    max={now}
                                                     name="dateOfBirth"
                                                     className={`
                                                     bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500

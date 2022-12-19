@@ -11,9 +11,15 @@ import { toast } from 'react-toastify';
 
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { add as addAutho } from '~/app/reducers/authority';
 import { add, getAllCustomer, getAllNationality, getCustomerById, update } from '~/app/reducers/customer';
 
 import { Button, Modal } from 'flowbite-react';
+
+const now = new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000)
+    .toISOString()
+    .replace('T', ' ')
+    .slice(0, 10);
 
 const objCustomer = {
     fullname: '',
@@ -34,21 +40,36 @@ const objCustomer = {
     },
 };
 
+const regexSpace = /^(\S+$)/;
+
 const CustomerSchema = Yup.object().shape({
-    fullname: Yup.string().required('Tên khách hàng không được để trống'),
-    email: Yup.string().email('Sai định dạng email').required('Email không được để trống'),
+    fullname: Yup.string()
+        .matches(regexSpace, 'Không chỉ để khoảng trắng')
+        .required('Tên khách hàng không được để trống'),
+    email: Yup.string()
+        .matches(regexSpace, 'Không chỉ để khoảng trắng')
+        .email('Sai định dạng email')
+        .required('Email không được để trống'),
     gender: Yup.string().nullable(),
-    citizenIdCode: Yup.number().typeError('CCCD/CMNT phải là số').required('CMND/CCCD không được để trống'),
-    dateOfBirth: Yup.string().required('Ngày sinh không được để trống'),
-    phoneNumber: Yup.string().required('Số điện thoại không được để trống'),
-    address: Yup.string().required('Địa chỉ không được để trống'),
-    img: Yup.string().required('Ảnh không được để trống'),
+    citizenIdCode: Yup.number().required('CMND/CCCD không được để trống'),
+    dateOfBirth: Yup.string()
+        .matches(regexSpace, 'Không chỉ để khoảng trắng')
+        .required('Ngày sinh không được để trống'),
+    phoneNumber: Yup.string()
+        .matches(regexSpace, 'Không chỉ để khoảng trắng')
+        .required('Số điện thoại không được để trống'),
+    address: Yup.string().matches(regexSpace, 'Không chỉ để khoảng trắng').required('Địa chỉ không được để trống'),
+    img: Yup.string().matches(regexSpace, 'Không chỉ để khoảng trắng').required('Ảnh không được để trống'),
     status: Yup.string().nullable(),
     nationality: Yup.number().nullable(),
     users: Yup.object({
-        username: Yup.string().required('Username không được để trống'),
-        password: Yup.string().required('Mật khẩu không được để trống'),
-        status: Yup.string().nullable(),
+        username: Yup.string()
+            .matches(regexSpace, 'Không chỉ để khoảng trắng')
+            .required('Username không được để trống'),
+        password: Yup.string()
+            .matches(regexSpace, 'Không chỉ để khoảng trắng')
+            .required('Mật khẩu không được để trống'),
+        status: Yup.string().matches(regexSpace, 'Không chỉ để khoảng trắng').nullable(),
         roles: Yup.array().nullable(),
     }),
 });
@@ -105,14 +126,44 @@ function CustomerManage() {
     function handleAdd(data) {
         dispatch(
             add({
-                ...data,
+                customer: {
+                    fullname: data.fullname,
+                    address: data.address,
+                    citizenIdCode: data.citizenIdCode,
+                    dateOfBirth: data.dateOfBirth,
+                    img: data.img,
+                    phoneNumber: data.phoneNumber,
+                    email: data.email,
+                    status: 1,
+                    gender: data.gender === '' ? 'Nam' : data.gender,
+                    nationality: nationalities.filter(
+                        (nat) =>
+                            nat.id ===
+                            (data.nationality === undefined ? nationalities[0].id : Number(data.nationality)),
+                    )[0],
+                },
+                user: {
+                    ...data.users,
+                    status: 1,
+                    roles: [
+                        {
+                            id: 3,
+                            name: 'Khách hàng',
+                            status: 1,
+                        },
+                    ],
+                },
+            }),
+        );
+        dispatch(
+            addAutho({
                 status: 1,
-                gender: data.gender === '' ? 'Nam' : data.gender,
-                users: { ...data.users, status: 1, roles: [] },
-                nationality: nationalities.filter(
-                    (nat) =>
-                        nat.id === (data.nationality === undefined ? nationalities[0].id : Number(data.nationality)),
-                )[0],
+                roles: {
+                    id: 2,
+                    name: 'Nhân viên',
+                    status: 1,
+                },
+                users: data.users,
             }),
         );
         toast.success('Thêm khách hàng thành công', { autoClose: 2000 });
@@ -396,6 +447,7 @@ function CustomerManage() {
                                                 </label>
                                                 <Field
                                                     type="date"
+                                                    max={now}
                                                     name="dateOfBirth"
                                                     className={`
                                                     bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
@@ -653,6 +705,7 @@ function CustomerManage() {
                                                 </label>
                                                 <Field
                                                     type="date"
+                                                    max={now}
                                                     name="dateOfBirth"
                                                     className={`
                                                     bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
