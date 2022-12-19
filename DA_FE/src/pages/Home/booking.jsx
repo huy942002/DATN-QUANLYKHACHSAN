@@ -4,7 +4,7 @@ import axios from 'axios';
 import dayjs from "dayjs";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
-import { Button, DatePicker, Divider, Input, Select } from "antd";
+import { Button, DatePicker, Divider, Form, Input, Select } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import Loading from "../Loading/loading";
 
@@ -36,12 +36,62 @@ const Booking = () => {
         numberOfAdults: 1,
         numberOfKids: 0,
         quantityRoom: 1,
-        deposite: "",
+        deposits: "",
         note: "",
         paymentStatus: 1,
         status: 1,
     });
     const [isLoading, setIsLoading] = useState(false);
+
+    const validateMessages = {
+        required: 'Vui lòng nhập ${label}!',
+        types: {
+          email: '${label} không đúng định dạng!',
+          number: '${label} is not a valid number!',
+        },
+        number: {
+          range: '${label} must be between ${min} and ${max}',
+        },
+        phoneNumber: {
+            validator: (_, value) => {
+                console.log(_);
+                if(value) {
+                    if(/(0[3|5|7|8|9])+([0-9]{8})\b/g.test(value)) {
+                        return Promise.resolve();
+                    }
+                    return Promise.reject(_.field + ' chưa đúng!');
+                }
+                return Promise.resolve();
+            }
+        },
+        space: {
+            validator: (_, value) => {
+                if(value) {
+                    if(value.trim()) {
+                        return Promise.resolve();
+                    }
+                    return Promise.reject(_.field + ' không được để trống!');
+                }
+                return Promise.resolve();
+            }
+        },
+        specialCharacters: {
+            validator: (_, value) => {
+                if(value) {
+                    if(/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(value)) {
+                        return Promise.reject(_.field + ' không được có ký tự đặc biệt!');
+                    }
+                    return Promise.resolve();
+                }
+                return Promise.resolve();
+            }
+        }
+    };
+    const [form] = Form.useForm();
+
+    const onFinish = (values) => {
+        console.log(values);
+    };
 
     const getAllKindOfRoom = async () => {
         await axios.get('http://localhost:8080/api/kind-of-room')
@@ -60,7 +110,7 @@ const Booking = () => {
                         numberOfAdults: numberOfAdults ? numberOfAdults : 1,
                         numberOfKids: numberOfKids ? numberOfKids : 0,
                         quantityRoom: quantityRoom ? quantityRoom : 1,
-                        deposite: "",
+                        deposits: "",
                         note: "",
                         paymentStatus: 1,
                         status: 1,
@@ -125,400 +175,487 @@ const Booking = () => {
     const comfirmBooking = async () => {
         const params = {
             ...booking,
-            deposite: (booking.kindOfRoom.priceByDay * booking.quantityRoom * 10 / 100) + (booking.kindOfRoom.priceByDay * booking.quantityRoom),
-            paymentStatus: 2,
+            deposits: ((booking.kindOfRoom.priceByDay * booking.quantityRoom) + (booking.kindOfRoom.priceByDay * booking.quantityRoom * 10 / 100) ) * day,
+            paymentStatus: 1,
             status: 1,
         }
         await axios
             .post("http://localhost:8080/api/booking", params)
             .then((res) => {
-                console.log(res);
+                const paramsBanking = {
+                    deposits: (booking.kindOfRoom.priceByDay * booking.quantityRoom * 10 / 100) + (booking.kindOfRoom.priceByDay * booking.quantityRoom),
+                    bankCode: "",
+                    billMobile: booking.customerPhoneNumber,
+                    billEmail: booking.customerEmail,
+                    billingFullName: booking.customerName,
+                    billAddress: "",
+                    billCity: "",
+                    billCountry: "",
+                    billState: "",
+                    idBooking: res.data.id
+                }
+                axios
+                .post("http://localhost:8080/api/payment", paramsBanking)
+                .then((res) => {
+                    if(res.data.code === "00") {
+                        window.location.replace(res.data.paymentUrl);
+                    }
+                })
             })
     }
+
+    const disabledDate = (current) => {
+        return current && current < dayjs().endOf('day');
+    };
 
     return (
         <>
             {isLoading && (<Loading></Loading>)}
-            <div className="py-10 px-[280px] text-base">
-                <div className='font-bold text-xl'>
-                    Đặt phòng khách sạn
-                </div>
-                <div className='font-medium text-base mt-2'>
-                    Điền thông tin người liên lạc và khách bên dưới
-                </div>
-                <div className="grid grid-cols-12 gap-6 mt-3">
-                    <div className="col-span-8">
-                        <div className='rounded-lg p-3 grid grid-cols-3 gap-6 shadow-md bg-white'>
-                            <div>
-                                <div className='font-medium'>
-                                    Nhận phòng:
-                                </div>
-                                <DatePicker
-                                    size="large"
-                                    className="mt-2 w-full"
-                                    format="DD-MM-YYYY"
-                                    placeholder="Chọn ngày"
-                                    value={booking.hireDate ? dayjs(booking.hireDate) : ""}
-                                    onChange={
-                                        (date, dateString) => {
-                                            setBooking({
-                                                ...booking,
-                                                hireDate: formatDateTime(dateString),
-                                                checkOutDay: genCheckOutDay(formatDateTime(dateString), day),
-                                            })
-                                        }
-                                    }
-                                />
-                            </div>
-                            <div>
-                                <div className='font-medium'>
-                                    Số ngày:
-                                </div>
-                                <Select
-                                    size='large'
-                                    className="w-full mt-2"
-                                    options={days}
-                                    value={day ? day : days[0].value}
-                                    onChange={
-                                        (e) => {
-                                            setDay(e);
-                                            setBooking({
-                                                ...booking,
-                                                checkOutDay: genCheckOutDay(booking.hireDate, e),
-                                            })
-                                        }
-                                    }
-                                />
-                            </div>
-                            <div>
-                                <div className='font-medium'>
-                                    Trả phòng:
-                                </div>
-                                <DatePicker
-                                    disabled
-                                    size="large"
-                                    className="mt-2 w-full"
-                                    format="DD-MM-YYYY"
-                                    placeholder="Chọn ngày"
-                                    value={booking.checkOutDay ? dayjs(booking.checkOutDay) : null}
-                                />
-                            </div>
-                            <div className='col-span-2'>
-                                <div className='font-medium'>
-                                    Người lớn, trẻ em và số phòng:
-                                </div>
-                                <div
-                                    className='mt-2 w-full h-10 border rounded-lg flex items-center pl-3 hover:cursor-pointer hover:border-design-greenLight'
-                                    onClick={
-                                        () => setOpenOption(!openOption)
-                                    }
-                                >
-                                    {booking.numberOfAdults} người lớn, {booking.numberOfKids} trẻ em, {booking.quantityRoom} phòng
-                                </div>
-                                <div className={`bg-design-lightGray rounded-lg p-3 mt-2 ${openOption ? "" : "hidden"}`}>
-                                    <div className='flex items-center'>
-                                        <div className='w-full font-medium'>
-                                            Người lớn
-                                        </div>
-                                        <div className='w-full ml-3 flex items-center justify-end select-none'>
-                                            <div
-                                                className='h-10 w-10 bg-white border rounded-lg flex justify-center items-center cursor-pointer hover:bg-default-1 text-design-greenLight'
-                                                onClick={
-                                                    () => {
-                                                        if(booking.numberOfAdults >= 2) {
-                                                            setBooking({
-                                                                ...booking,
-                                                                numberOfAdults: Number(booking.numberOfAdults) - 1,
-                                                            })
-                                                        }
-                                                    }
-                                                }
-                                            >
-                                                <FontAwesomeIcon icon={faMinus}></FontAwesomeIcon>
-                                            </div>
-                                            <div className='h-10 w-10 bg-white border rounded-lg mx-1 flex justify-center items-center font-semibold text-lg'>
-                                                {booking.numberOfAdults}
-                                            </div>
-                                            <div 
-                                                className='h-10 w-10 bg-white border rounded-lg flex justify-center items-center cursor-pointer hover:bg-default-1 text-design-greenLight'
-                                                onClick={
-                                                    () => {
-                                                        setBooking({
-                                                            ...booking,
-                                                            numberOfAdults: Number(booking.numberOfAdults) + 1
-                                                        })
-                                                    }
-                                                }
-                                            >
-                                                <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon>
-                                            </div>
-                                        </div>
+            <Form name="nest-messages" onFinish={comfirmBooking} validateMessages={validateMessages}>
+                <div className="py-10 px-[280px] text-base">
+                    <div className='font-bold text-xl'>
+                        Đặt phòng khách sạn
+                    </div>
+                    <div className='font-medium text-base mt-2'>
+                        Điền thông tin người liên lạc và khách bên dưới
+                    </div>
+                    <div className="grid grid-cols-12 gap-6 mt-3">
+                        <div className="col-span-8">
+                            <div className='rounded-lg p-3 grid grid-cols-3 gap-6 shadow-md bg-white'>
+                                <div>
+                                    <div className='font-medium'>
+                                        Nhận phòng:
                                     </div>
-                                    <div className='flex items-center mt-2'>
-                                        <div className='w-full font-medium'>
-                                            Trẻ em
-                                        </div>
-                                        <div className='w-full ml-3 flex items-center justify-end select-none'>
-                                            <div
-                                                className='h-10 w-10 bg-white border rounded-lg flex justify-center items-center cursor-pointer hover:bg-default-1 text-design-greenLight'
-                                                onClick={
-                                                    () => {
-                                                        if(booking.numberOfKids >= 1) {
-                                                            setBooking({
-                                                                ...booking,
-                                                                numberOfKids: Number(booking.numberOfKids) - 1
-                                                            })
-                                                        }
-                                                    }
-                                                }
-                                            >
-                                                <FontAwesomeIcon icon={faMinus}></FontAwesomeIcon>
-                                            </div>
-                                            <div className='h-10 w-10 bg-white border rounded-lg mx-1 flex justify-center items-center font-semibold text-lg'>
-                                                {booking.numberOfKids}
-                                            </div>
-                                            <div
-                                                className='h-10 w-10 bg-white border rounded-lg flex justify-center items-center cursor-pointer hover:bg-default-1 text-design-greenLight'
-                                                onClick={
-                                                    () => {
-                                                        setBooking({
-                                                            ...booking,
-                                                            numberOfKids: Number(booking.numberOfKids) + 1
-                                                        })
-                                                    }
-                                                }
-                                            >
-                                                <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className='flex items-center mt-2'>
-                                        <div className='w-full font-medium'>
-                                            Số phòng
-                                        </div>
-                                        <div className='w-full ml-3 flex items-center justify-end select-none'>
-                                            <div
-                                                className='h-10 w-10 bg-white border rounded-lg flex justify-center items-center cursor-pointer hover:bg-default-1 text-design-greenLight'
-                                                onClick={
-                                                    () => {
-                                                        if(booking.quantityRoom >= 2) {
-                                                            setBooking({
-                                                                ...booking,
-                                                                quantityRoom: Number(booking.quantityRoom) - 1
-                                                            })
-                                                        }
-                                                    }
-                                                }
-                                            >
-                                                <FontAwesomeIcon icon={faMinus}></FontAwesomeIcon>
-                                            </div>
-                                            <div className='h-10 w-10 bg-white border rounded-lg mx-1 flex justify-center items-center font-semibold text-lg'>
-                                                {booking.quantityRoom}
-                                            </div>
-                                            <div
-                                                className='h-10 w-10 bg-white border rounded-lg flex justify-center items-center cursor-pointer hover:bg-default-1 text-design-greenLight'
-                                                onClick={
-                                                    () => {
-                                                        setBooking({
-                                                            ...booking,
-                                                            quantityRoom: Number(booking.quantityRoom) + 1
-                                                        })
-                                                    }
-                                                }
-                                            >
-                                                <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className=''>
-                                <div className='font-medium'>
-                                    Loại phòng:
-                                    <Select
-                                        size='large'
-                                        className="w-full mt-2"
-                                        options={genOptionsKindOfRoom()}
-                                        value={booking.kindOfRoom ? booking.kindOfRoom.id : genOptionsKindOfRoom() ? genOptionsKindOfRoom()[0].value : ""}
+                                    <DatePicker
+                                        disabledDate={disabledDate}
+                                        size="large"
+                                        className="mt-2 w-full"
+                                        format="DD-MM-YYYY"
+                                        placeholder="Chọn ngày"
+                                        value={booking.hireDate ? dayjs(booking.hireDate) : ""}
                                         onChange={
-                                            (e) => {
-                                                setBooking({
-                                                    ...booking,
-                                                    kindOfRoom: kindOfRoomList.find((x) => x.id === e)
-                                                });
+                                            (date, dateString) => {
+                                                if(dateString) {
+                                                    setBooking({
+                                                        ...booking,
+                                                        hireDate: formatDateTime(dateString),
+                                                        checkOutDay: genCheckOutDay(formatDateTime(dateString), day),
+                                                    })
+                                                } else {
+                                                    setBooking({
+                                                        ...booking,
+                                                        hireDate: dayjs(dateTomorrow),
+                                                        checkOutDay: genCheckOutDay(dayjs(dateTomorrow), day),
+                                                    })
+                                                }
                                             }
                                         }
                                     />
                                 </div>
-                            </div>
-                            {/* {hireDate && checkOutDay && (
-                                <div className='col-span-3 font-medium'>
-                                    Khách đến nhận phòng vào: &nbsp;
-                                    <span className='text-red-600 font-semibold'>
-                                        {timeInOut && timeInOut[0].timeIn} {dayjs(hireDate).format('DD-MM-YYYY')}
-                                    </span>
-                                    &nbsp;
-                                    và trả phòng vào: &nbsp;
-                                    <span className='text-red-600 font-semibold'>
-                                        {timeInOut && timeInOut[0].timeOut} {dayjs(checkOutDay).format('DD-MM-YYYY')}
-                                    </span>
-                                </div>
-                            )} */}
-                        </div>
-                        
-                        <div className='font-medium text-base mt-6 mb-2'>
-                            Thông tin của bạn
-                        </div>
-                        <div className='rounded-lg p-3 shadow-md bg-white'>
-                            <div className='font-medium'>
-                                Tên người liên hệ:
-                            </div>
-                            <Input
-                                size="large"
-                                className="mt-2"
-                                placeholder="Tên người liên hệ..."
-                                prefix={<UserOutlined />}
-                                value={booking.customerName}
-                                onChange={
-                                    (e) => setBooking({
-                                        ...booking,
-                                        customerName: e.target.value
-                                    })
-                                }
-                            />
-
-                            <div className="grid grid-cols-2 gap-6 mt-6">
                                 <div>
                                     <div className='font-medium'>
-                                        Số điện thoại:
+                                        Số ngày:
                                     </div>
-                                    <Input
-                                        size="large"
-                                        className="mt-2"
-                                        placeholder="Số điện thoại..."
-                                        prefix={<UserOutlined />}
-                                        value={booking.customerPhoneNumber}
+                                    <Select
+                                        size='large'
+                                        className="w-full mt-2"
+                                        options={days}
+                                        value={day ? day : days[0].value}
                                         onChange={
-                                            (e) => setBooking({
-                                                ...booking,
-                                                customerPhoneNumber: e.target.value
-                                            })
+                                            (e) => {
+                                                setDay(e);
+                                                setBooking({
+                                                    ...booking,
+                                                    checkOutDay: genCheckOutDay(booking.hireDate, e),
+                                                })
+                                            }
                                         }
                                     />
                                 </div>
                                 <div>
                                     <div className='font-medium'>
-                                        Email:
+                                        Trả phòng:
                                     </div>
-                                    <Input
+                                    <DatePicker
+                                        disabled
                                         size="large"
-                                        className="mt-2"
-                                        placeholder="Email..."
-                                        prefix={<UserOutlined />}
-                                        value={booking.customerEmail}
-                                        onChange={
-                                            (e) => setBooking({
-                                                ...booking,
-                                                customerEmail: e.target.value
-                                            })
-                                        }
+                                        className="mt-2 w-full"
+                                        format="DD-MM-YYYY"
+                                        placeholder="Chọn ngày"
+                                        value={booking.checkOutDay ? dayjs(booking.checkOutDay) : null}
                                     />
                                 </div>
+                                <div className='col-span-2'>
+                                    <div className='font-medium'>
+                                        Người lớn, trẻ em và số phòng:
+                                    </div>
+                                    <div
+                                        className='mt-2 w-full h-10 border rounded-lg flex items-center pl-3 hover:cursor-pointer hover:border-design-greenLight'
+                                        onClick={
+                                            () => setOpenOption(!openOption)
+                                        }
+                                    >
+                                        {booking.numberOfAdults} người lớn, {booking.numberOfKids} trẻ em, {booking.quantityRoom} phòng
+                                    </div>
+                                    <div className={`bg-design-lightGray rounded-lg p-3 mt-2 ${openOption ? "" : "hidden"}`}>
+                                        <div className='flex items-center'>
+                                            <div className='w-full font-medium'>
+                                                Người lớn
+                                            </div>
+                                            <div className='w-full ml-3 flex items-center justify-end select-none'>
+                                                <div
+                                                    className='h-10 w-10 bg-white border rounded-lg flex justify-center items-center cursor-pointer hover:bg-default-1 text-design-greenLight'
+                                                    onClick={
+                                                        () => {
+                                                            if(booking.numberOfAdults >= 2) {
+                                                                setBooking({
+                                                                    ...booking,
+                                                                    numberOfAdults: Number(booking.numberOfAdults) - 1,
+                                                                })
+                                                            }
+                                                        }
+                                                    }
+                                                >
+                                                    <FontAwesomeIcon icon={faMinus}></FontAwesomeIcon>
+                                                </div>
+                                                <div className='h-10 w-10 bg-white border rounded-lg mx-1 flex justify-center items-center font-semibold text-lg'>
+                                                    {booking.numberOfAdults}
+                                                </div>
+                                                <div 
+                                                    className='h-10 w-10 bg-white border rounded-lg flex justify-center items-center cursor-pointer hover:bg-default-1 text-design-greenLight'
+                                                    onClick={
+                                                        () => {
+                                                            setBooking({
+                                                                ...booking,
+                                                                numberOfAdults: Number(booking.numberOfAdults) + 1
+                                                            })
+                                                        }
+                                                    }
+                                                >
+                                                    <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className='flex items-center mt-2'>
+                                            <div className='w-full font-medium'>
+                                                Trẻ em
+                                            </div>
+                                            <div className='w-full ml-3 flex items-center justify-end select-none'>
+                                                <div
+                                                    className='h-10 w-10 bg-white border rounded-lg flex justify-center items-center cursor-pointer hover:bg-default-1 text-design-greenLight'
+                                                    onClick={
+                                                        () => {
+                                                            if(booking.numberOfKids >= 1) {
+                                                                setBooking({
+                                                                    ...booking,
+                                                                    numberOfKids: Number(booking.numberOfKids) - 1
+                                                                })
+                                                            }
+                                                        }
+                                                    }
+                                                >
+                                                    <FontAwesomeIcon icon={faMinus}></FontAwesomeIcon>
+                                                </div>
+                                                <div className='h-10 w-10 bg-white border rounded-lg mx-1 flex justify-center items-center font-semibold text-lg'>
+                                                    {booking.numberOfKids}
+                                                </div>
+                                                <div
+                                                    className='h-10 w-10 bg-white border rounded-lg flex justify-center items-center cursor-pointer hover:bg-default-1 text-design-greenLight'
+                                                    onClick={
+                                                        () => {
+                                                            setBooking({
+                                                                ...booking,
+                                                                numberOfKids: Number(booking.numberOfKids) + 1
+                                                            })
+                                                        }
+                                                    }
+                                                >
+                                                    <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className='flex items-center mt-2'>
+                                            <div className='w-full font-medium'>
+                                                Số phòng
+                                            </div>
+                                            <div className='w-full ml-3 flex items-center justify-end select-none'>
+                                                <div
+                                                    className='h-10 w-10 bg-white border rounded-lg flex justify-center items-center cursor-pointer hover:bg-default-1 text-design-greenLight'
+                                                    onClick={
+                                                        () => {
+                                                            if(booking.quantityRoom >= 2) {
+                                                                setBooking({
+                                                                    ...booking,
+                                                                    quantityRoom: Number(booking.quantityRoom) - 1
+                                                                })
+                                                            }
+                                                        }
+                                                    }
+                                                >
+                                                    <FontAwesomeIcon icon={faMinus}></FontAwesomeIcon>
+                                                </div>
+                                                <div className='h-10 w-10 bg-white border rounded-lg mx-1 flex justify-center items-center font-semibold text-lg'>
+                                                    {booking.quantityRoom}
+                                                </div>
+                                                <div
+                                                    className='h-10 w-10 bg-white border rounded-lg flex justify-center items-center cursor-pointer hover:bg-default-1 text-design-greenLight'
+                                                    onClick={
+                                                        () => {
+                                                            setBooking({
+                                                                ...booking,
+                                                                quantityRoom: Number(booking.quantityRoom) + 1
+                                                            })
+                                                        }
+                                                    }
+                                                >
+                                                    <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className=''>
+                                    <div className='font-medium'>
+                                        Loại phòng:
+                                        <Select
+                                            size='large'
+                                            className="w-full mt-2"
+                                            options={genOptionsKindOfRoom()}
+                                            value={booking.kindOfRoom ? booking.kindOfRoom.id : genOptionsKindOfRoom() ? genOptionsKindOfRoom()[0].value : ""}
+                                            onChange={
+                                                (e) => {
+                                                    setBooking({
+                                                        ...booking,
+                                                        kindOfRoom: kindOfRoomList.find((x) => x.id === e)
+                                                    });
+                                                }
+                                            }
+                                        />
+                                    </div>
+                                </div>
+                                {/* {hireDate && checkOutDay && (
+                                    <div className='col-span-3 font-medium'>
+                                        Khách đến nhận phòng vào: &nbsp;
+                                        <span className='text-red-600 font-semibold'>
+                                            {timeInOut && timeInOut[0].timeIn} {dayjs(hireDate).format('DD-MM-YYYY')}
+                                        </span>
+                                        &nbsp;
+                                        và trả phòng vào: &nbsp;
+                                        <span className='text-red-600 font-semibold'>
+                                            {timeInOut && timeInOut[0].timeOut} {dayjs(checkOutDay).format('DD-MM-YYYY')}
+                                        </span>
+                                    </div>
+                                )} */}
+                            </div>
+                            
+                                <div className='font-medium text-base mt-6 mb-2'>
+                                    Thông tin của bạn
+                                </div>
+                                <div className='rounded-lg p-3 shadow-md bg-white'>
+                                    <div className='font-medium'>
+                                        Tên người liên hệ:
+                                    </div>
+                                    <Form.Item
+                                        name="Tên người liên hệ"
+                                        rules={[
+                                            {   
+                                                required: true,
+
+                                            },
+                                            validateMessages.space,
+                                            validateMessages.specialCharacters,
+
+                                        ]}
+                                    >
+                                        <Input
+                                            size="large"
+                                            className="mt-2"
+                                            placeholder="Tên người liên hệ..."
+                                            prefix={<UserOutlined />}
+                                            value={booking.customerName}
+                                            onChange={
+                                                (e) => setBooking({
+                                                    ...booking,
+                                                    customerName: e.target.value
+                                                })
+                                            }
+                                        />
+                                    </Form.Item>
+                                    <div className="grid grid-cols-2 gap-6 mt-6">
+                                        <div>
+                                            <div className='font-medium'>
+                                                Số điện thoại:
+                                            </div>
+                                            <Form.Item
+                                                name="Số điện thoại"
+                                                rules={[
+                                                    {   
+                                                        required: true,
+                                                    },
+                                                    // {
+                                                    //     validator: (_, value) => {
+                                                    //         if(value) {
+                                                    //             if(/(0[3|5|7|8|9])+([0-9]{8})\b/g.test(value)) {
+                                                    //                 return Promise.resolve();
+                                                    //             }
+                                                    //             return Promise.reject('Số điện thoại chưa đúng!');
+                                                    //         }
+                                                    //         return Promise.resolve();
+                                                    //     }
+                                                    // }
+                                                    // validateMessages.space,
+                                                    validateMessages.phoneNumber,
+                                                ]}
+                                            >
+                                                <Input
+                                                    size="large"
+                                                    className="mt-2"
+                                                    placeholder="Số điện thoại..."
+                                                    prefix={<UserOutlined />}
+                                                    value={booking.customerPhoneNumber}
+                                                    onChange={
+                                                        (e) => setBooking({
+                                                            ...booking,
+                                                            customerPhoneNumber: e.target.value
+                                                        })
+                                                    }
+                                                />
+                                            </Form.Item>
+                                        </div>
+                                        <div>
+                                            <div className='font-medium'>
+                                                Email:
+                                            </div>
+                                            <Form.Item
+                                                name="Email"
+                                                rules={[
+                                                    {   
+                                                        required: true,
+                                                        type: 'email',
+                                                    },
+                                                    // validateMessages.space,
+                                                ]}
+                                            >
+                                                <Input
+                                                    size="large"
+                                                    className="mt-2"
+                                                    placeholder="Email..."
+                                                    prefix={<UserOutlined />}
+                                                    value={booking.customerEmail}
+                                                    onChange={
+                                                        (e) => setBooking({
+                                                            ...booking,
+                                                            customerEmail: e.target.value
+                                                        })
+                                                    }
+                                                />
+                                            </Form.Item>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            <div className='font-medium text-base mt-6 mb-2'>
+                                Chi tiết giá
+                            </div>
+                            <div className='rounded-lg p-3 shadow-md bg-white grid grid-cols-2'>
+                                <div className='font-medium'>
+                                    Thanh toán ngay
+                                </div>
+                                <div className="flex justify-end items-center">
+                                    {formatCurrency(((booking.kindOfRoom.priceByDay * booking.quantityRoom) + (booking.kindOfRoom.priceByDay * booking.quantityRoom * 10 / 100) ) * day)}
+                                </div>
+                                <div className='font-medium mt-3'>
+                                    Phòng
+                                </div>
+                                <div className="flex justify-end items-center mt-3">
+                                    {formatCurrency(booking.kindOfRoom.priceByDay * booking.quantityRoom * day)}
+                                </div>
+                                <div className='font-medium mt-3'>
+                                    Thuế (10% VAT)
+                                </div>
+                                <div className="flex justify-end items-center mt-3">
+                                    {formatCurrency(booking.kindOfRoom.priceByDay * booking.quantityRoom * 10 / 100 * day)}
+                                </div>
+                                <div className='font-medium mt-3'>
+                                    Phí phục vụ
+                                </div>
+                                <div className="flex justify-end items-center mt-3">
+                                    MIẾN PHÍ
+                                </div>
                             </div>
                         </div>
 
-                        <div className='font-medium text-base mt-6 mb-2'>
-                            Chi tiết giá
-                        </div>
-                        <div className='rounded-lg p-3 shadow-md bg-white grid grid-cols-2'>
-                            <div className='font-medium'>
-                                Thanh toán ngay
-                            </div>
-                            <div className="flex justify-end items-center">
-                                {formatCurrency(booking.kindOfRoom.priceByDay * booking.quantityRoom)}
-                            </div>
-                            <div className='font-medium mt-3'>
-                                Thuế (10% VAT)
-                            </div>
-                            <div className="flex justify-end items-center mt-3">
-                                {formatCurrency(booking.kindOfRoom.priceByDay * booking.quantityRoom * 10 / 100)}
-                            </div>
-                            <div className='font-medium mt-3'>
-                                Phí phục vụ
-                            </div>
-                            <div className="flex justify-end items-center mt-3">
-                                MIẾN PHÍ
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="col-span-4">
-                        <div className='rounded-lg shadow-md bg-white'>
-                            <div className="flex items-center p-3">
-                                <img src="https://d1785e74lyxkqq.cloudfront.net/_next/static/v2/6/6aa2fd01a9460e1a71bb0efb713f0212.svg" alt="" />
-                                <div className="ml-3">
-                                    <div className="font-bold">
-                                        POLYTEL
-                                    </div>
-                                    <div className="font-medium text-sm">
-                                        Êm mông - Thoải mái - Thư thái tâm hồn
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="bg-default-1 p-3">
-                                <div>
-                                    Ngày nhận phòng: 
-                                    <span className="text-red-600 font-medium ml-2">
-                                        {timeInOut && timeInOut[0].timeIn} {dayjs(hireDate).format('DD-MM-YYYY')}
-                                    </span>
-                                </div>
-                                <div className="mt-3">
-                                    Ngày trả phòng:
-                                    <span className="text-red-600 font-medium ml-2">
-                                        {timeInOut && timeInOut[0].timeOut} {dayjs(checkOutDay).format('DD-MM-YYYY')}
-                                    </span>
-                                </div>
-                            </div>
-                            <div className="px-6 py-3">
-                                <div className="font-semibold">
-                                    {"(x" + booking.quantityRoom + ") " + booking.kindOfRoom.name} 
-                                </div>
-                                <div className="grid grid-cols-2">
-                                    <div className="mt-3">
-                                        <img className="rounded-lg" src="https://ik.imagekit.io/tvlk/apr-asset/dgXfoyh24ryQLRcGq00cIdKHRmotrWLNlvG-TxlcLxGkiDwaUSggleJNPRgIHCX6/hotel/asset/10042556-4db2f0c5d7089b6f88bc52fd5bb3dc16.jpeg?_src=imagekit&tr=h-80,q-40,w-80" alt="" />
-                                    </div>
-                                    <div className="mt-3">
-                                        <div>
-                                            Miễn phí ăn sáng
+                        <div className="col-span-4">
+                            <div className='rounded-lg shadow-md bg-white'>
+                                <div className="flex items-center p-3">
+                                    <img src="https://d1785e74lyxkqq.cloudfront.net/_next/static/v2/6/6aa2fd01a9460e1a71bb0efb713f0212.svg" alt="" />
+                                    <div className="ml-3">
+                                        <div className="font-bold">
+                                            POLYTEL
                                         </div>
-                                        <div>
-                                            Miễn phí wifi
+                                        <div className="font-medium text-sm">
+                                            Êm mông - Thoải mái - Thư thái tâm hồn
                                         </div>
                                     </div>
                                 </div>
-                                <Divider style={{marginTop: 10, marginBottom: 10}}></Divider>
-                                <div className="font-medium">
-                                    Thanh toán trực tiếp
+                                <div className="bg-default-1 p-3">
+                                    <div>
+                                        Ngày nhận phòng: 
+                                        <span className="text-red-600 font-medium ml-2">
+                                            {timeInOut && timeInOut[0].timeIn} {dayjs(hireDate).format('DD-MM-YYYY')}
+                                        </span>
+                                    </div>
+                                    <div className="mt-3">
+                                        Ngày trả phòng:
+                                        <span className="text-red-600 font-medium ml-2">
+                                            {timeInOut && timeInOut[0].timeOut} {dayjs(checkOutDay).format('DD-MM-YYYY')}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="px-6 py-3">
+                                    <div className="font-semibold">
+                                        {"(x" + booking.quantityRoom + ") " + booking.kindOfRoom.name} 
+                                    </div>
+                                    <div className="grid grid-cols-2">
+                                        <div className="mt-3">
+                                            <img className="rounded-lg" src="https://ik.imagekit.io/tvlk/apr-asset/dgXfoyh24ryQLRcGq00cIdKHRmotrWLNlvG-TxlcLxGkiDwaUSggleJNPRgIHCX6/hotel/asset/10042556-4db2f0c5d7089b6f88bc52fd5bb3dc16.jpeg?_src=imagekit&tr=h-80,q-40,w-80" alt="" />
+                                        </div>
+                                        <div className="mt-3">
+                                            <div>
+                                                Miễn phí ăn sáng
+                                            </div>
+                                            <div>
+                                                Miễn phí wifi
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <Divider style={{marginTop: 10, marginBottom: 10}}></Divider>
+                                    <div className="font-medium">
+                                        Thanh toán trực tiếp
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div className="mt-3">
-                            <Button
-                                size="large"
-                                type="primary"
-                                className="w-full h-auto text-xl"
-                                onClick={
-                                    () => {
-                                        comfirmBooking();
-                                    }
-                                }
-                            >
-                                Đặt phòng & Thanh toán
-                            </Button>
+                            <div className="mt-3">
+                                <Button
+                                    size="large"
+                                    type="primary"
+                                    className="w-full h-auto text-xl"
+                                    htmlType="submit"
+                                    // onClick={
+                                    //     () => {
+                                    //         if(form) {
+                                    //             comfirmBooking();
+                                    //         }
+                                    //     }
+                                    // }
+                                >
+                                    Đặt phòng & Thanh toán
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </Form>
         </>
     )
 }

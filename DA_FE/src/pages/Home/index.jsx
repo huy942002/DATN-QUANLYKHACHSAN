@@ -5,8 +5,9 @@ import { useState, useEffect } from 'react';
 import { Button, Carousel, DatePicker, Divider, Select, Spin } from 'antd';
 import dayjs from 'dayjs';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Loading from '../Loading/loading';
+import { toast, ToastContainer } from 'react-toastify';
 
 
 const contentStyle = {
@@ -17,7 +18,9 @@ const contentStyle = {
     background: '#364d79',
 };
 
-function Home() {
+const Home = () => {
+
+    const { idBooking } = useParams();
     const days = [];
     for(let i = 1; i <= 30; i++) {
         days.push({
@@ -44,6 +47,9 @@ function Home() {
     useEffect(
         () => {
             setIsLoading(true);
+            if(idBooking) {
+                checkAndUpdateBanking();
+            }
             genCheckOutDay(hireDate, day);
             getAllKindOfRoom();
             getTimeInOut();
@@ -52,6 +58,53 @@ function Home() {
             }, 500);
         }, []
     )
+
+    const disabledDate = (current) => {
+        // Can not select days before today and today
+        return current && current < dayjs().endOf('day');
+    };
+
+    const checkAndUpdateBanking = async () => {
+        
+        if(window.location.search && idBooking) {
+            let codePayment = new URLSearchParams(window.location.search).get("vnp_ResponseCode");
+            if(codePayment == "00") {
+                await axios
+                    .post("http://localhost:8080/api/booking/update-payment-status/" + idBooking)
+                    .then((res) => {
+                        if(res) {
+                            toast('🦄 Đặt phòng thành công!', {
+                                position: "top-right",
+                                autoClose: 5000,
+                                hideProgressBar: false,
+                                closeOnClick: true,
+                                pauseOnHover: true,
+                                draggable: true,
+                                progress: undefined,
+                                theme: "light",
+                            });
+                        }
+                    })
+            } else {
+                await axios
+                    .delete("http://localhost:8080/api/booking/" + idBooking)
+                    .then((res) => {
+                        if(res) {
+                            toast('🦄 Thanh toán chưa thành công!', {
+                                position: "top-right",
+                                autoClose: 5000,
+                                hideProgressBar: false,
+                                closeOnClick: true,
+                                pauseOnHover: true,
+                                draggable: true,
+                                progress: undefined,
+                                theme: "light",
+                            });
+                        }
+                    })
+            }
+        }
+    }
 
     const getTimeInOut = async () => {
         await axios
@@ -103,7 +156,8 @@ function Home() {
 
     return (
         <>  
-            {isLoading && (<Loading></Loading>)}
+            {isLoading && (<Loading content={idBooking ? "Đang check thanh toán!" : ""}></Loading>)}
+            <ToastContainer></ToastContainer>
             <div 
                 className='w-full'
                 // style={{boxShadow: '#1b1b1b 0px 1px 3px 0px'}}
@@ -153,11 +207,17 @@ function Home() {
                             className="mt-2 w-full"
                             format="DD-MM-YYYY"
                             placeholder="Chọn ngày"
+                            disabledDate={disabledDate}
                             value={ hireDate ? dayjs(hireDate) : "" }
                             onChange={
                                 (date, dateString) => {
-                                    setHireDate(formatDateTime(dateString));
-                                    genCheckOutDay(formatDateTime(dateString), day);
+                                    if(dateString) {
+                                        setHireDate(formatDateTime(dateString));
+                                        genCheckOutDay(formatDateTime(dateString), day);
+                                    } else {
+                                        setHireDate(dayjs(dateTomorrow));
+                                        genCheckOutDay(dayjs(dateTomorrow), day);
+                                    }
                                 }
                             }
                         />

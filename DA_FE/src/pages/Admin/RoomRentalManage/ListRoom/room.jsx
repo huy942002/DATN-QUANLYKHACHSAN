@@ -87,9 +87,9 @@ const Room = ({
                 rooms: data.room,
                 bills: dataBill || null,
                 booking: dataBooking,
-                hireDate: data.hireDate + " " + window.sessionStorage.getItem("time-in"),
-                checkOutDay: data.checkOutDay + " " + window.sessionStorage.getItem("time-out"),
-                userNamePersonnel: window.sessionStorage.getItem("username"),
+                hireDate: data.hireDate + " " + window.localStorage.getItem("time-in"),
+                checkOutDay: data.checkOutDay + " " + window.localStorage.getItem("time-out"),
+                userNamePersonnel: window.localStorage.getItem("username"),
             }
             await axios
                 .post('http://localhost:8080/api/booking/booking-room', params)

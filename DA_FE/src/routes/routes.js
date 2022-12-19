@@ -35,6 +35,7 @@ import Facilities from '~/pages/Admin/FacilityManage';
 
 const publicRoutes = [
     { path: config.routes.home, component: Home, layout: CustomerLayout },
+    { path: config.routes.bookingSuccess, component: Home, layout: CustomerLayout },
     { path: config.routes.login, component: Login, layout: null },
     { path: config.routes.room, component: RoomDetail, layout: null },
     { path: config.routes.searchRoom, component: SearchRoom, layout: null },

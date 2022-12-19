@@ -29,5 +29,6 @@ const routes = {
     bookingmanage: '/admin/booking-manage',
     manageBooking: '/admin/manage-booking',
     facilityManage: '/admin/facility-manage',
+    bookingSuccess: '/:idBooking'
 };
 export default routes;
