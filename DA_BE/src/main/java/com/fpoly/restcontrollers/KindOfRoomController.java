@@ -3,11 +3,20 @@
  */
 package com.fpoly.restcontrollers;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
+import com.fpoly.dto.DetailKindOfRoomResponseDTO;
+import com.fpoly.dto.ImageDTO;
+import com.fpoly.dto.KindOfRoomAndImageRequestDTO;
+import com.fpoly.entities.ImageKindOfRoom;
+import com.fpoly.repositories.imp.IImageKindOfRoomServiceImp;
+import com.fpoly.repositories.repo.ImageKindOfRoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,6 +42,12 @@ public class KindOfRoomController {
 
 	@Autowired
 	IKindOfRoomService repository;
+
+	@Autowired
+	IImageKindOfRoomServiceImp iImageKindOfRoomServiceImp;
+
+	@Autowired
+	ImageKindOfRoomRepository imageKindOfRoomRepository;
 
 	// getAll
 	@GetMapping
@@ -74,4 +89,63 @@ public class KindOfRoomController {
 		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
 	}
 
+	@Transactional
+	@PostMapping("/create-ver-2")
+	public ResponseEntity<KindOfRoom> createVer2(@RequestBody KindOfRoomAndImageRequestDTO kindOfRoomAndImageRequestDTO) {
+		KindOfRoom kindOfRoom = repository.save(kindOfRoomAndImageRequestDTO.getKindOfRoom());
+		List<ImageKindOfRoom> imageKindOfRoomList = new ArrayList<>();
+		for (ImageDTO i : kindOfRoomAndImageRequestDTO.getImageList()) {
+			if(i.getStatusDelete().equals("NO")) {
+				ImageKindOfRoom imageKindOfRoom = new ImageKindOfRoom();
+				imageKindOfRoom.setUrl(i.getUrl());
+				imageKindOfRoom.setKindOfRoom(kindOfRoom);
+				imageKindOfRoom.setStatus(1);
+				imageKindOfRoomList.add(imageKindOfRoom);
+			}
+		}
+		List<ImageKindOfRoom> imageKindOfRoomListResponse = imageKindOfRoomRepository.saveAll(imageKindOfRoomList);
+		return new ResponseEntity<>(kindOfRoom, HttpStatus.OK);
+	}
+
+	@Transactional
+	@GetMapping("/detail/{idKindOfRoom}")
+	public ResponseEntity<?> detail(@PathVariable Integer idKindOfRoom) {
+		KindOfRoom kindOfRoom = repository.findById(idKindOfRoom).get();
+		List<ImageKindOfRoom> imageKindOfRoomList = iImageKindOfRoomServiceImp.getImageListByKindOfRoomId(kindOfRoom.getId());
+		DetailKindOfRoomResponseDTO detailKindOfRoomResponseDTO = new DetailKindOfRoomResponseDTO(kindOfRoom, imageKindOfRoomList);
+		return new ResponseEntity<>(detailKindOfRoomResponseDTO, HttpStatus.OK);
+	}
+
+	@Transactional
+	@PostMapping("/update")
+	public ResponseEntity<KindOfRoom> update(@RequestBody KindOfRoomAndImageRequestDTO kindOfRoomAndImageRequestDTO) {
+		KindOfRoom kindOfRoom = repository.save(kindOfRoomAndImageRequestDTO.getKindOfRoom());
+		if(kindOfRoomAndImageRequestDTO.getImageList() != null) {
+			List<ImageKindOfRoom> imageKindOfRoomList = new ArrayList<>();
+			for (ImageDTO i : kindOfRoomAndImageRequestDTO.getImageList()) {
+				if(i.getStatusDelete().equals("NO") && i.getId() == 0) {
+					ImageKindOfRoom imageKindOfRoom = new ImageKindOfRoom();
+					imageKindOfRoom.setUrl(i.getUrl());
+					imageKindOfRoom.setKindOfRoom(kindOfRoom);
+					imageKindOfRoom.setStatus(1);
+					imageKindOfRoomList.add(imageKindOfRoom);
+				}
+			}
+			List<ImageKindOfRoom> imageKindOfRoomListResponse = imageKindOfRoomRepository.saveAll(imageKindOfRoomList);
+		}
+		if(kindOfRoomAndImageRequestDTO.getImageListDelete() != null) {
+			List<ImageKindOfRoom> imageKindOfRoomListDelete = new ArrayList<>();
+			for (ImageDTO i : kindOfRoomAndImageRequestDTO.getImageListDelete()) {
+				if(i.getStatusDelete().equals("YES") && i.getId() != 0) {
+					ImageKindOfRoom imageKindOfRoom = new ImageKindOfRoom();
+					imageKindOfRoom.setUrl(i.getUrl());
+					imageKindOfRoom.setKindOfRoom(kindOfRoom);
+					imageKindOfRoom.setStatus(1);
+					imageKindOfRoomListDelete.add(imageKindOfRoom);
+				}
+			}
+			imageKindOfRoomRepository.deleteAll(imageKindOfRoomListDelete);
+		}
+		return new ResponseEntity<>(kindOfRoom, HttpStatus.OK);
+	}
 }

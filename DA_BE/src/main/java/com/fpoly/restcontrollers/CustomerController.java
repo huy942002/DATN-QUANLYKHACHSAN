@@ -86,7 +86,7 @@ public class CustomerController {
 		u.setUsername(customer.getUser().getUsername());
 		u.setStatus(customer.getUser().getStatus());
 		u.setRoles(customer.getUser().getRoles());
-		role.setName("Kh·ch h‡ng");
+		role.setName("Kh√°ch h√†ng");
 		role.setStatus(1);
 		roleRepo.save(role);
 		userRepo.save(u);

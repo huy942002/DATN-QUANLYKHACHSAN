@@ -27,7 +27,7 @@ public class ImageKindOfRoom implements Serializable {
     private KindOfRoom kindOfRoom;
 
     @Column(name = "URL", nullable = false)
-    private String name;
+    private String url;
 
     @Column(name = "STATUS", nullable = false, precision = 10)
     private int status;

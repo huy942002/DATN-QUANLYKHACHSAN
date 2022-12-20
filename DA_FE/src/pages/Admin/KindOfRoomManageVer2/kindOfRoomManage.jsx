@@ -9,7 +9,7 @@ const KindOfRoomManage = () => {
         <>
             <Button
                 onClick={
-                    () => navigate('/admin/create-kind-of-room')
+                    () => navigate('/admin/kind-of-room/CREATE')
                 }
             >Thêm mới</Button>
         </>

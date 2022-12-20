@@ -1,8 +1,11 @@
-import { Form, Input, InputNumber, Modal, Switch, Upload } from "antd";
+import { Button, Form, Input, InputNumber, Modal, Switch, Upload } from "antd";
 import { PlusOutlined, UserOutlined } from '@ant-design/icons';
 import TextArea from "antd/es/input/TextArea";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
+import Loading from "~/pages/Loading/loading";
+import { useNavigate, useParams } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
 
 const getBase64 = (file) => new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -11,7 +14,72 @@ const getBase64 = (file) => new Promise((resolve, reject) => {
     reader.onerror = (error) => reject(error);
 });
 
-const CreateKindOfRoom = () => {
+const DetailKindOfRoom = () => {
+
+    const { type, idKindOfRoom } = useParams();
+    const navigate = useNavigate();
+    const [kindOfRoom, setKindOfRoom] = useState({
+        id: "",
+        name: "",
+        note: "",
+        priceByDay: "",
+        hourlyPrice: "",
+        status: 1,
+    });
+
+    const [initialValues, setInitialValues] = useState();
+    const [form] = Form.useForm();
+
+    useEffect(() => {
+        form.setFieldsValue(initialValues)
+    }, [form, initialValues])
+
+    useEffect(
+        () => {
+            if(type === "DETAIL" && idKindOfRoom) {
+                setIsLoading(true);
+                getDetailKindOfRoom();
+            }
+            setTimeout(() => {
+                setIsLoading(false)
+            }, 500);
+        }, []
+    )
+    
+
+    const getDetailKindOfRoom = async () => {
+        await axios
+            .get('http://localhost:8080/api/kind-of-room/detail/' + idKindOfRoom)
+            .then(
+                (res) => {
+                    if(res.status === 200) {
+                        setKindOfRoom(res.data.kindOfRoom);
+                        setInitialValues(
+                            {
+                                'Tên loại phòng': res.data.kindOfRoom.name,
+                                'Giá theo ngày': res.data.kindOfRoom.priceByDay,
+                                'Giá theo giờ': res.data.kindOfRoom.hourlyPrice,
+                                'Ghi chú': res.data.kindOfRoom.note,
+                            }
+                        )
+                        setFileList(
+                            res.data.imageKindOfRoomList.map(
+                                (x) => ({
+                                    uid: x.id,
+                                    id: x.id,
+                                    name: "",
+                                    status: 'done',
+                                    url: x.url,
+                                    statusDelete: "NO",
+                                })
+                            )
+                        )
+                    }
+                }
+            )
+    }
+
+    const [isLoading, setIsLoading] = useState(false);
 
     const validateMessages = {
         required: 'Vui lòng nhập ${label}!',
@@ -62,12 +130,23 @@ const CreateKindOfRoom = () => {
     const [previewImage, setPreviewImage] = useState('');
     const [previewTitle, setPreviewTitle] = useState('');
     const [fileList, setFileList] = useState([
-        {
-            uid: '-1',
-            name: 'image.png',
-            status: 'done',
-            url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-        },
+        // {
+        //     uid: '-1',
+        //     name: 'image.png',
+        //     status: 'done',
+        //     url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+        //     statusDelete: "NO",
+        // },
+    ]);
+
+    const [fileListDelete, setFileListDelete] = useState([
+        // {
+        //     uid: '-1',
+        //     name: 'image.png',
+        //     status: 'done',
+        //     url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+        //     statusDelete: "NO",
+        // },
     ]);
 
     const handleCancel = () => setPreviewOpen(false);
@@ -102,6 +181,7 @@ const CreateKindOfRoom = () => {
     );
 
     const uploadImgae = async (dataImage) => {
+        setIsLoading(true);
         const params = new FormData();
         params.append('file', dataImage);
         params.append('upload_preset', 'image-kind-of-room');
@@ -114,13 +194,16 @@ const CreateKindOfRoom = () => {
                     if(res.status === 200) {
                         const image = {
                             uid: res.data.public_id,
+                            id: "",
                             name: res.data.public_id,
                             status: 'done',
                             url: res.data.url,
+                            statusDelete: "NO",
                         }
                         let listImage = fileList;
                         listImage.push(image);
                         setFileList(listImage);
+                        setIsLoading(false);
                     }
                 }
             )
@@ -129,20 +212,98 @@ const CreateKindOfRoom = () => {
 
     const removeImage = (dataImage) => {
         let listImage = fileList;
+        let listImageDetlete = fileList;
+        listImageDetlete = listImageDetlete.find((x) => x.uid !== dataImage.uid);
         listImage = listImage.filter((x) => x.uid !== dataImage.uid);
         setFileList(listImage);
+        setFileListDelete([
+            ...fileListDelete,
+            listImageDetlete
+        ]);
     }
 
-    const addKindOfRoom = () => {
-        
+    console.log(fileList);
+    console.log(fileListDelete);
+
+    const kindOfRoomAction = async () => {
+        setIsLoading(true);
+        let imageList = [];
+        imageList = fileList && fileList.map((x) => ({
+            id: x.id ? Number(x.id) : "",
+            url: x.url,
+            statusDelete: "NO",
+        }))
+        let imageListDelete = [];
+        imageListDelete = fileListDelete && fileListDelete.map((x) => ({
+            id: x.id ? Number(x.id) : "",
+            url: x.url,
+            statusDelete: "YES",
+        }))
+        const params = {
+            kindOfRoom: kindOfRoom,
+            imageList: imageList,
+            imageListDelete: imageListDelete,
+        };
+        if(type === "CREATE") {
+            await axios
+                .post('http://localhost:8080/api/kind-of-room/create-ver-2', params)
+                .then(
+                    (res) => {
+                        if(res.status === 200) {
+                            setIsLoading(false);
+                            navigate('/admin/kind-of-room/DETAIL/' + res.data.id);
+                            toast('🦄 Thêm mới thành công!', {
+                                position: "top-right",
+                                autoClose: 5000,
+                                hideProgressBar: false,
+                                closeOnClick: true,
+                                pauseOnHover: true,
+                                draggable: true,
+                                progress: undefined,
+                                theme: "light",
+                            });
+                        }
+                    }
+                )
+        }
+
+        if(type === "DETAIL") {
+            await axios
+                .post('http://localhost:8080/api/kind-of-room/update', params)
+                .then(
+                    (res) => {
+                        if(res.status === 200) {
+                            setIsLoading(false);
+                            toast('🦄 Cập nhật thành công!', {
+                                position: "top-right",
+                                autoClose: 5000,
+                                hideProgressBar: false,
+                                closeOnClick: true,
+                                pauseOnHover: true,
+                                draggable: true,
+                                progress: undefined,
+                                theme: "light",
+                            });
+                        }
+                    }
+                )
+        }
     }
 
     return (
         <>
+            {isLoading && (<Loading></Loading>)}
+            <ToastContainer></ToastContainer>
             <div className="font-semibold text-xl">
                 Thêm mới loại phòng
             </div>
-            <Form name="nest-messages" onFinish={addKindOfRoom} validateMessages={validateMessages}>
+            <Form
+                form={form}
+                initialValues={initialValues}
+                name="nest-messages"
+                onFinish={kindOfRoomAction}
+                validateMessages={validateMessages}
+            >
                 <div className="grid grid-cols-12 gap-28 mt-6">
                     <div className="text-base col-span-4">
                         <div>
@@ -163,19 +324,20 @@ const CreateKindOfRoom = () => {
                                 <Input
                                     className="mt-1 w-full"
                                     placeholder="Nhập tên loại phòng..."
-                                    // prefix={<UserOutlined />}
-                                    // value={booking.customerName}
-                                    // onChange={
-                                    //     (e) => setBooking({
-                                    //         ...booking,
-                                    //         customerName: e.target.value
-                                    //     })
-                                    // }
+                                    // value={kindOfRoom.name}
+                                    onChange={
+                                        (e) => setKindOfRoom({
+                                            ...kindOfRoom,
+                                            name: e.target.value
+                                        })
+                                    }
                                 />
                             </Form.Item>
                         </div>
                         <div>
-                            Giá theo ngày
+                            <div className="mb-1">
+                                Giá theo ngày
+                            </div>
                             <Form.Item
                                 name="Giá theo ngày"
                                 rules={[
@@ -185,23 +347,28 @@ const CreateKindOfRoom = () => {
                                     },
                                 ]}
                                 hasFeedback 
+                                value={kindOfRoom.priceByDay}
                             >
                                 <InputNumber
-                                    className="mt-1 w-full"
+                                    className="w-full"
                                     placeholder="Nhập giá theo ngày..."
                                     formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                                     parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
                                     addonAfter={"VND"}
-                                    // prefix={<UserOutlined />}
-                                    // value={booking.customerName}
+                                    
                                     onChange={
-                                        (e) => console.log(e)
+                                        (e) => setKindOfRoom({
+                                            ...kindOfRoom,
+                                            priceByDay: e,
+                                        })
                                     }
                                 />
                             </Form.Item>
                         </div>
                         <div>
-                            Giá theo giờ
+                            <div className="mb-1">
+                                Giá theo giờ
+                            </div>
                             <Form.Item
                                 name="Giá theo giờ"
                                 rules={[
@@ -213,15 +380,17 @@ const CreateKindOfRoom = () => {
                                 hasFeedback 
                             >
                                 <InputNumber
-                                    className="mt-1 w-full"
+                                    className="w-full"
                                     placeholder="Nhập giá theo ngày..."
                                     formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                                     parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
                                     addonAfter={"VND"}
-                                    // prefix={<UserOutlined />}
-                                    // value={booking.customerName}
+                                    value={kindOfRoom.hourlyPrice}
                                     onChange={
-                                        (e) => console.log(e)
+                                        (e) => setKindOfRoom({
+                                            ...kindOfRoom,
+                                            hourlyPrice: e,
+                                        })
                                     }
                                 />
                             </Form.Item>
@@ -243,6 +412,13 @@ const CreateKindOfRoom = () => {
                                     style={{ height: 120, resize: 'none' }}
                                     className="w-full"
                                     placeholder="Ghi chú..."
+                                    value={kindOfRoom.note}
+                                    onChange={
+                                        (e) => setKindOfRoom({
+                                            ...kindOfRoom,
+                                            note: e.target.value,
+                                        })
+                                    }
                                 />
                             </Form.Item>
                         </div>
@@ -251,6 +427,13 @@ const CreateKindOfRoom = () => {
                                 checkedChildren="Hoạt động"
                                 unCheckedChildren="Ngừng hoạt động"
                                 defaultChecked
+                                checked={kindOfRoom.status === 1 ? true : false}
+                                onChange={
+                                    (e) => setKindOfRoom({
+                                        ...kindOfRoom,
+                                        status: e ? 1 : 2
+                                    })
+                                }
                             />
                         </div>
                     </div>
@@ -258,7 +441,6 @@ const CreateKindOfRoom = () => {
                         <div>Ảnh</div>
                         <div className="mt-1">
                             <Upload
-                                // action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
                                 listType="picture-card"
                                 fileList={fileList}
                                 onPreview={handlePreview}
@@ -286,9 +468,18 @@ const CreateKindOfRoom = () => {
                         </div>
                     </div>
                 </div>
+                <div className="mt-12 w-full">
+                    <Button
+                        className="float-right"
+                        htmlType="submit"
+                    >
+                        {type === "CREATE" && "Thêm mới"}
+                        {type === "DETAIL" && "Cập nhật"}
+                    </Button>
+                </div>
             </Form>
         </>
     )
 }
 
-export default CreateKindOfRoom;
+export default DetailKindOfRoom;
