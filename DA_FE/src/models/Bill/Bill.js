@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+
 export default class Bill {
     constructor() {
         this.personnel = null;
@@ -9,7 +11,7 @@ export default class Bill {
             name: 'Tiền mặt',
             status: 0,
         };
-        this.hireDate = "2022-12-04 12:00";
+        this.hireDate = dayjs(new Date()).format('YYYY-MM-DD HH:mm');
         this.checkOutDay = "2022-12-04 12:00";
         this.dateOfPayment = null;
         this.totalCash = null;

@@ -49,7 +49,7 @@ function Room({ room, roomPlan, setRoomPlan, dateChoose }) {
                 }
             >Check in</div>
           ),
-          disabled: room.rooms.statusByDate === 2 || !(dateChoose == dayjs(new Date()).format('YYYY-MM-DD')) || room.detailInvoiceList.find((x) => x.status === 3),
+          disabled: room.rooms.statusByDate === 2 || room.rooms.statusByDate === 3 || !(dateChoose == dayjs(new Date()).format('YYYY-MM-DD')) || room.detailInvoiceList.find((x) => x.status === 3),
         },
         {
           key: '2',

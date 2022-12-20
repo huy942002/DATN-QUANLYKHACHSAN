@@ -57,8 +57,8 @@ function ListRoom({ detailInvoices, setDetailInvoices, serviceDetails, setServic
         newDetailInvoice.facilitiesDetailsList = genDetail(data.room).facilitiesDetailsList;
         newDetailInvoice.serviceAvailableList = genDetail(data.room).serviceAvailableList;
         newDetailInvoice.rentalTypes = rentalTypeList[0];
-        newDetailInvoice.hireDate = dayjs(data.hireDate).format('YYYY-MM-DD') + " " + window.sessionStorage.getItem("time-in");
-        newDetailInvoice.checkOutDay = dayjs(data.checkOutDay).format('YYYY-MM-DD') + " " + window.sessionStorage.getItem("time-out");
+        newDetailInvoice.hireDate = dayjs(data.hireDate).format('YYYY-MM-DD') + " " + window.localStorage.getItem("time-in");
+        newDetailInvoice.checkOutDay = dayjs(data.checkOutDay).format('YYYY-MM-DD') + " " + window.localStorage.getItem("time-out");
         setDetailInvoices([
             ...detailInvoices,
             newDetailInvoice,

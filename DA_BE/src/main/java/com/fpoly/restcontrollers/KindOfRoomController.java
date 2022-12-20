@@ -137,10 +137,7 @@ public class KindOfRoomController {
 			List<ImageKindOfRoom> imageKindOfRoomListDelete = new ArrayList<>();
 			for (ImageDTO i : kindOfRoomAndImageRequestDTO.getImageListDelete()) {
 				if(i.getStatusDelete().equals("YES") && i.getId() != 0) {
-					ImageKindOfRoom imageKindOfRoom = new ImageKindOfRoom();
-					imageKindOfRoom.setUrl(i.getUrl());
-					imageKindOfRoom.setKindOfRoom(kindOfRoom);
-					imageKindOfRoom.setStatus(1);
+					ImageKindOfRoom imageKindOfRoom = iImageKindOfRoomServiceImp.findById(i.getId()).get();
 					imageKindOfRoomListDelete.add(imageKindOfRoom);
 				}
 			}

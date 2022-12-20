@@ -1052,7 +1052,7 @@ function CreateRoomManager() {
                     </Modal.Footer>
                 </Modal>
 
-                <Modal show={visiblecopy2} size="3xl" popup={false} onClose={() => setvisiblecopy2(false)}>
+                <Modal show={visiblecopy2} size="3xl" popup={false} onClose={() => setvisiblecopy2(false)} position="top-center">
                     <Modal.Header></Modal.Header>
                     <Modal.Body>
                         <div className="grid grid-rows-2 grid-flow-col gap-4">

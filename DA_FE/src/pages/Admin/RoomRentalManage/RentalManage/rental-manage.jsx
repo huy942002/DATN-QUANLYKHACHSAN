@@ -109,6 +109,7 @@ const RentalManage = () => {
         }
     };
 
+    console.log(bill);
 
     const checkData = async () => {
         const response = await axios.get('http://localhost:8080/api/room-rental-manage/details/' + idRoomChoose);
