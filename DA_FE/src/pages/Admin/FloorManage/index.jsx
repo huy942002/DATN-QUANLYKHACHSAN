@@ -4,11 +4,12 @@ import { Link } from 'react-router-dom';
 import config from '~/config';
 
 import authorServices from '~/services/authorServices';
+import { downloadExcel } from 'react-export-table-to-excel';
 
-import { faChevronRight, faPlus, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+import { faChevronRight, faPlus, faMagnifyingGlass, faFileExcel } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Modal } from 'flowbite-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllNumberOfFloors, getByIdNumberOfFloors, update, AddNBF as add } from '~/app/reducers/numberOfFloor';
 import { toast } from 'react-toastify';
@@ -23,6 +24,8 @@ const FloorSchema = Yup.object().shape({
     numberOfFloors: Yup.number().required('Số tầng không được để trống'),
     status: Yup.string().nullable(),
 });
+
+const header = ['ID', 'Tầng', 'Trạng thái'];
 
 function NumberOfFloors() {
     const [visibleDeleteFloor, setVisibleDeleteFloor] = useState(false);
@@ -97,6 +100,18 @@ function NumberOfFloors() {
         setVisibleAddFloor(false);
     }
 
+    function handleDownloadExcel() {
+        downloadExcel({
+            fileName: 'floor-manage',
+            sheet: 'floor-manage',
+            tablePayload: {
+                header,
+                // accept two different data structures
+                body: numberOfFloorss,
+            },
+        });
+    }
+
     return (
         <div className="text-black pt-6 px-1 pb-5">
             <nav className="flex" aria-label="Breadcrumb">
@@ -125,7 +140,7 @@ function NumberOfFloors() {
                 <div className="col-start-1 flex justify-center items-center">
                     <p>Tìm kiếm tầng</p>
                 </div>
-                <div className="col-start-2 col-end-6">
+                <div className="col-start-2 col-end-5">
                     <div className="relative">
                         <div className="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
                             <FontAwesomeIcon icon={faMagnifyingGlass} />
@@ -139,7 +154,7 @@ function NumberOfFloors() {
                         />
                     </div>
                 </div>
-                <div className="col-start-6 flex justify-center items-center">
+                <div className="col-start-5 flex justify-center items-center">
                     <button
                         type="button"
                         onClick={() => {
@@ -149,6 +164,15 @@ function NumberOfFloors() {
                     >
                         <FontAwesomeIcon icon={faPlus} />
                         <span className="mx-2">Thêm</span>
+                    </button>
+                </div>
+                <div>
+                    <button
+                        className="py-2 px-3 text-sm font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+                        onClick={handleDownloadExcel}
+                    >
+                        <FontAwesomeIcon className="mr-2" icon={faFileExcel} />
+                        Export
                     </button>
                 </div>
             </div>

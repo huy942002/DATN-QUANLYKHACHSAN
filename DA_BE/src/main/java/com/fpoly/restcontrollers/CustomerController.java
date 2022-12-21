@@ -3,10 +3,8 @@
  */
 package com.fpoly.restcontrollers;
 
-import java.lang.reflect.Array;
 import java.util.Optional;
 
-import com.fpoly.repositories.repo.AuthorityRepository;
 import com.fpoly.repositories.repo.CustomerRepository;
 import com.fpoly.repositories.repo.RoleRepository;
 import com.fpoly.repositories.repo.UserRepository;
@@ -27,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fpoly.dto.CustomerDTO;
-import com.fpoly.entities.Authority;
 import com.fpoly.entities.Customer;
 import com.fpoly.entities.Roles;
 import com.fpoly.entities.Users;
@@ -82,7 +79,7 @@ public class CustomerController {
 		u.setUsername(customer.getUser().getUsername());
 		u.setStatus(customer.getUser().getStatus());
 		u.setRoles(customer.getUser().getRoles());
-		role.setName("Kh√°ch h√†ng");
+		role.setName("Kh·ch h‡ng");
 		roleRepo.save(role);
 		userRepo.save(u);
 		c.setUsers(u);

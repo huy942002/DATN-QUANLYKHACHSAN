@@ -1,14 +1,15 @@
 import { Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 
-import { faMagnifyingGlass, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faFileExcel, faMagnifyingGlass, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { toast } from 'react-toastify';
 import ReactPaginate from 'react-paginate';
+import { downloadExcel } from 'react-export-table-to-excel';
 
 import { Button, Modal } from 'flowbite-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllService, getServiceById, update, add } from '~/app/reducers/service';
 import { getAllServiceType } from '~/app/reducers/serviceType';
@@ -22,6 +23,8 @@ const objService = {
 };
 
 const regexSpace = /^(\S+$)/;
+
+const header = ['ID', 'Tên dịch vụ', 'Giá', 'Ghi chú', 'Trạng thái'];
 
 const ServiceSchema = Yup.object().shape({
     name: Yup.string().matches(regexSpace, 'Không chỉ để khoảng trắng').required('Dịch vụ không được để trống'),
@@ -41,6 +44,7 @@ function Services() {
     const servic = useSelector((state) => state.service.service);
     const serviceType = useSelector((state) => state.serviceType.serviceTypes);
     const dispatch = useDispatch();
+    const tableRef = useRef(null);
 
     useEffect(() => {
         dispatch(getAllService());
@@ -107,13 +111,25 @@ function Services() {
         setVisibleAdd(false);
     }
 
+    function handleDownloadExcel() {
+        downloadExcel({
+            fileName: 'service-manage',
+            sheet: 'service-manage',
+            tablePayload: {
+                header,
+                // accept two different data structures
+                body: services,
+            },
+        });
+    }
+
     return (
         <div>
             <div className="grid grid-cols-6">
                 <div className="col-start-1 flex justify-center items-center">
                     <p>Tìm kiếm dịch vụ</p>
                 </div>
-                <div className="col-start-2 col-end-6">
+                <div className="col-start-2 col-end-5">
                     <div className="relative">
                         <div className="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
                             <FontAwesomeIcon icon={faMagnifyingGlass} />
@@ -126,7 +142,7 @@ function Services() {
                         />
                     </div>
                 </div>
-                <div className="col-start-6 flex justify-center items-center">
+                <div className="col-start-5 flex justify-center items-center">
                     <button
                         type="button"
                         onClick={() => {
@@ -136,6 +152,15 @@ function Services() {
                     >
                         <FontAwesomeIcon icon={faPlus} />
                         <span className="mx-2">Thêm</span>
+                    </button>
+                </div>
+                <div>
+                    <button
+                        className="py-2 px-3 text-sm font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+                        onClick={handleDownloadExcel}
+                    >
+                        <FontAwesomeIcon className="mr-2" icon={faFileExcel} />
+                        Export
                     </button>
                 </div>
             </div>

@@ -1,9 +1,12 @@
-import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+import { faFileExcel, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllHistory } from '~/app/reducers/history';
 import ReactPaginate from 'react-paginate';
+import { downloadExcel } from 'react-export-table-to-excel';
+
+const header = ['ID', 'Thời gian vào', 'Thời gian ra', 'Trạng thái giao ca', 'Trạng thái'];
 
 function HistoryAdmin() {
     const [valueSearch, setValueSearch] = useState('');
@@ -33,9 +36,21 @@ function HistoryAdmin() {
         setItemOffset(newOffset);
     };
 
+    function handleDownloadExcel() {
+        downloadExcel({
+            fileName: 'history-manage',
+            sheet: 'history-manage',
+            tablePayload: {
+                header,
+                // accept two different data structures
+                body: historiess,
+            },
+        });
+    }
+
     return (
         <div>
-            <div className="grid grid-cols-6">
+            <div className="grid grid-cols-6 gap-3">
                 <div className="col-start-1 flex justify-center items-center">
                     <p>Tìm kiếm nhân viên</p>
                 </div>
@@ -51,6 +66,15 @@ function HistoryAdmin() {
                             placeholder="Tìm kiếm..."
                         />
                     </div>
+                </div>
+                <div>
+                    <button
+                        className="py-2 px-3 text-sm font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+                        onClick={handleDownloadExcel}
+                    >
+                        <FontAwesomeIcon className="mr-2" icon={faFileExcel} />
+                        Export
+                    </button>
                 </div>
             </div>
             <div className="mt-4 p-2">

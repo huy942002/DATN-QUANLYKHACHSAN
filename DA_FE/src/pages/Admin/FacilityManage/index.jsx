@@ -2,7 +2,7 @@ import { Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import { Link } from 'react-router-dom';
 import config from '~/config';
-import { faChevronRight, faPlus, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+import { faChevronRight, faPlus, faMagnifyingGlass, faFileExcel } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Modal } from 'flowbite-react';
 import { useEffect, useState } from 'react';
@@ -10,11 +10,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getAllFacilities, getFacilitiesById, update, add } from '~/app/reducers/facility';
 import { toast } from 'react-toastify';
 import ReactPaginate from 'react-paginate';
+import { downloadExcel } from 'react-export-table-to-excel';
 
 const objFacilities = {
     name: '',
     status: '',
 };
+
+const header = ['ID', 'Tên cơ sở vật chất', 'Trạng thai'];
 
 const regexSpace = /^[^\s]+(\s+[^\s]+)*$/;
 
@@ -92,6 +95,18 @@ function Facilities() {
         setVisibleAddFaci(false);
     }
 
+    function handleDownloadExcel() {
+        downloadExcel({
+            fileName: 'facility-manage',
+            sheet: 'facility-manage',
+            tablePayload: {
+                header,
+                // accept two different data structures
+                body: facilities,
+            },
+        });
+    }
+
     return (
         <div className="text-black pt-6 px-1 pb-5">
             <nav className="flex" aria-label="Breadcrumb">
@@ -120,7 +135,7 @@ function Facilities() {
                 <div className="col-start-1 flex justify-center items-center">
                     <p>Tìm kiếm</p>
                 </div>
-                <div className="col-start-2 col-end-6">
+                <div className="col-start-2 col-end-5">
                     <div className="relative">
                         <div className="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
                             <FontAwesomeIcon icon={faMagnifyingGlass} />
@@ -134,7 +149,7 @@ function Facilities() {
                         />
                     </div>
                 </div>
-                <div className="col-start-6 flex justify-center items-center">
+                <div className="col-start-5 flex justify-center items-center">
                     <button
                         type="button"
                         onClick={() => {
@@ -144,6 +159,15 @@ function Facilities() {
                     >
                         <FontAwesomeIcon icon={faPlus} />
                         <span className="mx-2">Thêm</span>
+                    </button>
+                </div>
+                <div>
+                    <button
+                        className="py-2 px-3 text-sm font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+                        onClick={handleDownloadExcel}
+                    >
+                        <FontAwesomeIcon className="mr-2" icon={faFileExcel} />
+                        Export
                     </button>
                 </div>
             </div>

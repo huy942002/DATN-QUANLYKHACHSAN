@@ -1,14 +1,15 @@
 import { Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 
-import { faMagnifyingGlass, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faFileExcel, faMagnifyingGlass, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Modal } from 'flowbite-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { toast } from 'react-toastify';
 import ReactPaginate from 'react-paginate';
+import { downloadExcel } from 'react-export-table-to-excel';
 
 import { add, getAllServiceType, getServiceTypeById, update } from '~/app/reducers/serviceType';
 
@@ -17,6 +18,8 @@ const objServiceType = {
     note: '',
     status: '',
 };
+
+const header = ['ID', 'Tên loại dịch vụ', 'Ghi chú', 'Trạng thái'];
 
 const regexSpace = /^(\S+$)/;
 
@@ -60,6 +63,18 @@ function ServiceTypes() {
         setItemOffset(newOffset);
     };
 
+    function handleDownloadExcel2() {
+        downloadExcel({
+            fileName: 'servicetype-manage',
+            sheet: 'servicetype-manage',
+            tablePayload: {
+                header,
+                // accept two different data structures
+                body: serviceTypess,
+            },
+        });
+    }
+
     function openAddType() {
         setVisibleAddType(true);
     }
@@ -99,7 +114,7 @@ function ServiceTypes() {
                 <div className="col-start-1 flex justify-center items-center">
                     <p>Tìm kiếm loại dịch vụ</p>
                 </div>
-                <div className="col-start-2 col-end-6">
+                <div className="col-start-2 col-end-5">
                     <div className="relative">
                         <div className="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
                             <FontAwesomeIcon icon={faMagnifyingGlass} />
@@ -112,7 +127,7 @@ function ServiceTypes() {
                         />
                     </div>
                 </div>
-                <div className="col-start-6 flex justify-center items-center">
+                <div className="col-start-5 flex justify-center items-center">
                     <button
                         type="button"
                         onClick={() => {
@@ -122,6 +137,15 @@ function ServiceTypes() {
                     >
                         <FontAwesomeIcon icon={faPlus} />
                         <span className="mx-2">Thêm</span>
+                    </button>
+                </div>
+                <div>
+                    <button
+                        className="py-2 px-3 text-sm font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+                        onClick={handleDownloadExcel2}
+                    >
+                        <FontAwesomeIcon className="mr-2" icon={faFileExcel} />
+                        Export
                     </button>
                 </div>
             </div>

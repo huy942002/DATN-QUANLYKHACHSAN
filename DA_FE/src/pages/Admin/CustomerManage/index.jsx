@@ -4,13 +4,14 @@ import * as Yup from 'yup';
 import { Link } from 'react-router-dom';
 import config from '~/config';
 
-import { faChevronRight, faMagnifyingGlass, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faChevronRight, faFileExcel, faMagnifyingGlass, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { toast } from 'react-toastify';
 import ReactPaginate from 'react-paginate';
+import { downloadExcel } from 'react-export-table-to-excel';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { add as addAutho } from '~/app/reducers/authority';
 import { add, getAllCustomer, getAllNationality, getCustomerById, update } from '~/app/reducers/customer';
@@ -40,6 +41,19 @@ const objCustomer = {
         roles: '',
     },
 };
+
+const header = [
+    'ID',
+    'Họ tên',
+    'Email',
+    'Giới tính',
+    'CCCD',
+    'Ngày sinh',
+    'Số điện thoại',
+    'Địa chỉ',
+    'Avatar',
+    'Trạng thái',
+];
 
 const regexSpace = /^[^\s]+(\s+[^\s]+)*$/;
 const regexPhoneNumber = /^(0?)(3[2-9]|5[6|8|9]|7[0|6-9]|8[0-6|8|9]|9[0-4|6-9])[0-9]{7}$/;
@@ -144,6 +158,18 @@ function CustomerManage() {
         setVisibleUpdate(false);
     }
 
+    function handleDownloadExcel() {
+        downloadExcel({
+            fileName: 'customer-manage',
+            sheet: 'customer-manage',
+            tablePayload: {
+                header,
+                // accept two different data structures
+                body: customers,
+            },
+        });
+    }
+
     function handleAdd(data) {
         dispatch(
             add({
@@ -207,7 +233,7 @@ function CustomerManage() {
                 <div className="col-start-1 flex justify-center items-center">
                     <p>Tìm kiếm theo tên</p>
                 </div>
-                <div className="col-start-2 col-end-6">
+                <div className="col-start-2 col-end-5">
                     <div className="relative">
                         <div className="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
                             <FontAwesomeIcon icon={faMagnifyingGlass} />
@@ -221,7 +247,7 @@ function CustomerManage() {
                         />
                     </div>
                 </div>
-                <div className="col-start-6 flex justify-center items-center">
+                <div className="col-start-5 flex justify-center items-center">
                     <button
                         type="button"
                         onClick={() => {
@@ -231,6 +257,15 @@ function CustomerManage() {
                     >
                         <FontAwesomeIcon icon={faPlus} />
                         <span className="mx-2">Thêm</span>
+                    </button>
+                </div>
+                <div>
+                    <button
+                        className="py-2 px-3 text-sm font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+                        onClick={handleDownloadExcel}
+                    >
+                        <FontAwesomeIcon className="mr-2" icon={faFileExcel} />
+                        Export
                     </button>
                 </div>
             </div>
