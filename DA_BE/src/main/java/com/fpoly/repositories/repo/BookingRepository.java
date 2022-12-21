@@ -28,9 +28,12 @@ public interface BookingRepository extends JpaRepository<Booking, Integer>{
 
     List<Booking> findByStatusAndPaymentStatus(Integer status, Integer paymentStatus);
 
-    @Query("select b from Booking b where (b.status = 1 or b.status = 2) and b.paymentStatus = 2")
+    @Query("select b from Booking b where b.status = 1 and b.paymentStatus = 2")
     List<Booking> getAllBookingPaid();
 
-    @Query("select b from Booking b where b.paymentStatus = 1")
+    @Query("select b from Booking b where b.paymentStatus = 1 and b.status = 1")
     List<Booking> getAllBookingUnPaid();
+
+    @Query("select b from Booking b where b.status = 3")
+    List<Booking> getAllBookingCancel();
 }

@@ -186,23 +186,18 @@ const Booking = () => {
         await axios
             .post("http://localhost:8080/api/booking", params)
             .then((res) => {
-                const paramsBanking = {
-                    deposits: ((booking.kindOfRoom.priceByDay * booking.quantityRoom) + (booking.kindOfRoom.priceByDay * booking.quantityRoom * 10 / 100) ) * day,
-                    bankCode: "",
-                    billMobile: booking.customerPhoneNumber,
-                    billEmail: booking.customerEmail,
-                    billingFullName: booking.customerName,
-                    billAddress: "",
-                    billCity: "",
-                    billCountry: "",
-                    billState: "",
-                    idBooking: res.data.id
-                }
-                axios
-                .post("http://localhost:8080/api/payment", paramsBanking)
-                .then((res) => {
-                    if(res.data.code === "00") {
-                        window.location.replace(res.data.paymentUrl);
+                if(chooseOption === "PAY_NOW") {
+                    const paramsBanking = {
+                        deposits: ((booking.kindOfRoom.priceByDay * booking.quantityRoom) + (booking.kindOfRoom.priceByDay * booking.quantityRoom * 10 / 100) ) * day,
+                        bankCode: "",
+                        billMobile: booking.customerPhoneNumber,
+                        billEmail: booking.customerEmail,
+                        billingFullName: booking.customerName,
+                        billAddress: "",
+                        billCity: "",
+                        billCountry: "",
+                        billState: "",
+                        idBooking: res.data.id
                     }
                     axios
                         .post("http://localhost:8080/api/payment", paramsBanking)

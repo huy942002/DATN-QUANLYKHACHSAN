@@ -116,6 +116,39 @@ const UnPaid = () => {
             .catch((err) => {});
     }
 
+    const cancelBooking = async () => {
+        setIsLoading(true);
+        const params = {
+            ...dataBooking,
+            note: note,
+            status: 3,
+        }
+        await axios
+            .post('http://localhost:8080/api/booking', params)
+            .then(
+                (res) => {
+                    if(res) {
+                        setTimeout(() => {
+                            setIsModalOpen(false);
+                            setIsLoading(false);
+                        }, 500);
+                        getListBookingUnPaid();
+                        toast('🦄 Hủy đặt phòng thành công!', {
+                            position: "top-right",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                            theme: "light",
+                        });
+                    }
+                }
+            )
+            .catch((err) => {});
+    }
+
     return (
         <>
             {isLoading && (<Loading></Loading>)}
@@ -155,7 +188,7 @@ const UnPaid = () => {
                         Số trẻ em: {dataBooking && dataBooking.numberOfKids}
                     </div>
                     <div className="my-2">
-                        Tiền cần thanh toán: {dataBooking && formatCurrency(dataBooking.deposits)}
+                        Tiền cần thanh toán: {dataBooking && formatCurrency(dataBooking.moneyToPay ? dataBooking.moneyToPay : 0)}
                     </div>
 
                     <Radio.Group onChange={(e) => setChooseOption(e.target.value)} value={chooseOption}>
@@ -207,7 +240,7 @@ const UnPaid = () => {
                     {chooseOption === "CANCEL" && (
                         <Form
                             name="cancel"
-                            // onFinish={kindOfRoomAction}
+                            onFinish={cancelBooking}
                             validateMessages={validateMessages}
                             className="mt-3"
                         >
@@ -220,7 +253,6 @@ const UnPaid = () => {
                                     rules={[
                                         {   
                                             required: true,
-
                                         },
                                     ]}
                                     hasFeedback 

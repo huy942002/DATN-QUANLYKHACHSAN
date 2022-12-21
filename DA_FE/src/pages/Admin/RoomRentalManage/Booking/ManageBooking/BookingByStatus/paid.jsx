@@ -1,11 +1,13 @@
 import { Button, Checkbox, DatePicker, Divider, Input, InputNumber, Modal, Radio, Select, Switch, Table } from "antd";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBuildingCircleCheck, faCircleExclamation, faPersonWalkingArrowRight, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faBuildingCircleCheck, faCircleExclamation, faCircleXmark, faPersonWalkingArrowRight, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useState } from "react";
 import axios from "axios";
 import ListRoom from "../../../ListRoom/listRoom";
 import { UserOutlined, SearchOutlined, CheckOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import Loading from "~/pages/Loading/loading";
+import { toast } from 'react-toastify';
 
 function Paid() {
 
@@ -18,6 +20,7 @@ function Paid() {
     const [dataBill, setDataBill] = useState();
     const [roomBookingList, setRoomBookingList] = useState();
     const [queryCustomerName, setQueryCustomerName] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
     const genders = [
         { value: 'Nam', label: 'Nam' },
         { value: 'Nữ', label: 'Nữ' },
@@ -29,7 +32,7 @@ function Paid() {
                 <div className="font-semibold">
                     {customerName}
                     {element.bookingStatus === 1 && (
-                        <span className="text-white font-bold rounded-lg bg-status-2 px-2 py-1 ml-3">
+                        <span className="text-white font-semibold rounded-lg bg-status-2 px-2 py-1 ml-3">
                             {element.bookingStatus === 1 && "Mới"}
                         </span>
                     )}
@@ -79,6 +82,34 @@ function Paid() {
                     ></FontAwesomeIcon>
                 </span>
             ),
+        },
+    ];
+    const columnsRoomBookingList = [
+        { title: 'Phòng', dataIndex: 'customerName', key: '1',
+            render: (_, x) => (
+                <span>
+                    {x.rooms.name}
+                </span>
+            )
+        },
+        { title: 'Loại phòng', dataIndex: 'customerName', key: '4',
+            render: (_, x) => (
+                <span>
+                    {x.rooms.kindOfRoom.name}
+                </span>
+            )
+        },
+        { title: 'Nhận phòng', dataIndex: 'hireDate', key: '2' },
+        { title: 'Trả phòng', dataIndex: 'checkOutDay', key: '3' },
+        { title: '', dataIndex: '', key: '4',
+            render: (x) => (
+                <span
+                    className="flex justify-center items-center hover:text-status-2 cursor-pointer"
+                    onClick={() => deleteBookingRoom(x.id)}
+                >
+                    <FontAwesomeIcon className="w-5 h-5" icon={faCircleXmark}></FontAwesomeIcon>
+                </span>
+            )
         },
     ];
     const [chooseDateNow, setChooseDateNow] = useState(true);
@@ -248,6 +279,35 @@ function Paid() {
             })
             .catch((err) => {});
     }
+
+    const deleteBookingRoom = async (idDetailInvoice) => {
+        setIsLoading(true);
+        await axios
+            .get('http://localhost:8080/api/booking/delete-booking-room/' + idDetailInvoice)
+            .then((res) => {
+                if(res.data === "SUCCESS") {
+                    setRoomBookingList(
+                        roomBookingList.filter(
+                            (x) => x.id !== idDetailInvoice
+                        )
+                    )
+                    setTimeout(() => {
+                        setIsLoading(false);
+                        toast.success('🦄 Xóa phòng đặt thành công!', {
+                            position: "top-right",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                            theme: "light",
+                        });
+                    }, 500);
+                }
+            })
+            .catch((err) => {});
+    }
     //End Function
 
     //Util
@@ -264,6 +324,7 @@ function Paid() {
 
     return (
         <>
+            {isLoading && (<Loading></Loading>)}
             <Modal 
                 title={"Chi tiết booking"}
                 open={isModalOpen}
@@ -273,100 +334,121 @@ function Paid() {
                 cancelButtonProps={{ style: { display: 'none' } }}
                 style={{ top: 20 }}
             >
-                <div className="my-2">
-                    Tên khách hàng: {dataBooking && dataBooking.customerName}
-                </div>
-                <div className="my-2">
-                    Số điện thoại: {dataBooking && dataBooking.customerPhoneNumber}
-                </div>
-                <div className="my-2">
-                    Email: {dataBooking && dataBooking.customerEmail}
-                </div>
-                <div className="my-2">
-                    Loại phòng book: {dataBooking && dataBooking.kindOfRoom.name}
-                </div>
-                <div className="my-2">
-                    Ngày đến: {dataBooking && dataBooking.hireDate}
-                </div>
-                <div className="my-2">
-                    Ngày đi: {dataBooking && dataBooking.checkOutDay}
-                </div>
-                <div className="my-2">
-                    Số người lớn: {dataBooking && dataBooking.numberOfAdults}
-                </div>
-                <div className="my-2">
-                    Số trẻ em: {dataBooking && dataBooking.numberOfKids}
-                </div>
-                <div className="my-2">
-                    Tiền đã thanh toán: {dataBooking && formatCurrency(dataBooking.deposits)}
-                </div>
+                <div className="text-base">
+                    <div className="my-2">
+                        Tên khách hàng: {dataBooking && dataBooking.customerName}
+                    </div>
+                    <div className="my-2">
+                        Số điện thoại: {dataBooking && dataBooking.customerPhoneNumber}
+                    </div>
+                    <div className="my-2">
+                        Email: {dataBooking && dataBooking.customerEmail}
+                    </div>
+                    <div className="my-2">
+                        Loại phòng book: {dataBooking && dataBooking.kindOfRoom.name}
+                    </div>
+                    <div className="my-2">
+                        Ngày đến: {dataBooking && dataBooking.hireDate}
+                    </div>
+                    <div className="my-2">
+                        Ngày đi: {dataBooking && dataBooking.checkOutDay}
+                    </div>
+                    <div className="my-2">
+                        Số người lớn: {dataBooking && dataBooking.numberOfAdults}
+                    </div>
+                    <div className="my-2">
+                        Số trẻ em: {dataBooking && dataBooking.numberOfKids}
+                    </div>
+                    <div className="my-2">
+                        Tiền đã thanh toán: {dataBooking && formatCurrency(dataBooking.deposits)}
+                    </div>
 
-                <Divider orientation="left">
-                    <span className="font-semibold mr-3">Phòng book</span>
-                </Divider>
-                
-                {roomBookingList && roomBookingList.map(
-                    (x) => (
-                        <div className="grid grid-cols-12 gap-2">
-                            <div className="col-span-11 text-base font-semibold border rounded-md py-1 px-2 mb-2 flex items-center">
-                                <div className="border-r-2 border-design-charcoalblack pr-1">
-                                    {x.rooms.name}
+                    <Divider orientation="left">
+                        <span className="font-semibold mr-3">
+                            {roomBookingList && roomBookingList.length > 0 ? "Phòng" : "Chưa xếp phòng"}
+                            <Button
+                                className="px-2.5 ml-2"
+                                onClick={() => showModalListRoom()}
+                            >
+                                <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon>
+                            </Button>
+                        </span>
+                    </Divider>
+
+                    {roomBookingList && roomBookingList.length > 0 && (
+                        <Table
+                            size="middle"
+                            locale={{emptyText: "Chưa xếp phòng nào!"}}
+                            bordered
+                            pagination={false}
+                            columns={columnsRoomBookingList}
+                            dataSource={roomBookingList}
+                        />
+                    )}
+                    
+                    {/* {roomBookingList && roomBookingList.map(
+                        (x) => (
+                            <div className="grid grid-cols-12 gap-2">
+                                <div className="col-span-11 text-base font-semibold border rounded-md py-1 px-2 mb-2 flex items-center">
+                                    <div className="border-r-2 border-design-charcoalblack pr-1">
+                                        {x.rooms.name}
+                                    </div>
+                                    <div className="ml-1">
+                                        <FontAwesomeIcon
+                                            icon={faBuildingCircleCheck}
+                                            className="w-[14px] h-[14px] bg-design-charcoalblack rounded-full text-white p-1"
+                                        ></FontAwesomeIcon>
+                                    </div>
+                                    <div className="border-r-2 border-design-charcoalblack pr-1 ml-1">
+                                        {x.hireDate}
+                                    </div>
+                                    <div className="ml-1">
+                                        <FontAwesomeIcon
+                                            icon={faPersonWalkingArrowRight}
+                                            className="w-[14px] h-[14px] bg-design-charcoalblack rounded-full text-white p-1"
+                                        ></FontAwesomeIcon>
+                                    </div>
+                                    <div className="ml-1">
+                                        {x.checkOutDay}
+                                    </div>
                                 </div>
-                                <div className="ml-1">
+                                <div className="col-span-1 text-base font-semibold border rounded-md py-1 px-2 mb-2 cursor-pointer hover:border-design-greenLight hover:text-design-greenLight">
                                     <FontAwesomeIcon
-                                        icon={faBuildingCircleCheck}
-                                        className="w-[14px] h-[14px] bg-design-charcoalblack rounded-full text-white p-1"
+                                        icon={faTrash}
                                     ></FontAwesomeIcon>
                                 </div>
-                                <div className="border-r-2 border-design-charcoalblack pr-1 ml-1">
-                                    {x.hireDate}
-                                </div>
-                                <div className="ml-1">
-                                    <FontAwesomeIcon
-                                        icon={faPersonWalkingArrowRight}
-                                        className="w-[14px] h-[14px] bg-design-charcoalblack rounded-full text-white p-1"
-                                    ></FontAwesomeIcon>
-                                </div>
-                                <div className="ml-1">
-                                    {x.checkOutDay}
-                                </div>
                             </div>
-                            <div className="col-span-1 text-base font-semibold border rounded-md py-1 px-2 mb-2 cursor-pointer hover:border-design-greenLight hover:text-design-greenLight">
-                                <FontAwesomeIcon
-                                    icon={faTrash}
-                                ></FontAwesomeIcon>
-                            </div>
-                        </div>
-                    )
-                )}
+                        )
+                    )} */}
 
-                <Button
-                    type="primary"
-                    className="w-full mt-3"
-                    onClick={() => showModalListRoom()}
-                >
-                    Thêm phòng
-                    <FontAwesomeIcon
-                        icon={faPlus}
-                        className="ml-2"
-                    ></FontAwesomeIcon>
-                </Button>
+                    {/* <Button
+                        type="primary"
+                        className="w-full mt-3"
+                        onClick={() => showModalListRoom()}
+                    >
+                        Thêm phòng
+                        <FontAwesomeIcon
+                            icon={faPlus}
+                            className="ml-2"
+                        ></FontAwesomeIcon>
+                    </Button> */}
 
-                <Divider
-                    style={{ marginBottom: 20, marginTop: 20 }}
-                ></Divider>
+                    <Divider
+                        style={{ marginBottom: 20, marginTop: 20 }}
+                    ></Divider>
 
-                <Button 
-                    type="primary" 
-                    className="w-full" 
-                    onClick={() => setOpenModalCheckIn(true)}
-                >
-                    Khách nhận phòng
-                    <FontAwesomeIcon
-                        className="ml-2"
-                        icon={faBuildingCircleCheck}
-                    ></FontAwesomeIcon>
-                </Button>
+                    <Button 
+                        type="primary" 
+                        className="w-full" 
+                        onClick={() => setOpenModalCheckIn(true)}
+                    >
+                        Khách nhận phòng
+                        <FontAwesomeIcon
+                            className="ml-2"
+                            icon={faBuildingCircleCheck}
+                        ></FontAwesomeIcon>
+                    </Button>
+                </div>
             </Modal>
             <Modal 
                 title={"Khách nhận phòng"}
@@ -662,7 +744,7 @@ function Paid() {
                         onChange={
                             (e) => setChooseDateNow(e.target.checked)
                         }
-                    >Ngày hôm nay</Checkbox>
+                    >Ngày hôm nay ({dayjs(new Date()).format("DD-MM-YYYY")})</Checkbox>
                     <Checkbox
                         className="mr-3"
                         checked={chooseNew}

@@ -55,6 +55,12 @@ public class BookingController {
 	}
 
 	@Transactional
+	@GetMapping("/get-list-booking-cancel")
+	public ResponseEntity<?> getListBookingCancel() {
+		return new ResponseEntity<>(iBookingService.getAllBookingCancel(), HttpStatus.OK);
+	}
+
+	@Transactional
 	@GetMapping("/get-room-booking-list/{idBooking}")
 	public ResponseEntity<?> getRoomBookingList(@PathVariable Integer idBooking) {
 		List<DetailsInvoice> roomBookingList = new ArrayList<>();
@@ -119,6 +125,13 @@ public class BookingController {
 		BookingRoomResponseDTO bookingRoomResponseDTO = new BookingRoomResponseDTO(bills, detailsInvoice);
 
 		return new ResponseEntity<>(bookingRoomResponseDTO, HttpStatus.OK);
+	}
+
+	@Transactional
+	@GetMapping("/delete-booking-room/{idDetailInvoice}")
+	public ResponseEntity<?> deleteBookingRoom(@PathVariable Integer idDetailInvoice) {
+		iDetailInvoiceService.remove(idDetailInvoice);
+		return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
 	}
 
 	@Transactional

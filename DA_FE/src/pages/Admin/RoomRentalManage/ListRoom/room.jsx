@@ -8,6 +8,8 @@ import { Divider, message, Modal } from 'antd';
 import { useState, React } from 'react'
 import MonthlyCalendarRoom from '../Calendar/MonthlyCalendar';
 import axios from 'axios';
+import Loading from './../../../Loading/loading';
+import { toast } from 'react-toastify';
 
 const { confirm } = Modal;
 
@@ -34,6 +36,7 @@ const Room = ({
     const key = 'messageApi';
     const [messageApi, contextHolder] = message.useMessage();
     const [listDetailInvoice, setListDetailInvoice] = useState();
+    const [isLoading, setIsLoading] = useState(false);
     //End Data
 
     //Created
@@ -82,6 +85,7 @@ const Room = ({
     }
 
     const confirm = async (data) => {
+        setIsLoading(true);
         if(optionType === "BOOKING") {
             const params = {
                 rooms: data.room,
@@ -102,6 +106,19 @@ const Room = ({
                     setOpenCalendar(false);
                     setOpenModalListRoom(false);
                     updateRoomPlan();
+                    setTimeout(() => {
+                        setIsLoading(false);
+                    }, 500);
+                    toast.success('🦄 Xếp phòng thành công!', {
+                        position: "top-right",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "light",
+                    });
                 })
                 .catch((err) => {});
         }
@@ -165,7 +182,7 @@ const Room = ({
     return (
         <> 
             {contextHolder}
-
+            {isLoading && (<Loading></Loading>)}
             <div
                 onClick={
                     () => {

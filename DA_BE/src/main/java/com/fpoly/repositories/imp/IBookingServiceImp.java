@@ -58,4 +58,9 @@ public class IBookingServiceImp implements IBookingService {
 	public List<Booking> getAllBookingUnPaid() {
 		return bookingRepo.getAllBookingUnPaid();
 	}
+
+	@Override
+	public List<Booking> getAllBookingCancel() {
+		return bookingRepo.getAllBookingCancel();
+	}
 }

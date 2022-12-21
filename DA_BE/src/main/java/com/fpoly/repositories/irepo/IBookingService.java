@@ -20,4 +20,5 @@ public interface IBookingService extends IGeneralService<Booking>{
     List<Booking> findByStatusAndPaymentStatus(Integer status, Integer paymentStatus);
     List<Booking> getAllBookingPaid();
     List<Booking> getAllBookingUnPaid();
+    List<Booking> getAllBookingCancel();
 }

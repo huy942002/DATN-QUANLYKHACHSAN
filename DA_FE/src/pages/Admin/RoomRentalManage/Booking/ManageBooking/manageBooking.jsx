@@ -1,5 +1,6 @@
 import { Tabs } from "antd";
 import TabPane from "antd/es/tabs/TabPane";
+import Cancel from "./BookingByStatus/cancel";
 import Paid from './BookingByStatus/paid';
 import UnPaid from "./BookingByStatus/unpaid";
 
@@ -14,7 +15,9 @@ function ManageBooking() {
                     <TabPane tab="Chưa thanh toán" key="2" className="text-base">
                         <UnPaid></UnPaid>
                     </TabPane>
-                    <TabPane tab="Đã hủy" key="3" className="text-base"></TabPane>
+                    <TabPane tab="Đã hủy" key="3" className="text-base">
+                        <Cancel></Cancel>
+                    </TabPane>
             </Tabs>
         </>
     );
