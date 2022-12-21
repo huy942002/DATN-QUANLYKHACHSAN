@@ -53,6 +53,7 @@ function HandOver() {
     const [visibleConfirm, setVisibleConfirm] = useState(false);
     const [visibleConfirmReset, setVisibleConfirmReset] = useState(false);
     const [now, setNow] = useState('');
+    const [isCheckNote, setIsCheckNote] = useState(false);
     const [passwordReset, setPasswordReset] = useState('');
     const [handOver, setHandOver] = useState(objHandOver);
     const [resetHandOver, setResetHandOver] = useState(objResetHandOver);
@@ -161,8 +162,7 @@ function HandOver() {
         if (handOver.receiver === '') {
             // check note if surcharge have
             if (Number(handOver.surcharge) > 0 && refNote.current.value.length === 0) {
-                refNote.current.focus();
-                refNote.current.style.borderColor = 'red';
+                setIsCheckNote(true);
                 toast.error('Vui lòng ghi chú phụ thu', { autoClose: 2000 });
             } else {
                 refNote.current.style.borderColor = 'rgb(209 213 219)';
@@ -173,8 +173,7 @@ function HandOver() {
         } else {
             // check note if surcharge have
             if (Number(handOver.surcharge) > 0 && refNote.current.value.length === 0) {
-                refNote.current.focus();
-                refNote.current.style.borderColor = 'red';
+                setIsCheckNote(true);
                 toast.error('Vui lòng ghi chú phụ thu', { autoClose: 2000 });
             } else {
                 refNote.current.style.borderColor = 'rgb(209 213 219)';
@@ -331,6 +330,9 @@ function HandOver() {
                             }}
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         />
+                        {isCheckNote ? (
+                            <div className="text-sm text-red-600 mt-2">Vui lòng thêm ghi chú phụ thu</div>
+                        ) : null}
                     </div>
                 </div>
                 <div className="mt-6">

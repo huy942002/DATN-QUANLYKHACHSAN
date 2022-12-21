@@ -15,7 +15,7 @@ const objFacilities = {
     status: '',
 };
 
-const regexSpace = /^(\S+$)/;
+const regexSpace = /^[^\s]+(\s+[^\s]+)*$/;
 
 const FacilitySchema = Yup.object().shape({
     name: Yup.string()

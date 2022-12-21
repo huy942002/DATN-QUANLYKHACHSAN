@@ -32,7 +32,6 @@ const objPersonnel = {
 };
 
 const objAuth = {
-    status: '',
     roles: {
         name: '',
         status: '',
@@ -100,7 +99,6 @@ function Authorization() {
         } else {
             dispatch(
                 addAutho({
-                    status: 1,
                     roles: {
                         id: 2,
                         name: 'Nhân viên',

@@ -19,7 +19,7 @@ const objKindOfRoom = {
     status: '',
 };
 
-const regexSpace = /^(\S+$)/;
+const regexSpace = /^[^\s]+(\s+[^\s]+)*$/;
 
 const KindOfRoomSchema = Yup.object().shape({
     name: Yup.string().matches(regexSpace, 'Không chỉ để khoảng trắng').required('Loại phòng không được để trống'),

@@ -30,9 +30,6 @@ public class Authority implements Serializable {
 	@Column(name = "ID", unique = true, nullable = false, precision = 10)
 	private int id;
 
-	@Column(name = "STATUS", nullable = false, precision = 10)
-	private int status;
-
 	@ManyToOne(optional = false, cascade = CascadeType.MERGE)
 	@JoinColumn(name = "ID_ROLES", nullable = false)
 	private Roles roles;

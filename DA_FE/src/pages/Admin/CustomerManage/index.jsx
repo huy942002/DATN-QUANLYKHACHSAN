@@ -40,7 +40,8 @@ const objCustomer = {
     },
 };
 
-const regexSpace = /^(\S+$)/;
+const regexSpace = /^[^\s]+(\s+[^\s]+)*$/;
+const regexPhoneNumber = /^(0?)(3[2-9]|5[6|8|9]|7[0|6-9]|8[0-6|8|9]|9[0-4|6-9])[0-9]{7}$/;
 
 const CustomerSchema = Yup.object().shape({
     fullname: Yup.string()
@@ -51,12 +52,13 @@ const CustomerSchema = Yup.object().shape({
         .email('Sai định dạng email')
         .required('Email không được để trống'),
     gender: Yup.string().nullable(),
-    citizenIdCode: Yup.number().required('CMND/CCCD không được để trống'),
+    citizenIdCode: Yup.number().typeError('CMND/CCCD phải là số').required('CMND/CCCD không được để trống'),
     dateOfBirth: Yup.string()
         .matches(regexSpace, 'Không chỉ để khoảng trắng')
         .required('Ngày sinh không được để trống'),
     phoneNumber: Yup.string()
         .matches(regexSpace, 'Không chỉ để khoảng trắng')
+        .matches(regexPhoneNumber, 'Không đúng định dạng số điện thoại')
         .required('Số điện thoại không được để trống'),
     address: Yup.string().matches(regexSpace, 'Không chỉ để khoảng trắng').required('Địa chỉ không được để trống'),
     img: Yup.string().matches(regexSpace, 'Không chỉ để khoảng trắng').required('Ảnh không được để trống'),
@@ -153,17 +155,6 @@ function CustomerManage() {
                         },
                     ],
                 },
-            }),
-        );
-        dispatch(
-            addAutho({
-                status: 1,
-                roles: {
-                    id: 2,
-                    name: 'Nhân viên',
-                    status: 1,
-                },
-                users: data.users,
             }),
         );
         toast.success('Thêm khách hàng thành công', { autoClose: 2000 });

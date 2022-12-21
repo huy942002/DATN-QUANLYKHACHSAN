@@ -41,7 +41,8 @@ const objPersonnel = {
     },
 };
 
-const regexSpace = /^(\S+$)/;
+const regexSpace = /^[^\s]+(\s+[^\s]+)*$/;
+const regexPhoneNumber = /^(0?)(3[2-9]|5[6|8|9]|7[0|6-9]|8[0-6|8|9]|9[0-4|6-9])[0-9]{7}$/;
 
 const PersonnelSchema = Yup.object().shape({
     fullname: Yup.string()
@@ -58,9 +59,10 @@ const PersonnelSchema = Yup.object().shape({
         .required('Ngày sinh không được để trống'),
     phoneNumber: Yup.string()
         .matches(regexSpace, 'Không chỉ để khoảng trắng')
+        .matches(regexPhoneNumber, 'Không đúng định dạng số điện thoại')
         .required('Số điện thoại không được để trống'),
     address: Yup.string().required('Địa chỉ không được để trống'),
-    img: Yup.string().required('Ảnh không được để trống'),
+    img: Yup.string().matches(regexSpace, 'Không chỉ để khoảng trắng').required('Ảnh không được để trống'),
     status: Yup.string().nullable(),
     nationality: Yup.number().nullable(),
     users: Yup.object({

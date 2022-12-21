@@ -50,9 +50,6 @@ public class CustomerController {
 	UserRepository userRepo;
 	
 	@Autowired
-	AuthorityRepository authRepo;
-	
-	@Autowired
 	RoleRepository roleRepo;
 
 	@Autowired
@@ -71,7 +68,6 @@ public class CustomerController {
 		Customer c = new Customer();
 		Users u = new Users();
 		Roles role = new Roles();
-		Authority auth = new Authority();
 		c.setFullname(customer.getCustomer().getFullname());
 		c.setEmail(customer.getCustomer().getEmail());
 		c.setGender(customer.getCustomer().getGender());
@@ -87,7 +83,6 @@ public class CustomerController {
 		u.setStatus(customer.getUser().getStatus());
 		u.setRoles(customer.getUser().getRoles());
 		role.setName("Khách hàng");
-		role.setStatus(1);
 		roleRepo.save(role);
 		userRepo.save(u);
 		c.setUsers(u);
