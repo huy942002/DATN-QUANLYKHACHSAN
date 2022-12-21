@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllHistory } from '~/app/reducers/history';
+import ReactPaginate from 'react-paginate';
 
 function HistoryAdmin() {
     const [valueSearch, setValueSearch] = useState('');
@@ -13,6 +14,24 @@ function HistoryAdmin() {
         dispatch(getAllHistory());
         // eslint-disable-next-line
     }, []);
+
+    // Here we use item offsets; we could also use page offsets
+    // following the API or data you're working with.
+    const [itemOffset, setItemOffset] = useState(0);
+
+    // Simulate fetching items from another resources.
+    // (This could be items from props; or items loaded in a local state
+    // from an API endpoint with useEffect and useState)
+    const itemsPerPage = 5;
+    const endOffset = itemOffset + itemsPerPage;
+    const currentItems = historiess.slice(itemOffset, endOffset);
+    const pageCount = Math.ceil(historiess.length / itemsPerPage);
+
+    // Invoke when user click to request another page.
+    const handlePageClick = (event) => {
+        const newOffset = (event.selected * itemsPerPage) % historiess.length;
+        setItemOffset(newOffset);
+    };
 
     return (
         <div>
@@ -57,7 +76,7 @@ function HistoryAdmin() {
                             </tr>
                         </thead>
                         <tbody>
-                            {historiess
+                            {currentItems
                                 .filter((x) => x.users.username.toLowerCase().includes(valueSearch))
                                 .reverse()
                                 .map((x) => (
@@ -75,6 +94,20 @@ function HistoryAdmin() {
                                 ))}
                         </tbody>
                     </table>
+                    <ReactPaginate
+                        breakLabel="..."
+                        nextLabel=">> Next"
+                        onPageChange={handlePageClick}
+                        pageRangeDisplayed={5}
+                        pageCount={pageCount}
+                        previousLabel="Prev <<"
+                        renderOnZeroPageCount={null}
+                        containerClassName="pagination"
+                        pageLinkClassName="page-num"
+                        previousLinkClassName="page-num"
+                        nextLinkClassName="page-num"
+                        activeLinkClassName="active-num"
+                    />
                 </div>
             </div>
         </div>

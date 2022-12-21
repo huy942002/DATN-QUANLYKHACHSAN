@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { toast } from 'react-toastify';
+import ReactPaginate from 'react-paginate';
 
 import { add, getAllServiceType, getServiceTypeById, update } from '~/app/reducers/serviceType';
 
@@ -40,6 +41,24 @@ function ServiceTypes() {
         setServiceTypes(serviceTypee);
         // eslint-disable-next-line
     }, [serviceTypee]);
+
+    // Here we use item offsets; we could also use page offsets
+    // following the API or data you're working with.
+    const [itemOffset, setItemOffset] = useState(0);
+
+    // Simulate fetching items from another resources.
+    // (This could be items from props; or items loaded in a local state
+    // from an API endpoint with useEffect and useState)
+    const itemsPerPage = 5;
+    const endOffset = itemOffset + itemsPerPage;
+    const currentItems2 = serviceTypess.slice(itemOffset, endOffset);
+    const pageCount2 = Math.ceil(serviceTypess.length / itemsPerPage);
+
+    // Invoke when user click to request another page.
+    const handlePageClick2 = (event) => {
+        const newOffset = (event.selected * itemsPerPage) % serviceTypess.length;
+        setItemOffset(newOffset);
+    };
 
     function openAddType() {
         setVisibleAddType(true);
@@ -126,7 +145,7 @@ function ServiceTypes() {
                             </tr>
                         </thead>
                         <tbody>
-                            {serviceTypess
+                            {currentItems2
                                 .filter((x) => x.name.toLowerCase().includes(valueSearch2))
                                 .map((x) => (
                                     <tr className="bg-white dark:bg-gray-800" key={x.id}>
@@ -159,6 +178,20 @@ function ServiceTypes() {
                                 ))}
                         </tbody>
                     </table>
+                    <ReactPaginate
+                        breakLabel="..."
+                        nextLabel=">> Next"
+                        onPageChange={handlePageClick2}
+                        pageRangeDisplayed={5}
+                        pageCount={pageCount2}
+                        previousLabel="Prev <<"
+                        renderOnZeroPageCount={null}
+                        containerClassName="pagination"
+                        pageLinkClassName="page-num"
+                        previousLinkClassName="page-num"
+                        nextLinkClassName="page-num"
+                        activeLinkClassName="active-num"
+                    />
                     {/* Modal delete */}
                     <Modal show={visibleDeleteType} size="md" popup={true} onClose={() => setVisibleDeleteType(false)}>
                         <Modal.Header />

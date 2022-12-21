@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllFacilities, getFacilitiesById, update, add } from '~/app/reducers/facility';
 import { toast } from 'react-toastify';
+import ReactPaginate from 'react-paginate';
 
 const objFacilities = {
     name: '',
@@ -39,6 +40,24 @@ function Facilities() {
         setFacilitiex(facility);
         // eslint-disable-next-line
     }, [facility]);
+
+    // Here we use item offsets; we could also use page offsets
+    // following the API or data you're working with.
+    const [itemOffset, setItemOffset] = useState(0);
+
+    // Simulate fetching items from another resources.
+    // (This could be items from props; or items loaded in a local state
+    // from an API endpoint with useEffect and useState)
+    const itemsPerPage = 5;
+    const endOffset = itemOffset + itemsPerPage;
+    const currentItems = facilities.slice(itemOffset, endOffset);
+    const pageCount = Math.ceil(facilities.length / itemsPerPage);
+
+    // Invoke when user click to request another page.
+    const handlePageClick = (event) => {
+        const newOffset = (event.selected * itemsPerPage) % facilities.length;
+        setItemOffset(newOffset);
+    };
 
     function openAddFaci() {
         setVisibleAddFaci(true);
@@ -145,7 +164,7 @@ function Facilities() {
                             </tr>
                         </thead>
                         <tbody>
-                            {facilities
+                            {currentItems
                                 .filter((x) => x.name.toLowerCase().includes(valueSearchFaci))
                                 .map((x) => (
                                     <tr className="bg-white dark:bg-gray-800" key={x.id}>
@@ -179,6 +198,20 @@ function Facilities() {
                                 ))}
                         </tbody>
                     </table>
+                    <ReactPaginate
+                        breakLabel="..."
+                        nextLabel=">> Next"
+                        onPageChange={handlePageClick}
+                        pageRangeDisplayed={5}
+                        pageCount={pageCount}
+                        previousLabel="Prev <<"
+                        renderOnZeroPageCount={null}
+                        containerClassName="pagination"
+                        pageLinkClassName="page-num"
+                        previousLinkClassName="page-num"
+                        nextLinkClassName="page-num"
+                        activeLinkClassName="active-num"
+                    />
                     {/* Modal delete */}
                     <Modal show={visibleDeleteFaci} size="md" popup={true} onClose={() => setVisibleDeleteFaci(false)}>
                         <Modal.Header />

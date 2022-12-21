@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllResetHandOver } from '~/app/reducers/resetHandOver';
+import ReactPaginate from 'react-paginate';
 
 const objSearch2 = {
     dateTimeStart: '',
@@ -25,6 +26,24 @@ function ResetHandOver() {
     useEffect(() => {
         setResetHandOverss(resetHandOvers);
     }, [resetHandOvers]);
+
+    // Here we use item offsets; we could also use page offsets
+    // following the API or data you're working with.
+    const [itemOffset, setItemOffset] = useState(0);
+
+    // Simulate fetching items from another resources.
+    // (This could be items from props; or items loaded in a local state
+    // from an API endpoint with useEffect and useState)
+    const itemsPerPage = 5;
+    const endOffset = itemOffset + itemsPerPage;
+    const currentItems2 = resetHandOverss.slice(itemOffset, endOffset);
+    const pageCount2 = Math.ceil(resetHandOverss.length / itemsPerPage);
+
+    // Invoke when user click to request another page.
+    const handlePageClick2 = (event) => {
+        const newOffset = (event.selected * itemsPerPage) % resetHandOverss.length;
+        setItemOffset(newOffset);
+    };
 
     function handleSearchRange2() {
         setResetHandOverss(
@@ -129,6 +148,20 @@ function ResetHandOver() {
                                     ))}
                             </tbody>
                         </table>
+                        <ReactPaginate
+                            breakLabel="..."
+                            nextLabel=">> Next"
+                            onPageChange={handlePageClick2}
+                            pageRangeDisplayed={5}
+                            pageCount={pageCount2}
+                            previousLabel="Prev <<"
+                            renderOnZeroPageCount={null}
+                            containerClassName="pagination"
+                            pageLinkClassName="page-num"
+                            previousLinkClassName="page-num"
+                            nextLinkClassName="page-num"
+                            activeLinkClassName="active-num"
+                        />
                     </div>
                 </div>
             </div>

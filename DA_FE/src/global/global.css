@@ -54,14 +54,45 @@
 }
 
 ::selection {
-    background: #00b96b; 
+    background: #00b96b;
     color: white;
 }
 ::-moz-selection {
-    background: #00b96b; 
+    background: #00b96b;
     color: white;
 }
 ::-webkit-selection {
-    background: #00b96b; 
+    background: #00b96b;
     color: white;
+}
+
+/* css for pagination */
+.pagination {
+    list-style: none;
+    display: flex;
+    margin-top: 50px;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 5rem;
+    gap: 5px;
+}
+
+.pagination .page-num {
+    padding: 8px 15px;
+    cursor: pointer;
+    border-radius: 3px;
+    font-weight: 400;
+}
+
+.page-num {
+    width: 20px;
+    height: 20px;
+    border: 1px solid #00b96b;
+    color: #000000;
+    background: #ffffff;
+}
+
+.active-num {
+    color: #ffffff;
+    background: #00b96b;
 }

@@ -8,6 +8,7 @@ import { faChevronRight, faMagnifyingGlass, faPlus, faSackDollar } from '@fortaw
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { toast } from 'react-toastify';
+import ReactPaginate from 'react-paginate';
 
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -101,6 +102,24 @@ function PersonnelManage() {
         setPerson(personnel);
         // eslint-disable-next-line
     }, [personnel]);
+
+    // Here we use item offsets; we could also use page offsets
+    // following the API or data you're working with.
+    const [itemOffset, setItemOffset] = useState(0);
+
+    // Simulate fetching items from another resources.
+    // (This could be items from props; or items loaded in a local state
+    // from an API endpoint with useEffect and useState)
+    const itemsPerPage = 5;
+    const endOffset = itemOffset + itemsPerPage;
+    const currentItems = personnels.slice(itemOffset, endOffset);
+    const pageCount = Math.ceil(personnels.length / itemsPerPage);
+
+    // Invoke when user click to request another page.
+    const handlePageClick = (event) => {
+        const newOffset = (event.selected * itemsPerPage) % personnels.length;
+        setItemOffset(newOffset);
+    };
 
     // open the modal delete
     function getIdDelete(id) {
@@ -266,7 +285,7 @@ function PersonnelManage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {personnels
+                            {currentItems
                                 .filter((x) => x.users.username.toLowerCase().includes(valueSearch))
                                 .map((x) => (
                                     <tr className="bg-white dark:bg-gray-800" key={x.id}>
@@ -306,6 +325,20 @@ function PersonnelManage() {
                                 ))}
                         </tbody>
                     </table>
+                    <ReactPaginate
+                        breakLabel="..."
+                        nextLabel=">> Next"
+                        onPageChange={handlePageClick}
+                        pageRangeDisplayed={5}
+                        pageCount={pageCount}
+                        previousLabel="Prev <<"
+                        renderOnZeroPageCount={null}
+                        containerClassName="pagination"
+                        pageLinkClassName="page-num"
+                        previousLinkClassName="page-num"
+                        nextLinkClassName="page-num"
+                        activeLinkClassName="active-num"
+                    />
                     {/* Modal delete */}
                     <Modal show={visibleDelete} size="md" popup={true} onClose={() => setVisibleDelete(false)}>
                         <Modal.Header />

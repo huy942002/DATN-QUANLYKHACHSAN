@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { toast } from 'react-toastify';
+import ReactPaginate from 'react-paginate';
 
 import { getAllHandOver, update, getHandOverById } from '~/app/reducers/handOver';
 
@@ -49,6 +50,24 @@ function HandOver() {
     useEffect(() => {
         setHandOverss(handOvers);
     }, [handOvers]);
+
+    // Here we use item offsets; we could also use page offsets
+    // following the API or data you're working with.
+    const [itemOffset, setItemOffset] = useState(0);
+
+    // Simulate fetching items from another resources.
+    // (This could be items from props; or items loaded in a local state
+    // from an API endpoint with useEffect and useState)
+    const itemsPerPage = 5;
+    const endOffset = itemOffset + itemsPerPage;
+    const currentItems = handOverss.slice(itemOffset, endOffset);
+    const pageCount = Math.ceil(handOverss.length / itemsPerPage);
+
+    // Invoke when user click to request another page.
+    const handlePageClick = (event) => {
+        const newOffset = (event.selected * itemsPerPage) % handOverss.length;
+        setItemOffset(newOffset);
+    };
 
     function handleSearchRange() {
         setHandOverss(
@@ -147,7 +166,7 @@ function HandOver() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {handOverss
+                                {currentItems
                                     .filter((x) => x.personnel.fullname.toLowerCase().includes(valueSearch))
                                     .reverse()
                                     .map((x) => (
@@ -174,6 +193,20 @@ function HandOver() {
                                     ))}
                             </tbody>
                         </table>
+                        <ReactPaginate
+                            breakLabel="..."
+                            nextLabel=">> Next"
+                            onPageChange={handlePageClick}
+                            pageRangeDisplayed={5}
+                            pageCount={pageCount}
+                            previousLabel="Prev <<"
+                            renderOnZeroPageCount={null}
+                            containerClassName="pagination"
+                            pageLinkClassName="page-num"
+                            previousLinkClassName="page-num"
+                            nextLinkClassName="page-num"
+                            activeLinkClassName="active-num"
+                        />
                         {/* Modal show info */}
                         <Modal show={visible} size="6xl" popup={true} onClose={() => setVisible(false)}>
                             <Modal.Header>

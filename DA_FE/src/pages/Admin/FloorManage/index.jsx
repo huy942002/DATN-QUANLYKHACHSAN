@@ -12,6 +12,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllNumberOfFloors, getByIdNumberOfFloors, update, AddNBF as add } from '~/app/reducers/numberOfFloor';
 import { toast } from 'react-toastify';
+import ReactPaginate from 'react-paginate';
 
 const objNumberOfFloor = {
     numberOfFloors: '',
@@ -40,6 +41,24 @@ function NumberOfFloors() {
         authorServices.currentUser().then((res) => setCurrentUser(res));
         // eslint-disable-next-line
     }, [numberOfFloor]);
+
+    // Here we use item offsets; we could also use page offsets
+    // following the API or data you're working with.
+    const [itemOffset, setItemOffset] = useState(0);
+
+    // Simulate fetching items from another resources.
+    // (This could be items from props; or items loaded in a local state
+    // from an API endpoint with useEffect and useState)
+    const itemsPerPage = 4;
+    const endOffset = itemOffset + itemsPerPage;
+    const currentItems = numberOfFloorss.slice(itemOffset, endOffset);
+    const pageCount = Math.ceil(numberOfFloorss.length / itemsPerPage);
+
+    // Invoke when user click to request another page.
+    const handlePageClick = (event) => {
+        const newOffset = (event.selected * itemsPerPage) % numberOfFloorss.length;
+        setItemOffset(newOffset);
+    };
 
     function openAddFloor() {
         setVisibleAddFloor(true);
@@ -150,7 +169,7 @@ function NumberOfFloors() {
                             </tr>
                         </thead>
                         <tbody>
-                            {numberOfFloorss
+                            {currentItems
                                 .filter((x) => x.numberOfFloors.toString().includes(valueSearchFloor))
                                 .sort((a, b) => b.numberOfFloors - a.numberOfFloors)
                                 .map((x) => (
@@ -185,6 +204,20 @@ function NumberOfFloors() {
                                 ))}
                         </tbody>
                     </table>
+                    <ReactPaginate
+                        breakLabel="..."
+                        nextLabel=">> Next"
+                        onPageChange={handlePageClick}
+                        pageRangeDisplayed={5}
+                        pageCount={pageCount}
+                        previousLabel="Prev <<"
+                        renderOnZeroPageCount={null}
+                        containerClassName="pagination"
+                        pageLinkClassName="page-num"
+                        previousLinkClassName="page-num"
+                        nextLinkClassName="page-num"
+                        activeLinkClassName="active-num"
+                    />
                     {/* Modal delete */}
                     <Modal
                         show={visibleDeleteFloor}
