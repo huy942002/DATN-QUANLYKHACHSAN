@@ -45,8 +45,14 @@ public class BookingController {
     @Transactional
     @GetMapping("/get-list-booking-paid")
     public ResponseEntity<?> getListBookingPaid() {
-        return new ResponseEntity<>(iBookingService.findByStatusAndPaymentStatus(1, 2), HttpStatus.OK);
+        return new ResponseEntity<>(iBookingService.getAllBookingPaid(), HttpStatus.OK);
     }
+
+	@Transactional
+	@GetMapping("/get-list-booking-unpaid")
+	public ResponseEntity<?> getListBookingUnPaid() {
+		return new ResponseEntity<>(iBookingService.getAllBookingUnPaid(), HttpStatus.OK);
+	}
 
 	@Transactional
 	@GetMapping("/get-room-booking-list/{idBooking}")
@@ -154,5 +160,11 @@ public class BookingController {
 		Booking booking = iBookingService.findById(idBooking).get();
 		iBookingService.remove(idBooking);
 		return new ResponseEntity<>(booking, HttpStatus.OK);
+	}
+
+	@Transactional
+	@PostMapping("/customer-payment")
+	public ResponseEntity<?> customerPayment(@RequestBody Booking booking) {
+		return new ResponseEntity<>(iBookingService.save(booking), HttpStatus.OK);
 	}
 }

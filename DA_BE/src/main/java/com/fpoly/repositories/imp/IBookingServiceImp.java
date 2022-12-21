@@ -48,4 +48,14 @@ public class IBookingServiceImp implements IBookingService {
 	public List<Booking> findByStatusAndPaymentStatus(Integer status, Integer paymentStatus) {
 		return bookingRepo.findByStatusAndPaymentStatus(status, paymentStatus);
 	}
+
+	@Override
+	public List<Booking> getAllBookingPaid() {
+		return bookingRepo.getAllBookingPaid();
+	}
+
+	@Override
+	public List<Booking> getAllBookingUnPaid() {
+		return bookingRepo.getAllBookingUnPaid();
+	}
 }

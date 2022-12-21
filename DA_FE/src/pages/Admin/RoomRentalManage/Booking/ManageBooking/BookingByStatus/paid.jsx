@@ -1,10 +1,10 @@
-import { Button, DatePicker, Divider, Input, InputNumber, Modal, Select, Table } from "antd";
+import { Button, Checkbox, DatePicker, Divider, Input, InputNumber, Modal, Radio, Select, Switch, Table } from "antd";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBuildingCircleCheck, faCircleExclamation, faPersonWalkingArrowRight, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useState } from "react";
 import axios from "axios";
 import ListRoom from "../../../ListRoom/listRoom";
-import { UserOutlined, SearchOutlined } from '@ant-design/icons';
+import { UserOutlined, SearchOutlined, CheckOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 
 function Paid() {
@@ -24,27 +24,52 @@ function Paid() {
     ];
     const [nationalityList, setNationalityList] = useState();
     const columns = [
-        { title: 'Tên khách hàng', dataIndex: 'customerName', key: '1'},
+        { title: 'Tên khách hàng', dataIndex: 'customerName', key: '1',
+            render: (customerName, element) => (
+                <div className="font-semibold">
+                    {customerName}
+                    {element.bookingStatus === 1 && (
+                        <span className="text-white font-bold rounded-lg bg-status-2 px-2 py-1 ml-3">
+                            {element.bookingStatus === 1 && "Mới"}
+                        </span>
+                    )}
+                    {/* {element.bookingStatus === 2 && (
+                        <span className="text-white font-bold rounded-lg bg-status-1 px-2 py-1 ml-3">
+                            {element.bookingStatus === 2 && (<CheckOutlined />)}
+                        </span>
+                    )} */}
+                </div>
+            )
+        },
         { title: 'Số điện thoại', dataIndex: 'customerPhoneNumber', key: '2'},
         { title: 'Email', dataIndex: 'customerEmail', key: '3'},
-        { title: 'Loại phòng book', dataIndex: 'kindOfRoom', key: '4',
+        { title: 'Loại phòng', dataIndex: 'kindOfRoom', key: '4',
             render: (kindOfRoom) => (
                 <span>
                     {kindOfRoom.name}
                 </span>
             )
         },
+        { title: 'Số lượng phòng', dataIndex: 'quantityRoom', key: '12',},
         { title: 'Ngày đến', dataIndex: 'hireDate', key: '5'},
-        { title: 'Ngày trả phòng', dataIndex: 'checkOutDay', key: '6'},
-        { title: 'Số người lớn', dataIndex: 'numberOfAdults', key: '8'},
-        { title: 'Số trẻ em', dataIndex: 'numberOfKids', key: '9'},
-        { title: 'Tiền thanh toán', dataIndex: 'deposits', key: '10',
-            render: (deposits) => (
-                <span>
-                    {formatCurrency(deposits)}
-                </span>
-            )
-        },
+        // { title: 'Trạng thái', dataIndex: 'bookingStatus', key: '13',
+        //     render: (bookingStatus) => (
+        //         <div className="w-full">
+        //             <span className={`rounded-full w-full px-3 py-1 text-white ${bookingStatus === 1 ? 'bg-status-2' : 'bg-status-4'}`}>
+        //                 {bookingStatus === 1 ? "Mới" : "Đã xếp phòng"}
+        //             </span>
+        //         </div>
+        //     )
+        // },
+        // { title: 'Số người lớn', dataIndex: 'numberOfAdults', key: '8'},
+        // { title: 'Số trẻ em', dataIndex: 'numberOfKids', key: '9'},
+        // { title: 'Tiền thanh toán', dataIndex: 'deposits', key: '10',
+        //     render: (deposits) => (
+        //         <span>
+        //             {formatCurrency(deposits)}
+        //         </span>
+        //     )
+        // },
         { title: '', dataIndex: '', key: '11',
             render: (element) => (
                 <span onClick={() => showModal(element)}>
@@ -56,7 +81,9 @@ function Paid() {
             ),
         },
     ];
-
+    const [chooseDateNow, setChooseDateNow] = useState(true);
+    const [chooseNew, setChooseNew] = useState(false);
+    const [chooseDone, setChooseDone] = useState(false);
     //End Data
 
     //Created
@@ -94,6 +121,36 @@ function Paid() {
                     .replace(/\s+/g, '')
                     .includes(queryCustomerName.toLowerCase().replace(/\s+/g, ''))
             )
+        }
+        return data;
+    }
+
+    const genBookingPaidListFilter = () => {
+        let data = "";
+        if(listBookingPaid) {
+            data = listBookingPaid;
+            data = data.filter(
+                (x) => x
+                    .customerName
+                    .toLowerCase()
+                    .replace(/\s+/g, '')
+                    .includes(queryCustomerName.toLowerCase().replace(/\s+/g, ''))
+            )
+            if(chooseDateNow) {
+                data = data.filter(
+                    (x) => x.hireDate === dayjs(new Date()).format("YYYY-MM_DD")
+                )
+            }
+            if(chooseDone) {
+                data = data.filter(
+                    (x) => x.bookingStatus === 2
+                )
+            }
+            if(chooseNew) {
+                data = data.filter(
+                    (x) => x.bookingStatus === 1
+                )
+            }
         }
         return data;
     }
@@ -204,8 +261,6 @@ function Paid() {
         );
     };
     //End Util
-
-    console.log(dataBooking && dataBooking.hireDate);
 
     return (
         <>
@@ -599,31 +654,58 @@ function Paid() {
                 ></ListRoom>
             </Modal>
 
-            <div className="flex items-center mb-3">
-                <span className="w-[200px] font-semibold">
-                    Tìm kiếm khách hàng:
-                </span>
-                <Input
-                    className=""
-                    placeholder="Search..."
-                    prefix={<SearchOutlined />}
-                    value={queryCustomerName}
-                    onChange={
-                        (e) => {
-                            setQueryCustomerName(e.target.value);
+            <div className="grid grid-cols-2 mb-3">
+                <div className="flex items-center">
+                    <Checkbox
+                        className="mr-3"
+                        checked={chooseDateNow}
+                        onChange={
+                            (e) => setChooseDateNow(e.target.checked)
                         }
-                    }
-                />
+                    >Ngày hôm nay</Checkbox>
+                    <Checkbox
+                        className="mr-3"
+                        checked={chooseNew}
+                        onChange={
+                            (e) => setChooseNew(e.target.checked)
+                        }
+                    >Mới</Checkbox>
+                    <Checkbox
+                        className="mr-3"
+                        checked={chooseDone}
+                        onChange={
+                            (e) => setChooseDone(e.target.checked)
+                        }
+                    >Đã xếp phòng</Checkbox>
+                    {/* <div className="">Trạng thái</div>
+                    <Radio.Group name="radiogroup" defaultValue={1}>
+                        <Radio value={1}>Mới</Radio>
+                        <Radio value={2}>Đã xếp phòng</Radio>
+                    </Radio.Group> */}
+                </div>
+
+                <div>
+                    <Input
+                        className=""
+                        placeholder="Search..."
+                        prefix={<SearchOutlined />}
+                        value={queryCustomerName}
+                        onChange={
+                            (e) => {
+                                setQueryCustomerName(e.target.value);
+                            }
+                        }
+                    />
+                </div>
             </div>
 
             <Table
                 size="middle"
                 locale={{emptyText: "Chưa có đơn book nào!"}}
                 bordered
-                pagination={false}
+                pagination={true}
                 columns={columns}
-                dataSource={genListBookingPaidFilter()}
-                pagination
+                dataSource={genBookingPaidListFilter()}
             />
         </>
     );

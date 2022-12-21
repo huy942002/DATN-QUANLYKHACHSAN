@@ -54,6 +54,9 @@ public class Booking implements Serializable {
 	@Column(name = "DEPOSITS", precision = 53)
 	private double deposits;
 
+	@Column(name = "MONEY_TO_PAY", precision = 10)
+	private Integer moneyToPay;
+
 	@Column(name = "NOTE", length = 255)
 	private String note;
 
@@ -62,6 +65,12 @@ public class Booking implements Serializable {
 
 	@Column(name = "STATUS", nullable = false, precision = 10)
 	private int status;
+
+	@Column(name = "BOOKING_STATUS", nullable = false, precision = 10)
+	private int bookingStatus;
+
+	@Column(name = "QUANTITY_ROOM")
+	private Integer quantityRoom;
 
 	@OneToMany(mappedBy = "booking")
 	@JsonIgnore
