@@ -26,5 +26,5 @@ public interface BillRepository extends JpaRepository<Bills, Integer>{
     List<Bills> findByStatus (Integer status);
 
     @Query("select b from Bills b where b.booking.id = :idBooking")
-    Bills getBillByIdBooking(Integer idBooking);
+    Bills getBillByIdBooking(@Param("idBooking") Integer idBooking);
 }

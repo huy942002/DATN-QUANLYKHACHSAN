@@ -170,28 +170,45 @@ function PersonnelManage() {
     }
 
     function handleUpdate(data) {
-        dispatch(
-            update({ ...data, nationality: nationalities.filter((nat) => nat.id === Number(data.nationality))[0] }),
-        );
-        toast.success('Cập nhật thành công', { autoClose: 2000 });
-        setVisibleUpdate(false);
+        if (
+            personnels
+                .filter((x) => x.users.username != data.users?.username)
+                .some((x) => x.users.username === data.users?.username)
+        ) {
+            toast.error('Username đã tồn tại', { autoClose: 2000 });
+        } else if (personnels.filter((x) => x.email != data.email).some((x) => x.email === data.email)) {
+            toast.error('Email đã tồn tại', { autoClose: 2000 });
+        } else {
+            dispatch(
+                update({ ...data, nationality: nationalities.filter((nat) => nat.id === Number(data.nationality))[0] }),
+            );
+            toast.success('Cập nhật thành công', { autoClose: 2000 });
+            setVisibleUpdate(false);
+        }
     }
 
     function handleAdd(data) {
-        dispatch(
-            add({
-                ...data,
-                status: 1,
-                gender: data.gender === '' ? 'Nam' : data.gender,
-                users: { ...data.users, status: 1, roles: [] },
-                nationality: nationalities.filter(
-                    (nat) =>
-                        nat.id === (data.nationality === undefined ? nationalities[0].id : Number(data.nationality)),
-                )[0],
-            }),
-        );
-        toast.success('Thêm nhân viên thành công', { autoClose: 2000 });
-        setVisibleAdd(false);
+        if (personnels.some((x) => x.users.username === data.users?.username)) {
+            toast.error('Username đã tồn tại', { autoClose: 2000 });
+        } else if (personnels.some((x) => x.email === data.email)) {
+            toast.error('Email đã tồn tại', { autoClose: 2000 });
+        } else {
+            dispatch(
+                add({
+                    ...data,
+                    status: 1,
+                    gender: data.gender === '' ? 'Nam' : data.gender,
+                    users: { ...data.users, status: 1, roles: [] },
+                    nationality: nationalities.filter(
+                        (nat) =>
+                            nat.id ===
+                            (data.nationality === undefined ? nationalities[0].id : Number(data.nationality)),
+                    )[0],
+                }),
+            );
+            toast.success('Thêm nhân viên thành công', { autoClose: 2000 });
+            setVisibleAdd(false);
+        }
     }
 
     function handleFirstMoney(data) {
@@ -300,6 +317,9 @@ function PersonnelManage() {
                                     Avatar
                                 </th>
                                 <th scope="col" className="py-3 px-6">
+                                    Tên nhân viên
+                                </th>
+                                <th scope="col" className="py-3 px-6">
                                     Username
                                 </th>
                                 <th scope="col" className="py-3 px-6">
@@ -327,12 +347,13 @@ function PersonnelManage() {
                         </thead>
                         <tbody>
                             {currentItems
-                                .filter((x) => x.users.username.toLowerCase().includes(valueSearch))
+                                .filter((x) => x.fullname.toLowerCase().includes(valueSearch))
                                 .map((x) => (
                                     <tr className="bg-white dark:bg-gray-800" key={x.id}>
                                         <td className="py-4 px-6">
                                             <img src={x.img} alt={x.fullname} className="rounded-sm" width={50} />
                                         </td>
+                                        <td className="py-4 px-6">{x.fullname}</td>
                                         <td className="py-4 px-6">{x.users.username}</td>
                                         <td className="py-4 px-6">{x.email}</td>
                                         <td className="py-4 px-6">{x.address}</td>

@@ -281,7 +281,7 @@ function HandOver() {
                     </div>
                     <div>
                         <span>
-                            Tổng tiền trong ca : {(totalCard + totalCash + handOver.moneyFirst).toLocaleString()}đ
+                            Tổng tiền trong ca : {(totalCard + totalCash + userLogin.moneyFirst).toLocaleString()}đ
                         </span>
                     </div>
                     <div>

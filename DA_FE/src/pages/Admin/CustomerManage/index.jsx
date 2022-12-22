@@ -80,12 +80,8 @@ const CustomerSchema = Yup.object().shape({
     status: Yup.string().nullable(),
     nationality: Yup.number().nullable(),
     users: Yup.object({
-        username: Yup.string()
-            .matches(regexSpace, 'Không chỉ để khoảng trắng')
-            .required('Username không được để trống'),
-        password: Yup.string()
-            .matches(regexSpace, 'Không chỉ để khoảng trắng')
-            .required('Mật khẩu không được để trống'),
+        username: Yup.string().matches(regexSpace, 'Không chỉ để khoảng trắng'),
+        password: Yup.string().matches(regexSpace, 'Không chỉ để khoảng trắng'),
         status: Yup.string().matches(regexSpace, 'Không chỉ để khoảng trắng').nullable(),
         roles: Yup.array().nullable(),
     }),
@@ -151,11 +147,22 @@ function CustomerManage() {
     }
 
     function handleUpdate(data) {
-        dispatch(
-            update({ ...data, nationality: nationalities.filter((nat) => nat.id === Number(data.nationality))[0] }),
-        );
-        toast.success('Cập nhật thành công', { autoClose: 2000 });
-        setVisibleUpdate(false);
+        console.log('ok');
+        if (
+            customers
+                .filter((x) => x.users?.username != data.users?.username)
+                .some((x) => x.users?.username === data.users?.username)
+        ) {
+            toast.error('Username đã tồn tại', { autoClose: 2000 });
+        } else if (customers.filter((x) => x.email != data.email).some((x) => x.email === data.email)) {
+            toast.error('Email đã tồn tại', { autoClose: 2000 });
+        } else {
+            dispatch(
+                update({ ...data, nationality: nationalities.filter((nat) => nat.id === Number(data.nationality))[0] }),
+            );
+            toast.success('Cập nhật thành công', { autoClose: 2000 });
+            setVisibleUpdate(false);
+        }
     }
 
     function handleDownloadExcel() {
@@ -171,39 +178,45 @@ function CustomerManage() {
     }
 
     function handleAdd(data) {
-        dispatch(
-            add({
-                customer: {
-                    fullname: data.fullname,
-                    address: data.address,
-                    citizenIdCode: data.citizenIdCode,
-                    dateOfBirth: data.dateOfBirth,
-                    img: data.img,
-                    phoneNumber: data.phoneNumber,
-                    email: data.email,
-                    status: 1,
-                    gender: data.gender === '' ? 'Nam' : data.gender,
-                    nationality: nationalities.filter(
-                        (nat) =>
-                            nat.id ===
-                            (data.nationality === undefined ? nationalities[0].id : Number(data.nationality)),
-                    )[0],
-                },
-                user: {
-                    ...data.users,
-                    status: 1,
-                    roles: [
-                        {
-                            id: 3,
-                            name: 'Khách hàng',
-                            status: 1,
-                        },
-                    ],
-                },
-            }),
-        );
-        toast.success('Thêm khách hàng thành công', { autoClose: 2000 });
-        setVisibleAdd(false);
+        if (customers.some((x) => x.users?.username === data.users?.username)) {
+            toast.error('Username đã tồn tại', { autoClose: 2000 });
+        } else if (customers.some((x) => x.email === data.email)) {
+            toast.error('Email đã tồn tại', { autoClose: 2000 });
+        } else {
+            dispatch(
+                add({
+                    customer: {
+                        fullname: data.fullname,
+                        address: data.address,
+                        citizenIdCode: data.citizenIdCode,
+                        dateOfBirth: data.dateOfBirth,
+                        img: data.img,
+                        phoneNumber: data.phoneNumber,
+                        email: data.email,
+                        status: 1,
+                        gender: data.gender === '' ? 'Nam' : data.gender,
+                        nationality: nationalities.filter(
+                            (nat) =>
+                                nat.id ===
+                                (data.nationality === undefined ? nationalities[0].id : Number(data.nationality)),
+                        )[0],
+                    },
+                    user: {
+                        ...data.users,
+                        status: 1,
+                        roles: [
+                            {
+                                id: 3,
+                                name: 'Khách hàng',
+                                status: 1,
+                            },
+                        ],
+                    },
+                }),
+            );
+            toast.success('Thêm khách hàng thành công', { autoClose: 2000 });
+            setVisibleAdd(false);
+        }
     }
 
     return (
@@ -278,6 +291,9 @@ function CustomerManage() {
                                     Avatar
                                 </th>
                                 <th scope="col" className="py-3 px-6">
+                                    Tên khách hàng
+                                </th>
+                                <th scope="col" className="py-3 px-6">
                                     Email
                                 </th>
                                 <th scope="col" className="py-3 px-6">
@@ -308,6 +324,7 @@ function CustomerManage() {
                                         <td className="py-4 px-6">
                                             <img src={x.img} alt={x.fullname} className="rounded-sm" width={50} />
                                         </td>
+                                        <td className="py-4 px-6">{x.fullname}</td>
                                         <td className="py-4 px-6">{x.email}</td>
                                         <td className="py-4 px-6">{x.address}</td>
                                         <td className="py-4 px-6">{x.gender}</td>
