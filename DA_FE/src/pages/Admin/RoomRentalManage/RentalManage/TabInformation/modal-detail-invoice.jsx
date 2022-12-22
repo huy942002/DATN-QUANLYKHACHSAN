@@ -62,14 +62,6 @@ function ModalDetailInvoice({ detailModalDetailInvoice, setDetailModalDetailInvo
                     options={genRentalType()}
                 />
             </div>
-            <div className="mt-3 flex items-center">
-                Số người
-                <InputNumber
-                    onChange={(e) => changeNumberOfPeople(e)}
-                    value={ detailModalDetailInvoice.numberOfPeople || "" }
-                    className="ml-3 w-16"
-                ></InputNumber>
-            </div>
             <div className="mt-3">
                 Ngày & Giờ Check in
                 <DatePicker
@@ -79,7 +71,7 @@ function ModalDetailInvoice({ detailModalDetailInvoice, setDetailModalDetailInvo
                     placeholder="Ngày & giờ check in"
                     value={ detailModalDetailInvoice.hireDate !== null ? dayjs(detailModalDetailInvoice.hireDate) : "" }
                     onChange={ (date, dateString) => changeHireDate(date, dateString) }
-                    disabled
+                    // disabled
                 />
             </div>
             <div className="mt-3">
