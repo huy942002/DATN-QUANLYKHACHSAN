@@ -18,5 +18,5 @@ import java.util.List;
  */
 @Service
 public interface IServiceDetailService extends IGeneralService<ServiceDetails>{
-    List<ServiceDetails> listByRoomAndStatus(DetailsInvoice detailsInvoice, Integer statuss);
+    List<ServiceDetails> listByRoomAndStatus(DetailsInvoice detailsInvoice, Integer status);
 }

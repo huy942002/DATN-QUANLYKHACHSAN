@@ -154,6 +154,7 @@ const RoomPlan = () => {
                 <div className="flex items-center">
                     <div className="mr-2 font-semibold">Tầng: </div>
                     <Select
+                        size='large'
                         defaultValue={genOptionsFloor()[0].value}
                         style={{
                             width: 120,
@@ -167,6 +168,7 @@ const RoomPlan = () => {
                 <div className="flex items-center">
                     <div className="mr-2 font-semibold">Loại Phòng: </div>
                     <Select
+                        size='large'
                         defaultValue={genOptionsKindOfRoom()[0].value}
                         style={{ width: 150 }}
                         options={genOptionsKindOfRoom()}
@@ -178,6 +180,7 @@ const RoomPlan = () => {
                 </div>
                 <div className="flex items-center">
                     <Input
+                        size='large'
                         value={queryName}
                         onChange={(e) => {
                             setQueryName(e.target.value.toUpperCase());
@@ -263,6 +266,7 @@ const RoomPlan = () => {
             <div className='text-base mb-6 font-semibold'>
                 Ngày
                 <DatePicker
+                    size='large'
                     className="ml-3"
                     format="DD-MM-YYYY"
                     placeholder="Chọn ngày"

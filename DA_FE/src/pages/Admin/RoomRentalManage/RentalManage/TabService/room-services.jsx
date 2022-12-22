@@ -99,30 +99,32 @@ function RoomServices({ detailInvoices, setDetailInvoices, serviceDetails, setSe
                 <div className="text-base font-semibold">Danh sách phòng</div>
             </Divider>
             {detailInvoices.map((element, index) => {
-                return (
-                    <div key={index}>
-                        <Divider orientation="left">
-                            <div className="text-base font-semibold">
-                                <div className="ml-2">
-                                    <Checkbox
-                                        onClick={() => {
-                                            changeSelected(element.key);
-                                        }}
-                                        checked={element.selected}
-                                    >{element.rooms.name}</Checkbox>
+                if(element.status !== 4) {
+                    return (
+                        <div key={index}>
+                            <Divider orientation="left">
+                                <div className="text-base font-semibold">
+                                    <div className="ml-2">
+                                        <Checkbox
+                                            onClick={() => {
+                                                changeSelected(element.key);
+                                            }}
+                                            checked={element.selected}
+                                        >{element.rooms.name}</Checkbox>
+                                    </div>
                                 </div>
-                            </div>
-                        </Divider>
-                        <Table
-                            size="middle"
-                            locale={{emptyText: "Chưa có dịch vụ nào!"}}
-                            bordered
-                            pagination={false}
-                            columns={columns}
-                            dataSource={genServiceDetailsByRoom(element.rooms.id)}
-                        />
-                    </div>
-                );
+                            </Divider>
+                            <Table
+                                size="middle"
+                                locale={{emptyText: "Chưa có dịch vụ nào!"}}
+                                bordered
+                                pagination={false}
+                                columns={columns}
+                                dataSource={genServiceDetailsByRoom(element.rooms.id)}
+                            />
+                        </div>
+                    );
+                }
             })}
         </div>
     );

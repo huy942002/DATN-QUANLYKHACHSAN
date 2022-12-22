@@ -52,8 +52,8 @@ public class IDetailInvoiceServiceImp implements IDetailInvoiceService {
 	}
 
 	@Override
-	public List<DetailsInvoice> findByBillsAndStatus(Bills bills, int status) {
-		return voiceRepo.findByBillsAndStatus(bills, status);
+	public List<DetailsInvoice> findByBillsAndStatus(Integer idBill) {
+		return voiceRepo.findByBillsAndStatus(idBill);
 	}
 
 	@Override

@@ -1,4 +1,4 @@
-import { DollarCircleOutlined, AuditOutlined } from '@ant-design/icons';
+import { DollarCircleOutlined, AuditOutlined, ExclamationCircleFilled } from '@ant-design/icons';
 import { Divider, DatePicker, Select, Input, Table, Descriptions, Badge, Modal, Drawer, Button, Radio, Space, message, InputNumber } from 'antd';
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -7,9 +7,12 @@ import { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import Loading from '~/pages/Loading/loading';
+import { toast } from 'react-toastify';
 const { RangePicker } = DatePicker;
+const { confirm } = Modal;
 
-function CheckInInformation({ bill, setBill, detailInvoices, serviceDetails, type, open, setOpen, dateNow, rentalTypeList }) {
+function CheckInInformation({ bill, setBill, detailInvoices, serviceDetails, type, open, setOpen, dateNow, rentalTypeList, checkData }) {
 
     //Data
     const columnDetailInVoice = [
@@ -23,9 +26,9 @@ function CheckInInformation({ bill, setBill, detailInvoices, serviceDetails, typ
                     {element.rentalType === "Theo ngày" ? element.day + " (Ngày)" : element.hour + " (Giờ)"}
                 </span>
         },
-        { title: 'Trạng thái', dataIndex: 'status', key: '4',
-            render: (status) => <span>{status}</span>,
-        },
+        // { title: 'Trạng thái', dataIndex: 'statusTT', key: '4',
+        //     render: (statusTT) => <span>{statusTT}</span>,
+        // },
         { title: 'Tổng tiền phòng', dataIndex: 'allMoneyRoom', key: '6',
             render: (allMoney) => <span>{formatCurrency(allMoney)}</span>,
         },
@@ -34,6 +37,9 @@ function CheckInInformation({ bill, setBill, detailInvoices, serviceDetails, typ
         },
         { title: 'Tổng tiền dịch vụ', dataIndex: 'allMoneyService', key: '7',
             render: (allMoneyService) => <span>{formatCurrency(allMoneyService)}</span>,
+        },
+        { title: 'Trạng thái', dataIndex: 'status', key: '8',
+            render: (status) => <span>{status === 1 ? "Đang hoạt động" : "Xong"}</span>,
         },
     ];
     const columnSerViceByRoom = [
@@ -59,6 +65,7 @@ function CheckInInformation({ bill, setBill, detailInvoices, serviceDetails, typ
     const [confirmLoading, setConfirmLoading] = useState(false);
     const [radioValue, setRadioValue] = useState("tienmat");
     const [disableCustomerPay, setDisableCustomerPay] = useState(radioValue === "tienmat" ? false : true);
+    const [isLoading, setIsLoading] = useState(false);
     //End Data
 
     //Created
@@ -86,11 +93,13 @@ function CheckInInformation({ bill, setBill, detailInvoices, serviceDetails, typ
                 e.hour = genHourRental(element.hireDate);
                 e.day = genDayRental(element.hireDate);
                 e.price = element.rentalTypes.id === 1 ? Number(element.rooms.kindOfRoom.priceByDay) : Number(element.rooms.kindOfRoom.hourlyPrice);
-                e.allMoneyRoom = element.rentalTypes.id === 1 ? Number(e.price * e.day) : Number(e.price * e.hour);
+                e.allMoneyRoom = element.status === 4 ? element.totalCash : element.rentalTypes.id === 1 ? Number(e.price * e.day) : Number(e.price * e.hour);
                 e.allMoneyService = genAllMoneyServiceByRoom(element.rooms.id);
-                e.surcharge = genSurchargeByRoom(element.rentalTypes.name, element.checkOutDay, element.rentalTypes.id === 1 ? Number(e.price * e.day) : Number(e.price * e.hour));
-                e.status = genStatus(element.rentalTypes.name, element.checkOutDay);
+                e.surcharge = element.status === 4 ? 0 : genSurchargeByRoom(element.rentalTypes.name, element.checkOutDay, element.rentalTypes.id === 1 ? Number(e.price * e.day) : Number(e.price * e.hour));
+                e.statusTT = genStatus(element.rentalTypes.name, element.checkOutDay);
                 e.key = key++;
+                e.status = element.status;
+                e.id = element.id;
                 array.push(e);
             })
         }
@@ -141,8 +150,21 @@ function CheckInInformation({ bill, setBill, detailInvoices, serviceDetails, typ
                 allMoney += (Number(element.allMoneyRoom) + Number(element.allMoneyService) + Number(element.surcharge));
             })
         }
+        allMoney = allMoney + (allMoney * 10 / 100);
         return allMoney;
     }
+
+    const genVAT = () => {
+        let allMoney = 0;
+        if(genDataTable()){
+            genDataTable().forEach(element => {
+                allMoney += (Number(element.allMoneyRoom) + Number(element.allMoneyService) + Number(element.surcharge));
+            })
+        }
+        allMoney = allMoney * 10 /100;
+        return allMoney;
+    }
+
     const genSurchargeByRoom = (type, dateTimeCheckOut, allMoneyRoom) => {
         let surchargeByRoom = 0;
         let d1 = dateNow.getTime();
@@ -267,6 +289,28 @@ function CheckInInformation({ bill, setBill, detailInvoices, serviceDetails, typ
             setBill({ ...bill, customerPay: genAllMoney(), customerReturnMoney: 0 });
         }
     }
+    const payDetailInvoice = async () => {
+        setIsLoading(true);
+        let data = genDataTable().find((x) => x.id === chooseDetailInvoice.id);
+        const params = {
+            ...chooseDetailInvoice,
+            status: 4,
+            totalCash: Number(data.allMoneyRoom) + Number(data.surcharge),
+        }
+        await axios
+            .post('http://localhost:8080/api/room-rental-manage/pay-detail-invoice', params)
+            .then(res => {
+                if(res) {
+                    setTimeout(() => {
+                        checkData();
+                        setIsLoading(false);
+                        setShowModalDetailInvoice(false);
+                        toast.success('Cập nhật thành công!', { autoClose: 2000 });
+                    }, 500);
+                }
+            })
+            .catch(err => {});
+    }
     //End Function
 
     //Util
@@ -287,6 +331,7 @@ function CheckInInformation({ bill, setBill, detailInvoices, serviceDetails, typ
 
     return <>
         {contextHolder}
+        {isLoading && (<Loading></Loading>)}
         {type === "details" && (
             <Drawer
                 title="Thanh toán hóa đơn"
@@ -313,6 +358,9 @@ function CheckInInformation({ bill, setBill, detailInvoices, serviceDetails, typ
                             Tổng tiền dịch vụ
                         </div>
                         <div className='my-6'>
+                            VAT (10%)
+                        </div>
+                        <div className='my-6'>
                             Tổng tiền
                         </div>
                         <div className='my-6'>
@@ -335,6 +383,7 @@ function CheckInInformation({ bill, setBill, detailInvoices, serviceDetails, typ
                         <div>{formatCurrency(genAllMoneyRoom())}</div>
                         <div className='my-6'>{formatCurrency(genSurcharge())}</div>
                         <div className='my-6'>{formatCurrency(genAllMoneyService())}</div>
+                        <div className='my-6'>{formatCurrency(genVAT())}</div>
                         <div className='my-6'>{formatCurrency(genAllMoney())}</div>
                         <div className='my-6'>{bill && formatCurrency(bill.deposits)}</div>
                         <div className='my-6'>0%</div>
@@ -346,15 +395,17 @@ function CheckInInformation({ bill, setBill, detailInvoices, serviceDetails, typ
                                 }}
                                 className="mt-[2px] w-full"
                                 value={bill.customerPay || 0}
-                                disabled={disableCustomerPay}
+                                disabled={disableCustomerPay || bill.deposits > genAllMoney()}
                                 addonAfter="VND"
+                                formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
                             />
                         </div>
-                        <div className='my-6'>{formatCurrency(bill.customerReturnMoney)}</div>
+                        <div className='my-6'>{bill.deposits > genAllMoney() ? formatCurrency(Number(bill.deposits) - Number(genAllMoney())) : formatCurrency(bill.customerReturnMoney)}</div>
                     </div>
                 </div>
                 <div className='my-6'>
-                    <Radio.Group value={radioValue} onChange={(e) => changePaymentType(e.target.value)}>
+                    <Radio.Group disabled={bill.deposits > genAllMoney()} value={radioValue} onChange={(e) => changePaymentType(e.target.value)}>
                         <Radio value="tienmat">
                             Tiền mặt
                         </Radio>
@@ -374,12 +425,28 @@ function CheckInInformation({ bill, setBill, detailInvoices, serviceDetails, typ
         )}
         <Modal
             title="Hóa đơn chi tiết phòng"
+            style={{ top: 20 }}
             open={ showModalDetailInvoice }
             cancelButtonProps={{ style: { display: 'none' } }}
             // confirmLoading={confirmLoading}
-            onOk={() => cancelModalDetailInvoice()}
+            onOk={() => {
+                confirm({
+                    title: 'Bạn có chắc chắn khách muốn trả phòng?',
+                    icon: <ExclamationCircleFilled />,
+                    // content: 'Some descriptions',
+                    onOk() {
+                        payDetailInvoice();
+                    },
+                    onCancel() {
+                      
+                    },
+                    okText: 'Xác nhận',
+                    cancelText: 'Hủy'
+                });
+                
+            }}
             onCancel={() => cancelModalDetailInvoice()}
-            okText="Xong"
+            okText="Khách trả phòng"
         >
             {showModalDetailInvoice && (
                 <>
@@ -405,10 +472,6 @@ function CheckInInformation({ bill, setBill, detailInvoices, serviceDetails, typ
                     <Divider orientation="left">
                         <div className="text-base font-semibold">Thông tin thuê phòng</div>
                     </Divider>
-                    <div className="mt-3">
-                        Số người: 
-                        <span className="ml-3 font-semibold">{chooseDetailInvoice && chooseDetailInvoice.numberOfPeople}</span>
-                    </div>
                     <div className="mt-3">
                         Loại hình thuê:  
                         <span className="ml-3 font-semibold">{chooseDetailInvoice && chooseDetailInvoice.rentalTypes.name}</span>

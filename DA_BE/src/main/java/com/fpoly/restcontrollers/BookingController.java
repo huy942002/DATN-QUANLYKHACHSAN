@@ -36,10 +36,11 @@ public class BookingController {
 
 	@Autowired IBillService iBillService;
 	@Autowired IDetailInvoiceService iDetailInvoiceService;
+
+	@Autowired DetailInvoiceRepository detailInvoiceRepository;
 	@Autowired ICustomerService iCustomerService;
 	@Autowired IPersonnelService iPersonnelService;
 	@Autowired IRentalTypeService iRentalTypeService;
-	@Autowired DetailInvoiceRepository detailInvoiceRepository;
 	@Autowired IBookingService iBookingService;
 
     @Transactional
@@ -82,15 +83,17 @@ public class BookingController {
 
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
+		Booking booking = iBookingService.save(bookingRoomDTO.getBooking());
+
 		Bills bills = new Bills();
 
 		if(bookingRoomDTO.getBills() != null){
 			bills = bookingRoomDTO.getBills();
 		} else {
 			Customer newCustomer = new Customer();
-			newCustomer.setFullname(bookingRoomDTO.getBooking().getCustomerName());
-			newCustomer.setEmail(bookingRoomDTO.getBooking().getCustomerEmail());
-			newCustomer.setPhoneNumber(bookingRoomDTO.getBooking().getCustomerPhoneNumber());
+			newCustomer.setFullname(booking.getCustomerName());
+			newCustomer.setEmail(booking.getCustomerEmail());
+			newCustomer.setPhoneNumber(booking.getCustomerPhoneNumber());
 			newCustomer.setStatus(1);
 
 			Customer customer = iCustomerService.save(newCustomer);
@@ -100,12 +103,12 @@ public class BookingController {
 			Bills newBill = new Bills();
 			newBill.setCustomer(customer);
 			newBill.setPersonnel(personnel);
-			newBill.setNumberOfAdults(bookingRoomDTO.getBooking().getNumberOfAdults());
-			newBill.setNumberOfKids(bookingRoomDTO.getBooking().getNumberOfKids());
+			newBill.setNumberOfAdults(booking.getNumberOfAdults());
+			newBill.setNumberOfKids(booking.getNumberOfKids());
 			newBill.setHireDate(LocalDateTime.now());
-			newBill.setDeposits(bookingRoomDTO.getBooking().getDeposits());
+			newBill.setDeposits(booking.getDeposits());
 			newBill.setStatus(3);
-			newBill.setBooking(bookingRoomDTO.getBooking());
+			newBill.setBooking(booking);
 
 			bills = iBillService.save(newBill);
 		}
@@ -156,6 +159,16 @@ public class BookingController {
 	@Transactional
 	@PostMapping
 	public ResponseEntity<?> saveBooking(@RequestBody Booking booking) {
+		if(booking.getStatus() == 3) {
+			Bills bills = iBillService.getBillByIdBooking(booking.getId());
+			if(bills != null) {
+				List<DetailsInvoice> detailsInvoiceList = iDetailInvoiceService.getDetailInvoiceByIdBill(bills.getId());
+				if(detailsInvoiceList != null) {
+					detailInvoiceRepository.deleteAll(detailsInvoiceList);
+				}
+				iBillService.remove(bills.getId());
+			}
+		}
 		return new ResponseEntity<>(iBookingService.save(booking), HttpStatus.OK);
 	}
 

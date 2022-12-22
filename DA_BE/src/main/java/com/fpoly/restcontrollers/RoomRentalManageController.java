@@ -156,7 +156,7 @@ public class RoomRentalManageController {
         Optional<Rooms> rooms = iRoomService.findById(id);
         DetailsInvoice detailsInvoiceByRoom = iDetailInvoiceService.findByRoomsAndStatus(rooms.get(), 1);
         Bills bills = detailsInvoiceByRoom.getBills();
-        List<DetailsInvoice> detailsInvoiceList = iDetailInvoiceService.findByBillsAndStatus(detailsInvoiceByRoom.getBills(), 1);
+        List<DetailsInvoice> detailsInvoiceList = iDetailInvoiceService.findByBillsAndStatus(detailsInvoiceByRoom.getBills().getId());
         List<ServiceDetails> serviceDetailsList = new ArrayList<>();
         for (DetailsInvoice d : detailsInvoiceList) {
             serviceDetailsList.addAll(iServiceDetailService.listByRoomAndStatus(d, 1));
@@ -177,6 +177,8 @@ public class RoomRentalManageController {
     @PostMapping("/update-detail")
     @Transactional
     public ResponseEntity<?> updateDetail(@RequestBody CheckInDTO checkInDTO){
+        iCustomerService.save(checkInDTO.getCustomer());
+        iBillService.save(Bills.toEntity(checkInDTO.getBill()));
         List<DetailsInvoice> detailsInvoiceList = new ArrayList<>();
         List<Rooms> roomsList = new ArrayList<>();
         for (DetailsInvoiceDTO d : checkInDTO.getDetailInvoices()){
@@ -184,7 +186,7 @@ public class RoomRentalManageController {
             d.getRooms().setStatus(2);
             roomsList.add(d.getRooms());
         }
-        roomRepository.saveAll(roomsList);
+//        roomRepository.saveAll(roomsList);
         List<DetailsInvoice> detailsInvoiceResponse = detailInvoiceRepository.saveAll(detailsInvoiceList);
         List<ServiceDetails> serviceDetailsList = new ArrayList<>();
         List<ServiceDetails> serviceDetailsListRemove = new ArrayList<>();
@@ -263,5 +265,13 @@ public class RoomRentalManageController {
     @GetMapping("/all-detail-invoice-by-room-and-status-and-date/{idRoom}/{date}")
     public ResponseEntity<?> getAllDetailInvoieByRoomAndStatusAndDate(@PathVariable Integer idRoom, @PathVariable String date){
         return new ResponseEntity<>(iDetailInvoiceService.getListDetailInvoiceByDate(idRoom, date), HttpStatus.OK);
+    }
+
+    @PostMapping("/pay-detail-invoice")
+    public ResponseEntity<?> payDetailInvoice(@RequestBody DetailsInvoice detailsInvoice){
+        iDetailInvoiceService.save(detailsInvoice);
+        detailsInvoice.getRooms().setStatus(3);
+        iRoomService.save(detailsInvoice.getRooms());
+        return new ResponseEntity<>(iDetailInvoiceService.save(detailsInvoice), HttpStatus.OK);
     }
 }

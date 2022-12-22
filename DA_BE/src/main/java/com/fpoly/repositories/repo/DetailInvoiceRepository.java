@@ -22,7 +22,8 @@ import java.util.List;
 @Repository
 public interface DetailInvoiceRepository extends JpaRepository<DetailsInvoice, Integer>{
     DetailsInvoice findByRoomsAndStatus(Rooms rooms, int status);
-    List<DetailsInvoice> findByBillsAndStatus(Bills bills, int status);
+    @Query("select d from DetailsInvoice d where d.bills.id = :idBill and (d.status = 1 or d.status = 4)")
+    List<DetailsInvoice> findByBillsAndStatus(Integer idBill);
     @Query(value = "select * from DETAILS_INVOICE where ID_ROOMS = :roomId AND (STATUS = 3 OR STATUS = 1) AND CONVERT(DATE,:date) >= CONVERT(DATE, HIRE_DATE) AND CONVERT(DATE,:date) <= CONVERT(DATE, CHECK_OUT_DAY)", nativeQuery = true)
     List<DetailsInvoice> getListDetailInvoiceByDate(@Param("roomId") Integer roomId,@Param("date") String date);
 

@@ -90,7 +90,10 @@ const Room = ({
             const params = {
                 rooms: data.room,
                 bills: dataBill || null,
-                booking: dataBooking,
+                booking: {
+                    ...dataBooking,
+                    bookingStatus: 2,
+                },
                 hireDate: data.hireDate + " " + window.localStorage.getItem("time-in"),
                 checkOutDay: data.checkOutDay + " " + window.localStorage.getItem("time-out"),
                 userNamePersonnel: window.localStorage.getItem("username"),

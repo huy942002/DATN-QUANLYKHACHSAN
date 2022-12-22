@@ -269,10 +269,11 @@ const ListRoom = ({
                 </div>
                 <div
                     onClick={() => {
-                        setQueryFloor('ALL');
-                        setQueryKindOfRoom('ALL');
-                        setQueryStatus('ALL');
-                        setQueryName('');
+                        // setQueryFloor('ALL');
+                        // setQueryKindOfRoom('ALL');
+                        // setQueryStatus('ALL');
+                        // setQueryName('');
+                        getRoomPlan(dateChoose);
                     }}
                     className={`flex items-center cursor-pointer rounded-lg hover:bg-default-1`}
                 >

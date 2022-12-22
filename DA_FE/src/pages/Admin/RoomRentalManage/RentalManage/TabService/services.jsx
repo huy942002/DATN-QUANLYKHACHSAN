@@ -128,6 +128,7 @@ function Services({ detailInvoices, serviceDetails, setServiceDetails }) {
                     <div className='text-base font-semibold'>Loại dịch vụ</div>
                     <div className="flex gap-6 mt-[2px]">
                         <Select
+                            size='large'
                             defaultValue={genOptionsKindOfRoom()[0].value}
                             style={{ width: 150 }}
                             options={genOptionsKindOfRoom()}
@@ -137,6 +138,7 @@ function Services({ detailInvoices, serviceDetails, setServiceDetails }) {
                             className="font-semibold"
                         />
                         <Input
+                            size='large'
                             value={query}
                             onChange={(e) => {
                                 setQuery(e.target.value);

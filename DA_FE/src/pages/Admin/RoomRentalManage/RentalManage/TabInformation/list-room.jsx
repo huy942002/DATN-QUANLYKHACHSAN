@@ -223,19 +223,21 @@ function ListRoom({ detailInvoices, setDetailInvoices, serviceDetails, setServic
 
             <div className="grid grid-cols-3 gap-12">
                 {detailInvoices.map((element, index) => {
-                    return (
-                        <RoomDetail
-                            key={index}
-                            detailInvoice={element}
-                            detailInvoiceList={detailInvoices}
-                            setDetailInvoices={setDetailInvoices}
-                            showModalDetailInvoice={showModalDetailInvoice}
-                            setDetailModalDetailInvoice={setDetailModalDetailInvoice}
-                            showModalRoomDetail={showModalRoomDetail}
-                            rentalTypeList={rentalTypeList}
-                            dateNow={dateNow}
-                        ></RoomDetail>
-                    );
+                    if(element.status !== 4) {
+                        return (
+                            <RoomDetail
+                                key={index}
+                                detailInvoice={element}
+                                detailInvoiceList={detailInvoices}
+                                setDetailInvoices={setDetailInvoices}
+                                showModalDetailInvoice={showModalDetailInvoice}
+                                setDetailModalDetailInvoice={setDetailModalDetailInvoice}
+                                showModalRoomDetail={showModalRoomDetail}
+                                rentalTypeList={rentalTypeList}
+                                dateNow={dateNow}
+                            ></RoomDetail>
+                        );
+                    }
                 })}
             </div>
 

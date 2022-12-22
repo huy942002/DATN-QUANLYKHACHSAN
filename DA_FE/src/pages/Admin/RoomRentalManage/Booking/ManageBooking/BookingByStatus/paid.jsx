@@ -1,4 +1,4 @@
-import { Button, Checkbox, DatePicker, Divider, Input, InputNumber, Modal, Radio, Select, Switch, Table } from "antd";
+import { Button, Checkbox, DatePicker, Divider, Form, Input, InputNumber, Modal, Radio, Select, Switch, Table } from "antd";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBuildingCircleCheck, faCircleExclamation, faCircleXmark, faPersonWalkingArrowRight, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useState } from "react";
@@ -8,6 +8,10 @@ import { UserOutlined, SearchOutlined, CheckOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import Loading from "~/pages/Loading/loading";
 import { toast } from 'react-toastify';
+import validateMessages from "~/config/rules";
+import TextArea from "antd/es/input/TextArea";
+import { ExclamationCircleFilled } from '@ant-design/icons';
+const { confirm } = Modal;
 
 function Paid() {
 
@@ -21,6 +25,13 @@ function Paid() {
     const [roomBookingList, setRoomBookingList] = useState();
     const [queryCustomerName, setQueryCustomerName] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const [chooseOption, setChooseOption] = useState("CHECK_IN");
+    const [note, setNote] = useState();
+    const [initialValues, setInitialValues] = useState();
+    const [form] = Form.useForm();
+    useEffect(() => {
+        form.setFieldsValue(initialValues)
+    }, [form, initialValues])
     const genders = [
         { value: 'Nam', label: 'Nam' },
         { value: 'Nữ', label: 'Nữ' },
@@ -251,7 +262,7 @@ function Paid() {
     };
 
     const checkInBooking = async () => {
-
+        setIsLoading(true);
         const params = {
             dataBill: {
                 ...dataBill,
@@ -272,10 +283,25 @@ function Paid() {
         await axios
             .post('http://localhost:8080/api/booking/check-in-booking', params)
             .then((res) => {
-                console.log(res);
-                getListBookingPaid();
-                setOpenModalCheckIn(false);
-                isModalOpen(false);
+                if(res) {
+                    getListBookingPaid();
+                    setTimeout(() => {
+                        setIsLoading(false);
+                        toast.success('🦄 Khách nhận phòng đặt thành công!', {
+                            position: "top-right",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                            theme: "light",
+                        });
+                        setIsLoading(false)
+                        setOpenModalCheckIn(false);
+                        setIsModalOpen(false);
+                    }, 500);
+                }
             })
             .catch((err) => {});
     }
@@ -308,6 +334,38 @@ function Paid() {
             })
             .catch((err) => {});
     }
+
+    const cancelBooking = async () => {
+        setIsLoading(true);
+        const params = {
+            ...dataBooking,
+            note: note,
+            status: 3,
+        }
+        await axios
+            .post('http://localhost:8080/api/booking', params)
+            .then(
+                (res) => {
+                    if(res) {
+                        setTimeout(() => {
+                            setIsModalOpen(false);
+                            setIsLoading(false);
+                        }, 500);
+                        toast('🦄 Hủy đặt phòng thành công!', {
+                            position: "top-right",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                            theme: "light",
+                        });
+                    }
+                }
+            )
+            .catch((err) => {});
+    }
     //End Function
 
     //Util
@@ -322,10 +380,12 @@ function Paid() {
     };
     //End Util
 
+    console.log(initialValues);
+
     return (
         <>
             {isLoading && (<Loading></Loading>)}
-            <Modal 
+            <Modal
                 title={"Chi tiết booking"}
                 open={isModalOpen}
                 onOk={handleOk}
@@ -345,13 +405,16 @@ function Paid() {
                         Email: {dataBooking && dataBooking.customerEmail}
                     </div>
                     <div className="my-2">
-                        Loại phòng book: {dataBooking && dataBooking.kindOfRoom.name}
+                        Loại phòng: {dataBooking && dataBooking.kindOfRoom.name}
                     </div>
                     <div className="my-2">
-                        Ngày đến: {dataBooking && dataBooking.hireDate}
+                        Số lượng phòng: {dataBooking && dataBooking.quantityRoom}
                     </div>
                     <div className="my-2">
-                        Ngày đi: {dataBooking && dataBooking.checkOutDay}
+                        Ngày nhận phòng: {dataBooking && dataBooking.hireDate}
+                    </div>
+                    <div className="my-2">
+                        Ngày trả phòng: {dataBooking && dataBooking.checkOutDay}
                     </div>
                     <div className="my-2">
                         Số người lớn: {dataBooking && dataBooking.numberOfAdults}
@@ -433,283 +496,525 @@ function Paid() {
                         ></FontAwesomeIcon>
                     </Button> */}
 
-                    <Divider
-                        style={{ marginBottom: 20, marginTop: 20 }}
-                    ></Divider>
+                    {roomBookingList && roomBookingList.length > 0 && (
+                        <>
+                            
+                            <Divider
+                                style={{ marginBottom: 20, marginTop: 20 }}
+                            ></Divider>
 
-                    <Button 
-                        type="primary" 
-                        className="w-full" 
-                        onClick={() => setOpenModalCheckIn(true)}
-                    >
-                        Khách nhận phòng
-                        <FontAwesomeIcon
-                            className="ml-2"
-                            icon={faBuildingCircleCheck}
-                        ></FontAwesomeIcon>
-                    </Button>
+                            <Radio.Group onChange={(e) => setChooseOption(e.target.value)} value={chooseOption}>
+                                <Radio value={"CHECK_IN"} className="text-base">Nhận phòng</Radio>
+                                <Radio value={"CANCEL"} className="text-base">Hủy đặt phòng</Radio>
+                            </Radio.Group>
+
+                            {chooseOption === "CHECK_IN" && (
+                                <Button 
+                                    size="large"
+                                    type="primary" 
+                                    className="w-full mt-3" 
+                                    onClick={() => {
+                                        setInitialValues(
+                                            {
+                                                'Tên khách hàng': dataBooking.customerName,
+                                                'Số điện thoại': dataBooking && dataBooking.customerPhoneNumber,
+                                                'Email': dataBooking && dataBooking.customerEmail,
+                                                'Số người lớn': dataBooking && dataBooking.numberOfAdults,
+                                                'Số trẻ em': dataBooking && dataBooking.numberOfKids,
+                                            }
+                                        )
+                                        setOpenModalCheckIn(true);
+                                    }}
+                                >
+                                    Khách nhận phòng
+                                    <FontAwesomeIcon
+                                        className="ml-2"
+                                        icon={faBuildingCircleCheck}
+                                    ></FontAwesomeIcon>
+                                </Button>
+                            )}
+
+                            {chooseOption === "CANCEL" && (
+                                <Form
+                                    name="cancel"
+                                    onFinish={cancelBooking}
+                                    validateMessages={validateMessages}
+                                    className="mt-3"
+                                >
+                                    <div className="text-base">
+                                        <div className="mb-1">
+                                            Ghi chú hủy phòng: 
+                                        </div>
+                                        <Form.Item
+                                            name="Ghi chú hủy phòng"
+                                            rules={[
+                                                {   
+                                                    required: true,
+                                                },
+                                            ]}
+                                            hasFeedback 
+                                            value={note}
+                                        >
+                                            <TextArea
+                                                size="large"
+                                                showCount
+                                                maxLength={500}
+                                                style={{ height: 120, resize: 'none' }}
+                                                className="w-full"
+                                                placeholder="Ghi chú hủy đặt phòng..."
+                                                value={note}
+                                                onChange={
+                                                    (e) => setNote(e.target.value)
+                                                }
+                                            />
+                                        </Form.Item>
+                                        <Button htmlType="submit" size="large" className="w-full text-base mt-3" type="primary">
+                                            Khách hủy đặt phòng
+                                        </Button>
+                                    </div>
+                                </Form>
+                            )}
+                        </>
+                    )}
+
+                    {roomBookingList && roomBookingList.length === 0 && (
+                        <Form
+                            name="cancel"
+                            onFinish={cancelBooking}
+                            validateMessages={validateMessages}
+                            className="mt-3"
+                        >
+                            <div className="text-base">
+                                <div className="mb-1">
+                                    Ghi chú hủy phòng: 
+                                </div>
+                                <Form.Item
+                                    name="Ghi chú hủy phòng"
+                                    rules={[
+                                        {   
+                                            required: true,
+                                        },
+                                    ]}
+                                    hasFeedback 
+                                    value={note}
+                                >
+                                    <TextArea
+                                        size="large"
+                                        showCount
+                                        maxLength={500}
+                                        style={{ height: 120, resize: 'none' }}
+                                        className="w-full"
+                                        placeholder="Ghi chú hủy đặt phòng..."
+                                        value={note}
+                                        onChange={
+                                            (e) => setNote(e.target.value)
+                                        }
+                                    />
+                                </Form.Item>
+                                <Button htmlType="submit" size="large" className="w-full text-base mt-3" type="primary">
+                                    Khách hủy đặt phòng
+                                </Button>
+                            </div>
+                        </Form>
+                    )}
                 </div>
             </Modal>
-            <Modal 
+            <Modal
                 title={"Khách nhận phòng"}
                 open={openModalCheckIn}
-                onOk={() => checkInBooking()}
+                // onOk={() => checkInBooking()}
                 onCancel={() => setOpenModalCheckIn(false)}
                 okText="Nhận phòng"
                 cancelButtonProps={{ style: { display: 'none' } }}
+                okButtonProps={{ style: { display: 'none' } }}
                 style={{ top: 20 }}
             >
-                <div className="flex items-center py-2">
-                    <span className="w-[120px]">
-                        Tên khách hàng:
-                    </span>
-                    <Input
-                        className="w-[250px] ml-2"
-                        placeholder="Tên khách hàng..."
-                        prefix={<UserOutlined />}
-                        value={dataBill && dataBill.customer.fullname}
-                        onChange={
-                            (e) => {
-                                setDataBill({
-                                    ...dataBill,
-                                    customer: {
-                                        ...dataBill.customer,
-                                        fullname: e.target.value,
+                <Form
+                    form={form}
+                    initialValues={initialValues}
+                    name="nest-messages"
+                    onFinish={checkInBooking}
+                    validateMessages={validateMessages}
+                >
+                    <div className="text-base">
+                        <div className="py-2">
+                            <div className="mb-1">
+                                Tên khách hàng:
+                            </div>
+                            <Form.Item
+                                name="Tên khách hàng"
+                                rules={[
+                                    {   
+                                        required: true,
+
+                                    },
+                                    validateMessages.space,
+                                    validateMessages.specialCharacters,
+                                ]}
+                                hasFeedback 
+                            >
+                                <Input
+                                    size="large"
+                                    className=""
+                                    placeholder="Tên khách hàng..."
+                                    prefix={<UserOutlined />}
+                                    // value={dataBill && dataBill.customer.fullname}
+                                    onChange={
+                                        (e) => {
+                                            setDataBill({
+                                                ...dataBill,
+                                                customer: {
+                                                    ...dataBill.customer,
+                                                    fullname: e.target.value,
+                                                }
+                                            })
+                                        }
                                     }
-                                })
-                            }
-                        }
-                    />
-                </div>
-                <div className="flex items-center py-2">
-                    <span className="w-[120px]">
-                        Ngày sinh:
-                    </span>
-                    <DatePicker
-                        className="w-[250px] ml-2"
-                        format="DD-MM-YYYY"
-                        value={
-                            dataBill && dataBill.customer.dateOfBirth
-                            ? dayjs(dataBill.customer.dateOfBirth)
-                            : ''
-                        }
-                        onChange={
-                            (date, dateString) => {
-                                var newdate = dateString.split('-').reverse().join('-');
-                                setDataBill({
-                                    ...dataBill,
-                                    customer: {
-                                        ...dataBill.customer,
-                                        dateOfBirth: dateString === '' ? '' : new Date(Date.parse(newdate)),
+                                />
+                            </Form.Item>
+                        </div>
+                        <div className="">
+                            <div className="mb-1">
+                                Ngày sinh:
+                            </div>
+                            <Form.Item
+                                name="Ngày sinh"
+                                rules={[
+                                    {   
+                                        required: true,
+
+                                    },
+                                    // validateMessages.space,
+                                    // validateMessages.specialCharacters,
+                                ]}
+                                hasFeedback
+                            >
+                                <DatePicker
+                                    size="large"
+                                    className="w-full"
+                                    format="DD-MM-YYYY"
+                                    value={
+                                        dataBill && dataBill.customer.dateOfBirth
+                                        ? dayjs(dataBill.customer.dateOfBirth)
+                                        : ''
                                     }
-                                })
-                            }
-                        }
-                    />
-                </div>
-                <div className="flex items-center py-2">
-                    <span className="w-[120px]">
-                        Giới tính:
-                    </span>
-                    <Select
-                        className="w-[250px] ml-2"
-                        options={genders}
-                        value={
-                            dataBill && dataBill.customer.gender
-                            ? genders.find((x) => x.value === dataBill.customer.gender)
-                            : dataBill && setDataBill({
-                                ...dataBill,
-                                customer: {
-                                    ...dataBill.customer,
-                                    gender: genders[0].value,
+                                    onChange={
+                                        (date, dateString) => {
+                                            var newdate = dateString.split('-').reverse().join('-');
+                                            setDataBill({
+                                                ...dataBill,
+                                                customer: {
+                                                    ...dataBill.customer,
+                                                    dateOfBirth: dateString === '' ? '' : new Date(Date.parse(newdate)),
+                                                }
+                                            })
+                                        }
+                                    }
+                                />
+                            </Form.Item>
+                        </div>
+                        <div className="">
+                            <div className="mb-1">
+                                Giới tính:
+                            </div>
+                            <Select
+                                size="large"
+                                className="w-full"
+                                options={genders}
+                                value={
+                                    dataBill && dataBill.customer.gender
+                                    ? genders.find((x) => x.value === dataBill.customer.gender)
+                                    : dataBill && setDataBill({
+                                        ...dataBill,
+                                        customer: {
+                                            ...dataBill.customer,
+                                            gender: genders[0].value,
+                                        }
+                                    })
                                 }
-                            })
-                        }
-                        onChange={
-                            (e) => {
-                                setDataBill({
-                                    ...dataBill,
-                                    customer: {
-                                        ...dataBill.customer,
-                                        gender: e,
+                                onChange={
+                                    (e) => {
+                                        setDataBill({
+                                            ...dataBill,
+                                            customer: {
+                                                ...dataBill.customer,
+                                                gender: e,
+                                            }
+                                        })
                                     }
-                                })
-                            }
-                        }
-                    />
-                </div>
-                <div className="flex items-center py-2">
-                    <span className="w-[120px]">
-                        Quốc tịch:
-                    </span>
-                    <Select
-                        className="w-[250px] ml-2"
-                        options={genNationality()}
-                        value={
-                            dataBill && dataBill.customer.nationality
-                            ? genNationality().find((x) => x.value === dataBill.customer.nationality.id).value
-                            : dataBill && setDataBill({
-                                ...dataBill,
-                                customer: {
-                                    ...dataBill.customer,
-                                    nationality: nationalityList[0],
                                 }
-                            })
-                        }
-                        onChange={
-                            (e) => {
-                                setDataBill({
-                                    ...dataBill,
-                                    customer: {
-                                        ...dataBill.customer,
-                                        nationality: nationalityList.find((x) => x.id === e),
+                            />
+                        </div>
+                        <div className="mt-6">
+                            <div className="mb-1">
+                                Quốc tịch:
+                            </div>
+                            <Select
+                                size="large"
+                                className="w-full"
+                                options={genNationality()}
+                                value={
+                                    dataBill && dataBill.customer.nationality
+                                    ? genNationality().find((x) => x.value === dataBill.customer.nationality.id).value
+                                    : dataBill && setDataBill({
+                                        ...dataBill,
+                                        customer: {
+                                            ...dataBill.customer,
+                                            nationality: nationalityList[0],
+                                        }
+                                    })
+                                }
+                                onChange={
+                                    (e) => {
+                                        setDataBill({
+                                            ...dataBill,
+                                            customer: {
+                                                ...dataBill.customer,
+                                                nationality: nationalityList.find((x) => x.id === e),
+                                            }
+                                        })
                                     }
-                                })
-                            }
-                        }
-                    />
-                </div>
-                <div className="flex items-center py-2">
-                    <span className="w-[120px]">
-                        Số điện thoại:
-                    </span>
-                    <Input
-                        className="w-[250px] ml-2"
-                        placeholder="Số điện thoại..."
-                        prefix={<UserOutlined />}
-                        value={dataBill && dataBill.customer.phoneNumber}
-                        onChange={
-                            (e) => {
-                                setDataBill({
-                                    ...dataBill,
-                                    customer: {
-                                        ...dataBill.customer,
-                                        phoneNumber: e.target.value,
-                                    }
-                                })
-                            }
-                        }
-                    />
-                </div>
-                <div className="flex items-center py-2">
-                    <span className="w-[120px]">
-                        Email:
-                    </span>
-                    <Input
-                        className="w-[250px] ml-2"
-                        placeholder="Email..."
-                        prefix={<UserOutlined />}
-                        value={dataBill && dataBill.customer.email}
-                        onChange={
-                            (e) => {
-                                setDataBill({
-                                    ...dataBill,
-                                    customer: {
-                                        ...dataBill.customer,
-                                        email: e.target.value,
-                                    }
-                                })
-                            }
-                        }
-                    />
-                </div>
-                <div className="flex items-center py-2">
-                    <span className="w-[120px]">
-                        Giấy tờ tùy thân:
-                    </span>
-                    <Input
-                        className="w-[250px] ml-2"
-                        placeholder="Giấy tờ tùy thân..."
-                        prefix={<UserOutlined />}
-                        value={dataBill && dataBill.customer.citizenIdCode}
-                        onChange={
-                            (e) => {
-                                setDataBill({
-                                    ...dataBill,
-                                    customer: {
-                                        ...dataBill.customer,
-                                        citizenIdCode: e.target.value,
-                                    }
-                                })
-                            }
-                        }
-                    />
-                </div>
-                <div className="flex items-center py-2">
-                    <span className="w-[120px]">
-                        Địa chỉ:
-                    </span>
-                    <Input
-                        className="w-[250px] ml-2"
-                        placeholder="Địa chỉ..."
-                        prefix={<UserOutlined />}
-                        value={dataBill && dataBill.customer.address}
-                        onChange={
-                            (e) => {
-                                setDataBill({
-                                    ...dataBill,
-                                    customer: {
-                                        ...dataBill.customer,
-                                        address: e.target.value,
-                                    }
-                                })
-                            }
-                        }
-                    />
-                </div>
+                                }
+                            />
+                        </div>
+                        <div className="mt-6">
+                            <div className="mb-1">
+                                Số điện thoại:
+                            </div>
+                            <Form.Item
+                                name="Số điện thoại"
+                                rules={[
+                                    {   
+                                        required: true,
 
-                <Divider
-                    style={{ marginBottom: 20, marginTop: 20 }}
-                ></Divider>
+                                    },
+                                    // validateMessages.space,
+                                    // validateMessages.specialCharacters,
+                                ]}
+                                hasFeedback
+                            >
+                                <Input
+                                    size="large"
+                                    className="w-full"
+                                    placeholder="Số điện thoại..."
+                                    prefix={<UserOutlined />}
+                                    value={dataBill && dataBill.customer.phoneNumber}
+                                    onChange={
+                                        (e) => {
+                                            setDataBill({
+                                                ...dataBill,
+                                                customer: {
+                                                    ...dataBill.customer,
+                                                    phoneNumber: e.target.value,
+                                                }
+                                            })
+                                        }
+                                    }
+                                />
+                            </Form.Item>
+                            
+                        </div>
+                        <div className="mt-6">
+                            <div className="mb-1">
+                                Email:
+                            </div>
+                            <Form.Item
+                                name="Email"
+                                rules={[
+                                    {   
+                                        required: true,
 
-                <div className="flex items-center py-2">
-                    <span className="w-[120px]">
-                        Số người lớn:
-                    </span>
-                    <InputNumber
-                        className="w-[250px] ml-2"
-                        placeholder="Số người lớn..."
-                        value={dataBill && dataBill.numberOfAdults}
-                        onChange={
-                            (e) => {
-                                setDataBill({
-                                    ...dataBill,
-                                    numberOfAdults: e
-                                })
-                            }
-                        }
-                    />
-                </div>
-                <div className="flex items-center py-2">
-                    <span className="w-[120px]">
-                        Số người trẻ em:
-                    </span>
-                    <InputNumber
-                        className="w-[250px] ml-2"
-                        placeholder="Số người trẻ em..."
-                        value={dataBill && dataBill.numberOfKids}
-                        onChange={
-                            (e) => {
-                                setDataBill({
-                                    ...dataBill,
-                                    numberOfKids: e
-                                })
-                            }
-                        }
-                    />
-                </div>
-                <div className="flex items-center py-2">
-                    <span className="w-[120px]">
-                        Tiền đặt cọc (Đã thanh toán khi Booking):
-                    </span>
-                    <InputNumber
-                        className="w-[250px] ml-2"
-                        placeholder="Tiền đã thanh toán..."
-                        disabled
-                        value={dataBill && formatCurrency(dataBill.deposits)}
-                    />
-                </div>
+                                    },
+                                    // validateMessages.space,
+                                    // validateMessages.specialCharacters,
+                                ]}
+                                hasFeedback
+                            >
+                                <Input
+                                    size="large"
+                                    className=""
+                                    placeholder="Email..."
+                                    prefix={<UserOutlined />}
+                                    value={dataBill && dataBill.customer.email}
+                                    onChange={
+                                        (e) => {
+                                            setDataBill({
+                                                ...dataBill,
+                                                customer: {
+                                                    ...dataBill.customer,
+                                                    email: e.target.value,
+                                                }
+                                            })
+                                        }
+                                    }
+                                />
+                            </Form.Item>
+                        </div>
+                        <div className="">
+                            <div className="mb-1">
+                                Giấy tờ tùy thân:
+                            </div>
+                            <Form.Item
+                                name="Giấy tờ tùy thân"
+                                rules={[
+                                    {   
+                                        required: true,
 
+                                    },
+                                    // validateMessages.space,
+                                    // validateMessages.specialCharacters,
+                                ]}
+                                hasFeedback
+                            >
+                                <Input
+                                    size="large"
+                                    className="w-full"
+                                    placeholder="Giấy tờ tùy thân..."
+                                    prefix={<UserOutlined />}
+                                    value={dataBill && dataBill.customer.citizenIdCode}
+                                    onChange={
+                                        (e) => {
+                                            setDataBill({
+                                                ...dataBill,
+                                                customer: {
+                                                    ...dataBill.customer,
+                                                    citizenIdCode: e.target.value,
+                                                }
+                                            })
+                                        }
+                                    }
+                                />
+                            </Form.Item>
+                        </div>
+                        <div className="mt-6">
+                            <div className="mb-1">
+                                Địa chỉ:
+                            </div>
+                            <Form.Item
+                                name="Địa chỉ"
+                                rules={[
+                                    {   
+                                        required: true,
+
+                                    },
+                                    // validateMessages.space,
+                                    // validateMessages.specialCharacters,
+                                ]}
+                                hasFeedback
+                            >
+                                <Input
+                                    size="large"
+                                    className="w-full"
+                                    placeholder="Địa chỉ..."
+                                    prefix={<UserOutlined />}
+                                    value={dataBill && dataBill.customer.address}
+                                    onChange={
+                                        (e) => {
+                                            setDataBill({
+                                                ...dataBill,
+                                                customer: {
+                                                    ...dataBill.customer,
+                                                    address: e.target.value,
+                                                }
+                                            })
+                                        }
+                                    }
+                                />
+                            </Form.Item>
+                        </div>
+
+                        <Divider
+                            style={{ marginBottom: 20, marginTop: 20 }}
+                        ></Divider>
+
+                        <div className="">
+                            <div className="mb-1">
+                                Số người lớn:
+                            </div>
+                            <Form.Item
+                                name="Số người lớn"
+                                rules={[
+                                    {   
+                                        required: true,
+
+                                    },
+                                    // validateMessages.space,
+                                    // validateMessages.specialCharacters,
+                                ]}
+                                hasFeedback
+                            >
+                                <InputNumber
+                                    size="large"
+                                    className="w-full"
+                                    placeholder="Số người lớn..."
+                                    value={dataBill && dataBill.numberOfAdults}
+                                    onChange={
+                                        (e) => {
+                                            setDataBill({
+                                                ...dataBill,
+                                                numberOfAdults: e
+                                            })
+                                        }
+                                    }
+                                />
+                            </Form.Item>
+                        </div>
+                        <div className="mt-6">
+                            <span className="mb-1">
+                                Số người trẻ em:
+                            </span>
+                            <Form.Item
+                                name="Số trẻ em"
+                                rules={[
+                                    {   
+                                        required: true,
+
+                                    },
+                                    // validateMessages.space,
+                                    // validateMessages.specialCharacters,
+                                ]}
+                                hasFeedback
+                            >
+                                <InputNumber
+                                    size="large"
+                                    className="w-full"
+                                    placeholder="Số người trẻ em..."
+                                    value={dataBill && dataBill.numberOfKids}
+                                    onChange={
+                                        (e) => {
+                                            setDataBill({
+                                                ...dataBill,
+                                                numberOfKids: e
+                                            })
+                                        }
+                                    }
+                                />
+                            </Form.Item>
+                            
+                        </div>
+                        <div className="mt-7">
+                            <div className="mb-1">
+                                Tiền đặt cọc (Đã thanh toán khi Booking):
+                            </div>
+                            <InputNumber
+                                size="large"
+                                className="w-full"
+                                placeholder="Tiền đã thanh toán..."
+                                disabled
+                                value={dataBill && formatCurrency(dataBill.deposits)}
+                            />
+                        </div>
+
+                        <div className="mt-6">
+                            <Button
+                                size="large"
+                                htmlType="sumbit"
+                                type="primary"
+                                className="w-full"
+                            >Nhận phòng</Button>
+                        </div>
+                    </div>
+                </Form>
             </Modal>
             <Modal 
                 width={1800}

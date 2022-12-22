@@ -1,4 +1,4 @@
-import { DatePicker, Tabs, Button, message } from 'antd';
+import { DatePicker, Tabs, Button, message, Form } from 'antd';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Personnel from '~/models/Personnel/Personnel';
@@ -38,6 +38,7 @@ const RentalManage = () => {
     const [customer, setCustomer] = useState(new Customer());
     const [detailInvoices, setDetailInvoices] = useState([]);
     const [serviceDetails, setServiceDetails] = useState([]);
+    const [form] = Form.useForm();
     //End Data
 
     //Created
@@ -212,10 +213,13 @@ const RentalManage = () => {
             const response = await axios.post('http://localhost:8080/api/room-rental-manage/update-detail', {
                 detailInvoices: detailInvoices,
                 serviceDetails: serviceDetails,
+                bill: bill,
+                customer: customer,
             }).then((res) => {
                 if(res) {
                     setTimeout(() => {
                         setConfirmLoading(false);
+                        checkData();
                         messageApi.open({
                             key,
                             type: 'success',
@@ -261,6 +265,8 @@ const RentalManage = () => {
                                 setBill={setBill}
                                 nationalityList={nationalityList}
                                 billActiveList={billActiveList}
+                                form={form}
+                                onFinish={triggerAction}
                             ></CustomerInformation>
                         </div>
                         <div className='col-span-7'>
@@ -274,6 +280,7 @@ const RentalManage = () => {
                                 setOpen={setOpen}
                                 dateNow={dateNow}
                                 rentalTypeList={rentalTypes}
+                                checkData={checkData}
                             ></CheckInInformation>
                         </div>
                     </TabPane>
@@ -313,8 +320,9 @@ const RentalManage = () => {
                         </Button>
                     )}
                     <Button
-                        onClick={() => triggerAction()}
+                        onClick={() => form.submit()}
                         loading={confirmLoading}
+                        htmlType="submit"
                     >
                         {type === "check-in" && <span>Check in</span>}
                         {type === "details" && <span>Lưu</span>}
