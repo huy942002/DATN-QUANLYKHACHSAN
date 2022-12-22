@@ -3,8 +3,11 @@
  */
 package com.fpoly.restcontrollers;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+
+import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fpoly.entities.NumberOfFloors;
 import com.fpoly.repositories.irepo.INumberOfFloorService;
+import com.fpoly.repositories.repo.NumberOfFloorRepository;
 
 /**
  *
@@ -34,6 +38,9 @@ public class NumberOfFloorController {
 
 	@Autowired
 	INumberOfFloorService repository;
+	
+	@Autowired
+	NumberOfFloorRepository floorRepo;
 
 	// getAll
 	@GetMapping
@@ -51,6 +58,13 @@ public class NumberOfFloorController {
 	@PostMapping
 	public ResponseEntity<NumberOfFloors> createNewNumberOfFloor(@RequestBody NumberOfFloors num) {
 		return new ResponseEntity<>(repository.save(num), HttpStatus.OK);
+	}
+	
+	// upload
+	@Transactional
+	@PostMapping("/upload")
+	public ResponseEntity<List<NumberOfFloors>> uploadNumberOfFloor(@RequestBody List<NumberOfFloors> num) {
+		return new ResponseEntity<>(floorRepo.saveAll(num),HttpStatus.OK);
 	}
 
 	// getById

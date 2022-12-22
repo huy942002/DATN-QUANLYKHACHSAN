@@ -85,22 +85,58 @@ const slice = createSlice({
             state.loading = true;
         });
         builder.addCase(getAllBill.fulfilled, (state, action) => {
-            const now = new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000)
-                .toISOString()
-                .replace('T', ' ')
-                .slice(0, 10);
             state.loading = false;
             state.bills = action.payload;
-            const t1 = state.bills.filter((x) => x.hireDate >= `${now} 00:00` && x.hireDate <= `${now} 04:00`).length;
-            const t2 = state.bills.filter((x) => x.hireDate >= `${now} 04:00` && x.hireDate <= `${now} 06:00`).length;
-            const t3 = state.bills.filter((x) => x.hireDate >= `${now} 06:00` && x.hireDate <= `${now} 08:00`).length;
-            const t4 = state.bills.filter((x) => x.hireDate >= `${now} 08:00` && x.hireDate <= `${now} 10:00`).length;
-            const t5 = state.bills.filter((x) => x.hireDate >= `${now} 10:00` && x.hireDate <= `${now} 12:00`).length;
-            const t6 = state.bills.filter((x) => x.hireDate >= `${now} 12:00` && x.hireDate <= `${now} 14:00`).length;
-            const t7 = state.bills.filter((x) => x.hireDate >= `${now} 14:00` && x.hireDate <= `${now} 16:00`).length;
-            const t8 = state.bills.filter((x) => x.hireDate >= `${now} 16:00` && x.hireDate <= `${now} 18:00`).length;
-            const t9 = state.bills.filter((x) => x.hireDate >= `${now} 18:00` && x.hireDate <= `${now} 20:00`).length;
-            const t10 = state.bills.filter((x) => x.hireDate >= `${now} 20:00` && x.hireDate <= `${now} 23:59`).length;
+            const t1 = state.bills.filter(
+                (x) =>
+                    x.hireDate >= `${x.hireDate.slice(0, 10)} 00:00` &&
+                    x.hireDate <= `${x.hireDate.slice(0, 10)} 04:00`,
+            ).length;
+            const t2 = state.bills.filter(
+                (x) =>
+                    x.hireDate >= `${x.hireDate.slice(0, 10)} 04:00` &&
+                    x.hireDate <= `${x.hireDate.slice(0, 10)} 06:00`,
+            ).length;
+            const t3 = state.bills.filter(
+                (x) =>
+                    x.hireDate >= `${x.hireDate.slice(0, 10)} 06:00` &&
+                    x.hireDate <= `${x.hireDate.slice(0, 10)} 08:00`,
+            ).length;
+            const t4 = state.bills.filter(
+                (x) =>
+                    x.hireDate >= `${x.hireDate.slice(0, 10)} 08:00` &&
+                    x.hireDate <= `${x.hireDate.slice(0, 10)} 10:00`,
+            ).length;
+            const t5 = state.bills.filter(
+                (x) =>
+                    x.hireDate >= `${x.hireDate.slice(0, 10)} 10:00` &&
+                    x.hireDate <= `${x.hireDate.slice(0, 10)} 12:00`,
+            ).length;
+            const t6 = state.bills.filter(
+                (x) =>
+                    x.hireDate >= `${x.hireDate.slice(0, 10)} 12:00` &&
+                    x.hireDate <= `${x.hireDate.slice(0, 10)} 14:00`,
+            ).length;
+            const t7 = state.bills.filter(
+                (x) =>
+                    x.hireDate >= `${x.hireDate.slice(0, 10)} 14:00` &&
+                    x.hireDate <= `${x.hireDate.slice(0, 10)} 16:00`,
+            ).length;
+            const t8 = state.bills.filter(
+                (x) =>
+                    x.hireDate >= `${x.hireDate.slice(0, 10)} 16:00` &&
+                    x.hireDate <= `${x.hireDate.slice(0, 10)} 18:00`,
+            ).length;
+            const t9 = state.bills.filter(
+                (x) =>
+                    x.hireDate >= `${x.hireDate.slice(0, 10)} 18:00` &&
+                    x.hireDate <= `${x.hireDate.slice(0, 10)} 20:00`,
+            ).length;
+            const t10 = state.bills.filter(
+                (x) =>
+                    x.hireDate >= `${x.hireDate.slice(0, 10)} 20:00` &&
+                    x.hireDate <= `${x.hireDate.slice(0, 10)} 23:59`,
+            ).length;
             state.byRangeHourseData[0].quantity = t1;
             state.byRangeHourseData[1].quantity = t2;
             state.byRangeHourseData[2].quantity = t3;

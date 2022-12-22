@@ -20,6 +20,10 @@ export const add = createAsyncThunk('KindOfRoom/add', (data) => {
     return http.httpPost('kind-of-room', data);
 });
 
+export const upload = createAsyncThunk('KindOfRoom/upload', (data) => {
+    return http.httpPost(`kind-of-room/upload/`, data);
+});
+
 // Slice
 const slice = createSlice({
     name: 'kindOfRoom',

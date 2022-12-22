@@ -1,17 +1,18 @@
 import { Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 
-import { faFileExcel, faMagnifyingGlass, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faFileArrowUp, faFileExcel, faMagnifyingGlass, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { toast } from 'react-toastify';
 import ReactPaginate from 'react-paginate';
 import { downloadExcel } from 'react-export-table-to-excel';
+import * as xlsx from 'xlsx';
 
 import { Button, Modal } from 'flowbite-react';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getAllService, getServiceById, update, add } from '~/app/reducers/service';
+import { getAllService, getServiceById, update, add, upload } from '~/app/reducers/service';
 import { getAllServiceType } from '~/app/reducers/serviceType';
 
 const objService = {
@@ -22,7 +23,7 @@ const objService = {
     serviceType: '',
 };
 
-const regexSpace = /^(\S+$)/;
+const regexSpace = /^[^\s]+(\s+[^\s]+)*$/;
 
 const header = ['ID', 'Tên dịch vụ', 'Giá', 'Ghi chú', 'Trạng thái'];
 
@@ -40,6 +41,7 @@ function Services() {
     const [visibleAdd, setVisibleAdd] = useState(false);
     const [service, setService] = useState(objService);
     const [valueSearch, setValueSearch] = useState('');
+    const [excelData, setExcelData] = useState([]);
     const services = useSelector((state) => state.service.services);
     const servic = useSelector((state) => state.service.service);
     const serviceType = useSelector((state) => state.serviceType.serviceTypes);
@@ -123,13 +125,24 @@ function Services() {
         });
     }
 
+    const readExcel = async (e) => {
+        const file = e.target.files[0];
+        const data = await file.arrayBuffer(file);
+        const excelfile = xlsx.read(data);
+        const excelsheet = excelfile.Sheets[excelfile.SheetNames[0]];
+        const exceljson = xlsx.utils.sheet_to_json(excelsheet);
+        setExcelData(exceljson);
+        console.log(exceljson);
+        dispatch(upload(exceljson));
+    };
+
     return (
         <div>
             <div className="grid grid-cols-6">
                 <div className="col-start-1 flex justify-center items-center">
                     <p>Tìm kiếm dịch vụ</p>
                 </div>
-                <div className="col-start-2 col-end-5">
+                <div className="col-start-2 col-end-4">
                     <div className="relative">
                         <div className="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
                             <FontAwesomeIcon icon={faMagnifyingGlass} />
@@ -142,7 +155,7 @@ function Services() {
                         />
                     </div>
                 </div>
-                <div className="col-start-5 flex justify-center items-center">
+                <div className="col-start-4 flex justify-center items-center">
                     <button
                         type="button"
                         onClick={() => {
@@ -162,6 +175,22 @@ function Services() {
                         <FontAwesomeIcon className="mr-2" icon={faFileExcel} />
                         Export
                     </button>
+                </div>
+                <div>
+                    <label
+                        className="upload-btn-wrapper py-2 px-3 text-sm font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+                        htmlFor="upload"
+                    >
+                        <FontAwesomeIcon className="mr-2" icon={faFileArrowUp} />
+                        Import
+                    </label>
+                    <input
+                        type="file"
+                        id="upload"
+                        hidden
+                        className="py-2 px-3 text-sm font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+                        onChange={(e) => readExcel(e)}
+                    />
                 </div>
             </div>
             <div className="mt-4 p-2">

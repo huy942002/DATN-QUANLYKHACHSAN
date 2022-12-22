@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllBill, getAllRoom } from '~/app/reducers/chart';
+import { getAllDetailsInvoice } from '~/app/reducers/detailsInvoice';
 import { getAllService } from '~/app/reducers/service';
+import { getAllServiceDetail } from '~/app/reducers/serviceDetail';
 import BarChart from '~/components/BarChart';
 
 const now = new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000)
@@ -40,8 +42,8 @@ function Chart() {
     useEffect(() => {
         dispatch(getAllRoom());
         dispatch(getAllBill());
-        dispatch(getAllService());
-        dispatch(getAllRoom());
+        dispatch(getAllServiceDetail());
+        dispatch(getAllDetailsInvoice());
         // eslint-disable-next-line
     }, []);
     useEffect(() => {

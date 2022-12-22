@@ -1,7 +1,7 @@
 import { Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 
-import { faFileExcel, faMagnifyingGlass, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faFileArrowUp, faFileExcel, faMagnifyingGlass, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Modal } from 'flowbite-react';
 import { useEffect, useRef, useState } from 'react';
@@ -10,8 +10,9 @@ import ReactPaginate from 'react-paginate';
 
 import { toast } from 'react-toastify';
 import { downloadExcel } from 'react-export-table-to-excel';
+import * as xlsx from 'xlsx';
 
-import { add, getAllKindOfRoom, getKindOfRoomById, update } from '~/app/reducers/kindOfRoom';
+import { add, getAllKindOfRoom, getKindOfRoomById, update, upload } from '~/app/reducers/kindOfRoom';
 
 const objKindOfRoom = {
     name: '',
@@ -21,7 +22,7 @@ const objKindOfRoom = {
     status: '',
 };
 
-const header = ['ID', 'Tên loại phòng', 'Ghi chú', 'Giá theo giờ', 'Giá theo ngày', 'Trạng thái'];
+const header = ['id', 'name', 'note', 'priceByDay', 'hourlyPrice', 'status'];
 
 const regexSpace = /^[^\s]+(\s+[^\s]+)*$/;
 
@@ -39,6 +40,7 @@ function KindOfRoomManage() {
     const [visibleAddType, setVisibleAddType] = useState(false);
     const [valueSearch, setValueSearch] = useState('');
     const [kindOfRooms, setKindOfRoom] = useState(objKindOfRoom);
+    const [excelData, setExcelData] = useState([]);
     const kindOfRoom = useSelector((state) => state.kindOfRoom.kindOfRoom);
     const kindRoom = useSelector((state) => state.kindOfRoom.kindRoom);
     const dispatch = useDispatch();
@@ -112,13 +114,23 @@ function KindOfRoomManage() {
         });
     }
 
+    const readExcel = async (e) => {
+        const file = e.target.files[0];
+        const data = await file.arrayBuffer(file);
+        const excelfile = xlsx.read(data);
+        const excelsheet = excelfile.Sheets[excelfile.SheetNames[0]];
+        const exceljson = xlsx.utils.sheet_to_json(excelsheet);
+        setExcelData(exceljson);
+        dispatch(upload(exceljson));
+    };
+
     return (
         <div>
             <div className="grid grid-cols-6">
                 <div className="col-start-1 flex justify-center items-center">
                     <p>Tìm kiếm loại phòng</p>
                 </div>
-                <div className="col-start-2 col-end-5">
+                <div className="col-start-2 col-end-4">
                     <div className="relative">
                         <div className="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
                             <FontAwesomeIcon icon={faMagnifyingGlass} />
@@ -131,7 +143,7 @@ function KindOfRoomManage() {
                         />
                     </div>
                 </div>
-                <div className="col-start-5 flex justify-center items-center">
+                <div className="col-start-4 flex justify-center items-center">
                     <button
                         type="button"
                         onClick={() => {
@@ -151,6 +163,22 @@ function KindOfRoomManage() {
                         <FontAwesomeIcon className="mr-2" icon={faFileExcel} />
                         Export
                     </button>
+                </div>
+                <div>
+                    <label
+                        className="upload-btn-wrapper py-2 px-3 text-sm font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+                        htmlFor="upload"
+                    >
+                        <FontAwesomeIcon className="mr-2" icon={faFileArrowUp} />
+                        Import
+                    </label>
+                    <input
+                        type="file"
+                        id="upload"
+                        hidden
+                        className="py-2 px-3 text-sm font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+                        onChange={(e) => readExcel(e)}
+                    />
                 </div>
             </div>
             <div className="mt-4 p-2">
@@ -179,7 +207,7 @@ function KindOfRoomManage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {kindOfRoom
+                            {currentItems
                                 .filter((x) => x.name.toLowerCase().includes(valueSearch))
                                 .map((x) => (
                                     <tr className="bg-white dark:bg-gray-800" key={x.id}>

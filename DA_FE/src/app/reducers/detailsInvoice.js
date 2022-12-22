@@ -21,12 +21,13 @@ const slice = createSlice({
         // getAllDetailsInvoice
         builder.addCase(getAllDetailsInvoice.pending, (state) => {
             state.loading = true;
+            state.totalRoomPrice = 0;
         });
         builder.addCase(getAllDetailsInvoice.fulfilled, (state, action) => {
             state.loading = false;
-            state.detailsInvoice = action.payload.filter((x) => x.status === 1);
-            state.detailsInvoice
-                .filter((x) => x.bills.status === 1)
+            state.detailsInvoices = action.payload.filter((x) => x.status === 2);
+            state.detailsInvoices
+                .filter((x) => x.bills.status === 2)
                 .map((x) => {
                     x.rentalTypes.id === 1
                         ? (state.totalRoomPrice += x.rooms.kindOfRoom.priceByDay)

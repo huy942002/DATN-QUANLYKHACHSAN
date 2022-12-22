@@ -278,9 +278,6 @@ function CustomerManage() {
                                     Avatar
                                 </th>
                                 <th scope="col" className="py-3 px-6">
-                                    Username
-                                </th>
-                                <th scope="col" className="py-3 px-6">
                                     Email
                                 </th>
                                 <th scope="col" className="py-3 px-6">
@@ -305,13 +302,12 @@ function CustomerManage() {
                         </thead>
                         <tbody>
                             {currentItems
-                                .filter((x) => x.users.username.toLowerCase().includes(valueSearch))
+                                .filter((x) => x.fullname.toLowerCase().includes(valueSearch))
                                 .map((x) => (
                                     <tr className="bg-white dark:bg-gray-800" key={x.id}>
                                         <td className="py-4 px-6">
                                             <img src={x.img} alt={x.fullname} className="rounded-sm" width={50} />
                                         </td>
-                                        <td className="py-4 px-6">{x.users.username}</td>
                                         <td className="py-4 px-6">{x.email}</td>
                                         <td className="py-4 px-6">{x.address}</td>
                                         <td className="py-4 px-6">{x.gender}</td>

@@ -20,7 +20,9 @@ export const add = createAsyncThunk('service/add', (data) => {
     return http.httpPost('service', data);
 });
 
-
+export const upload = createAsyncThunk('service/upload', (data) => {
+    return http.httpPost(`service/upload/`, data);
+});
 
 // Slice
 const slice = createSlice({
@@ -78,7 +80,6 @@ const slice = createSlice({
             state.loading = false;
             state.error = action.error.message;
         });
-
 
         builder.addCase(add.pending, (state) => {
             state.loading = true;

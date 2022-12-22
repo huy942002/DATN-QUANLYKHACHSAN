@@ -5,13 +5,26 @@ import config from '~/config';
 
 import authorServices from '~/services/authorServices';
 import { downloadExcel } from 'react-export-table-to-excel';
+import * as xlsx from 'xlsx';
 
-import { faChevronRight, faPlus, faMagnifyingGlass, faFileExcel } from '@fortawesome/free-solid-svg-icons';
+import {
+    faChevronRight,
+    faPlus,
+    faMagnifyingGlass,
+    faFileExcel,
+    faFileArrowUp,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Modal } from 'flowbite-react';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getAllNumberOfFloors, getByIdNumberOfFloors, update, AddNBF as add } from '~/app/reducers/numberOfFloor';
+import {
+    getAllNumberOfFloors,
+    getByIdNumberOfFloors,
+    update,
+    AddNBF as add,
+    upload,
+} from '~/app/reducers/numberOfFloor';
 import { toast } from 'react-toastify';
 import ReactPaginate from 'react-paginate';
 
@@ -25,7 +38,7 @@ const FloorSchema = Yup.object().shape({
     status: Yup.string().nullable(),
 });
 
-const header = ['ID', 'Tầng', 'Trạng thái'];
+const header = ['id', 'numberOfFloors', 'status'];
 
 function NumberOfFloors() {
     const [visibleDeleteFloor, setVisibleDeleteFloor] = useState(false);
@@ -36,6 +49,7 @@ function NumberOfFloors() {
     const [numberOfFloors, setNumberOfFloors] = useState(objNumberOfFloor);
     const numberOfFloorss = useSelector((state) => state.numberOfFloor.numberOfFloors);
     const numberOfFloor = useSelector((state) => state.numberOfFloor.NumberOfFloor);
+    const [excelData, setExcelData] = useState([]);
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -52,7 +66,7 @@ function NumberOfFloors() {
     // Simulate fetching items from another resources.
     // (This could be items from props; or items loaded in a local state
     // from an API endpoint with useEffect and useState)
-    const itemsPerPage = 4;
+    const itemsPerPage = 5;
     const endOffset = itemOffset + itemsPerPage;
     const currentItems = numberOfFloorss.slice(itemOffset, endOffset);
     const pageCount = Math.ceil(numberOfFloorss.length / itemsPerPage);
@@ -112,6 +126,16 @@ function NumberOfFloors() {
         });
     }
 
+    const readExcel = async (e) => {
+        const file = e.target.files[0];
+        const data = await file.arrayBuffer(file);
+        const excelfile = xlsx.read(data);
+        const excelsheet = excelfile.Sheets[excelfile.SheetNames[0]];
+        const exceljson = xlsx.utils.sheet_to_json(excelsheet);
+        setExcelData(exceljson);
+        dispatch(upload(exceljson));
+    };
+
     return (
         <div className="text-black pt-6 px-1 pb-5">
             <nav className="flex" aria-label="Breadcrumb">
@@ -132,7 +156,6 @@ function NumberOfFloors() {
                     </li>
                 </ol>
             </nav>
-
             <div className="grid grid-cols-6 gap-3 pt-8 px-3">
                 <div className="col-start-1 col-end-7">
                     <hr />
@@ -140,7 +163,7 @@ function NumberOfFloors() {
                 <div className="col-start-1 flex justify-center items-center">
                     <p>Tìm kiếm tầng</p>
                 </div>
-                <div className="col-start-2 col-end-5">
+                <div className="col-start-2 col-end-4">
                     <div className="relative">
                         <div className="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
                             <FontAwesomeIcon icon={faMagnifyingGlass} />
@@ -154,7 +177,7 @@ function NumberOfFloors() {
                         />
                     </div>
                 </div>
-                <div className="col-start-5 flex justify-center items-center">
+                <div className="col-start-4 flex justify-center items-center">
                     <button
                         type="button"
                         onClick={() => {
@@ -174,6 +197,22 @@ function NumberOfFloors() {
                         <FontAwesomeIcon className="mr-2" icon={faFileExcel} />
                         Export
                     </button>
+                </div>
+                <div>
+                    <label
+                        className="upload-btn-wrapper py-2 px-3 text-sm font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+                        htmlFor="upload"
+                    >
+                        <FontAwesomeIcon className="mr-2" icon={faFileArrowUp} />
+                        Import
+                    </label>
+                    <input
+                        type="file"
+                        id="upload"
+                        hidden
+                        className="py-2 px-3 text-sm font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+                        onChange={(e) => readExcel(e)}
+                    />
                 </div>
             </div>
             <div className="mt-4 p-2">

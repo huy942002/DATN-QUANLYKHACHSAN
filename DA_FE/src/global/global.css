@@ -96,3 +96,14 @@
     color: #ffffff;
     background: #00b96b;
 }
+
+/* custom file upload */
+.upload-btn-wrapper {
+    display: inline-block;
+    /* background-color: indigo; */
+    /* color: white; */
+    /* padding: 0.7rem; */
+    /* font-family: sans-serif; */
+    /* border-radius: 0.3rem; */
+    cursor: pointer;
+}

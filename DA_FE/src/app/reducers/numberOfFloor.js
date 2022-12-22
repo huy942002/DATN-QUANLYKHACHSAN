@@ -28,6 +28,10 @@ export const update = createAsyncThunk('number-of-floor/update', (data) => {
     return http.httpPut(`number-of-floor/${data.id}`, data);
 });
 
+export const upload = createAsyncThunk('numberOfFloors/upload', (data) => {
+    return http.httpPost(`number-of-floor/upload/`, data);
+});
+
 // Slice
 const slice = createSlice({
     name: 'numberOfFloor',

@@ -13,6 +13,8 @@ import com.fpoly.dto.KindOfRoomAndImageRequestDTO;
 import com.fpoly.entities.ImageKindOfRoom;
 import com.fpoly.repositories.imp.IImageKindOfRoomServiceImp;
 import com.fpoly.repositories.repo.ImageKindOfRoomRepository;
+import com.fpoly.repositories.repo.KindOfRoomRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fpoly.entities.KindOfRoom;
+import com.fpoly.entities.NumberOfFloors;
 import com.fpoly.repositories.irepo.IKindOfRoomService;
 
 /**
@@ -48,6 +51,9 @@ public class KindOfRoomController {
 
 	@Autowired
 	ImageKindOfRoomRepository imageKindOfRoomRepository;
+	
+	@Autowired
+	KindOfRoomRepository kindRoomRepo;
 
 	// getAll
 	@GetMapping
@@ -59,6 +65,13 @@ public class KindOfRoomController {
 	@PostMapping
 	public ResponseEntity<KindOfRoom> createNewKindOfRoom(@RequestBody KindOfRoom kind) {
 		return new ResponseEntity<>(repository.save(kind), HttpStatus.OK);
+	}
+	
+	// upload
+	@Transactional
+	@PostMapping("/upload")
+	public ResponseEntity<List<KindOfRoom>> uploadKindOfRoom(@RequestBody List<KindOfRoom> kindRoom) {
+		return new ResponseEntity<>(kindRoomRepo.saveAll(kindRoom),HttpStatus.OK);
 	}
 
 	// getById

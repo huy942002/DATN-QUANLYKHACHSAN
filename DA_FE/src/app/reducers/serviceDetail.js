@@ -24,9 +24,9 @@ const slice = createSlice({
         });
         builder.addCase(getAllServiceDetail.fulfilled, (state, action) => {
             state.loading = false;
-            state.serviceDetails = action.payload.filter((x) => x.status === 1);
+            state.serviceDetails = action.payload.filter((x) => x.status === 2);
             state.serviceDetails
-                .filter((x) => x.detailsInvoice.id === 1)
+                .filter((x) => x.detailsInvoice.id === 2)
                 .map((x) => (state.totalMoneyService += x.servicess.prices));
             state.error = '';
         });

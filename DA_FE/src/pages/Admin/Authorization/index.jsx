@@ -5,6 +5,7 @@ import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { toast } from 'react-toastify';
+import authorServices from '~/services/authorServices';
 
 import { Button, Modal } from 'flowbite-react';
 import { useEffect, useState } from 'react';
@@ -56,12 +57,18 @@ function Authorization() {
     const authorities = useSelector((state) => state.authority.authorities);
     const dispatch = useDispatch();
 
+    const [currentUser, setCurrentUser] = useState();
+
     useEffect(() => {
         dispatch(getAllPersonnel());
         dispatch(getAllAuthority());
         setPerson(personnel);
         // eslint-disable-next-line
     }, [personnel]);
+
+    useEffect(() => {
+        authorServices.currentUser().then((res) => setCurrentUser(res));
+    }, []);
 
     function getIdAdmin(id, e, idUser) {
         const Auth = authorities.find((x) => x.users.id === idUser);
@@ -159,7 +166,7 @@ function Authorization() {
                     <li>
                         <div className="flex items-center">
                             <FontAwesomeIcon icon={faChevronRight} />
-                            <span className="px-2">Phân quyền nhân viên</span>
+                            <span className="px-2">Phân quyền nhân viên {currentUser?.users.username}</span>
                         </div>
                     </li>
                 </ol>
@@ -186,7 +193,16 @@ function Authorization() {
                         <tbody>
                             {personnels.map((x) => (
                                 <tr className="bg-white dark:bg-gray-800" key={x.id}>
-                                    <td className="py-4 px-6">{x.fullname}</td>
+                                    <td className="py-4 px-6">
+                                        {x.fullname}
+                                        {x.users?.username === currentUser?.users.username ? (
+                                            <span className="ml-2 bg-green-100 text-green-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-green-200 dark:text-green-900">
+                                                Hiện tại
+                                            </span>
+                                        ) : (
+                                            ''
+                                        )}
+                                    </td>
                                     <td className="py-4 px-6 text-center">
                                         <input
                                             role="button"

@@ -21,7 +21,7 @@ const objServiceType = {
 
 const header = ['ID', 'Tên loại dịch vụ', 'Ghi chú', 'Trạng thái'];
 
-const regexSpace = /^(\S+$)/;
+const regexSpace = /^[^\s]+(\s+[^\s]+)*$/;
 
 const ServiceTypeSchema = Yup.object().shape({
     name: Yup.string().matches(regexSpace, 'Không chỉ để khoảng trắng').required('Loại dịch vụ không được để trống'),
