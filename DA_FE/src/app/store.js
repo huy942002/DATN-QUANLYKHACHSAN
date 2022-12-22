@@ -25,6 +25,8 @@ import serviceDetail from './reducers/serviceDetail';
 import booking from './reducers/booking';
 import facilityy from './reducers/facility';
 import detailsInvoice from './reducers/detailsInvoice';
+import bill from './reducers/bill';
+import paymenttype from './reducers/paymenttype';
 
 const reducer = combineReducers({
     // here we will be adding reducers
@@ -51,6 +53,8 @@ const reducer = combineReducers({
     serviceDetail: serviceDetail,
     booking: booking,
     facilityy: facilityy,
+    bill: bill,
+    paymenttype: paymenttype,
 });
 const store = configureStore({
     reducer,

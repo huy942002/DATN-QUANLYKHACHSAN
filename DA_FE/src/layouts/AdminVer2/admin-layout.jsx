@@ -173,7 +173,7 @@ const AdminLayout = ({ children }) => {
                                     key: '9',
                                     // icon: <UploadOutlined />,
                                     label: 'Hóa đơn',
-                                    // onClick: () => setCollapsed(!collapsed),
+                                    onClick: () => navigate('/admin/bill-manage'),
                                 },
                             ],
                         },

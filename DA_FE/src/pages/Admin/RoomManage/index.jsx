@@ -18,6 +18,8 @@ import { Button, Modal, Label, FileInput } from 'flowbite-react';
 import { getByRoomId, fddeleteById, add } from '~/app/reducers/facilityDetail';
 import { getAllService } from '~/app/reducers/service';
 
+import ReactPaginate from 'react-paginate';
+
 import axios from 'axios';
 
 const objRoom = {
@@ -148,6 +150,16 @@ function RoomManage() {
     const [image2, setImage2] = useState('');
     const [image3, setImage3] = useState('');
     const [Err2, setErr2] = useState('');
+    const [itemOffset, setItemOffset] = useState(0);
+    const itemsPerPage = 7;
+    const endOffset = itemOffset + itemsPerPage;
+    const currentItems = rooms.slice(itemOffset, endOffset);
+    const pageCount = Math.ceil(rooms.length / itemsPerPage);
+
+    const handlePageClick = (event) => {
+        const newOffset = (event.selected * itemsPerPage) % rooms.length;
+        setItemOffset(newOffset);
+    };
 
     const dispatch = useDispatch();
 
@@ -536,7 +548,7 @@ function RoomManage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {rooms
+                            {currentItems
                                 .filter((x) => (x.kindOfRoom.id + '').toLowerCase().includes(valueSearch1))
                                 .filter((x) =>
                                     (x.numberOfFloors.numberOfFloors + '').toLowerCase().includes(valueSearch),
@@ -609,6 +621,20 @@ function RoomManage() {
                                 ))}
                         </tbody>
                     </table>
+                    <ReactPaginate
+                        breakLabel="..."
+                        nextLabel=">> Next"
+                        onPageChange={handlePageClick}
+                        pageRangeDisplayed={7}
+                        pageCount={pageCount}
+                        previousLabel="Prev <<"
+                        renderOnZeroPageCount={null}
+                        containerClassName="pagination"
+                        pageLinkClassName="page-num"
+                        previousLinkClassName="page-num"
+                        nextLinkClassName="page-num"
+                        activeLinkClassName="active-num"
+                    />
                     {/* Modal delete */}
                     <Modal show={visibleDelete} size="md" popup={true} onClose={() => setVisibleDelete(false)}>
                         <Modal.Header />

@@ -32,6 +32,7 @@ import Booking from '~/pages/Home/booking';
 import Facilities from '~/pages/Admin/FacilityManage';
 import KindOfRoomManageVer2 from '~/pages/Admin/KindOfRoomManageVer2/kindOfRoomManage';
 import DetailKindOfRoom from '~/pages/Admin/KindOfRoomManageVer2/detailKindOfRoom';
+import BillManage from '~/pages/Admin/BillManage';
 
 // Routes public
 
@@ -71,6 +72,7 @@ const privateRoutes = [
     { path: config.routes.kindOfRoomVer2, component: KindOfRoomManageVer2 },
     { path: config.routes.createKindOfRoom, component: DetailKindOfRoom },
     { path: config.routes.detailKindOfRoom, component: DetailKindOfRoom },
+    { path: config.routes.billmanage, component: BillManage },
 ];
 
 const privateRoutesDirect = [
