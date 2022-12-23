@@ -139,6 +139,8 @@ function CreateOptionRoomManager() {
         setErr5('');
         let formIsValid = true;
         var mobPattern = /^[1-9]/;
+        var regexSpace = /^[^\s]+(\s+[^\s]+)*$/;
+        var mobPattern2 = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
         if (!SLP) {
             formIsValid = false;
             setErr("Number of rooms you want to create is required.");
@@ -150,6 +152,12 @@ function CreateOptionRoomManager() {
         if (!NameRoom) {
             formIsValid = false;
             setErr2("Name is required.");
+        }else if (mobPattern2.test(NameRoom)) {
+            formIsValid = false;
+            setErr2("Invalid Name of rooms you want to create is required.");
+        }else if (!regexSpace.test(NameRoom)) {
+            formIsValid = false;
+            setErr2("Invalid Name of rooms you want to create is required.");
         }
         if (!image) {
             formIsValid = false;

@@ -83,10 +83,18 @@ function CreateRoomManager() {
         setErr3('');
         setErr4('');
         setErr5('');
+        var regexSpace = /^[^\s]+(\s+[^\s]+)*$/;
+        var mobPattern = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
         let formIsValid = true;
         if (!NameRoom) {
             formIsValid = false;
             setErr2("Name is required.");
+        }else if (mobPattern.test(NameRoom)) {
+            formIsValid = false;
+            setErr2("Invalid Name of rooms you want to create is required.");
+        }else if (!regexSpace.test(NameRoom)) {
+            formIsValid = false;
+            setErr2("Invalid Name of rooms you want to create is required.");
         }
         if (!image) {
             formIsValid = false;
