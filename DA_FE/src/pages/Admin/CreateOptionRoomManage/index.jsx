@@ -150,7 +150,7 @@ function CreateOptionRoomManager() {
             setErr("Invalid Number of rooms you want to create is required.");
         }
         if (!NameRoom) {
-            formIsValid = false;
+                formIsValid = false;
             setErr2("Name is required.");
         }else if (mobPattern2.test(NameRoom)) {
             formIsValid = false;
